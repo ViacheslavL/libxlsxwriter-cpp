@@ -10,7 +10,12 @@
 #include "xlsxwriter/xmlwriter.h"
 #include "xlsxwriter/chart.h"
 #include "xlsxwriter/utility.h"
-#include "math.h"
+#include <math.h>
+
+#ifndef NAN
+#define NAN (0./0.)
+#define isnan(x) ((x)!=(x))
+#endif 
 
 /*
  * Forward declarations.
@@ -146,7 +151,7 @@ lxw_chart_new(uint8_t type)
     GOTO_LABEL_ON_MEM_ERROR(chart->x_axis->title.range, mem_error);
 
     chart->y_axis->min_value = NAN;
-    chart->y_axis->max_value = NAN;    
+    chart->y_axis->max_value = NAN;
     chart->y_axis->title.range = calloc(1, sizeof(lxw_series_range));
     GOTO_LABEL_ON_MEM_ERROR(chart->y_axis->title.range, mem_error);
 
