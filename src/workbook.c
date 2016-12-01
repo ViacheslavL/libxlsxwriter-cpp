@@ -795,8 +795,22 @@ _add_chart_cache_data(lxw_workbook *self)
 {
     lxw_chart *chart;
     lxw_chart_series *series;
+    
+    struct lxw_charts *charts;
+
+    charts = calloc(1, sizeof(struct lxw_charts));    
+    STAILQ_INIT(charts);
 
     STAILQ_FOREACH(chart, self->ordered_charts, ordered_list_pointers) {
+        STAILQ_INSERT_TAIL(charts, chart, list_pointers);
+        if (chart->combined)
+            STAILQ_INSERT_TAIL(charts, chart->combined, list_pointers);
+    }
+
+    STAILQ_FOREACH(chart, charts, ordered_list_pointers) {
+        
+
+   /* STAILQ_FOREACH(chart, self->ordered_charts, ordered_list_pointers) {*/
 
         _populate_range(self, chart->title.range);
         _populate_range(self, chart->x_axis->title.range);
@@ -811,6 +825,7 @@ _add_chart_cache_data(lxw_workbook *self)
             _populate_range(self, series->title.range);
         }
     }
+    free(charts);
 }
 
 /*

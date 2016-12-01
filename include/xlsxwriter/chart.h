@@ -75,6 +75,7 @@
 #include <string.h>
 
 #include "common.h"
+#include "shape.h"
 
 STAILQ_HEAD(lxw_chart_series_list, lxw_chart_series);
 STAILQ_HEAD(lxw_series_data_points, lxw_series_data_point);
@@ -174,6 +175,23 @@ enum lxw_chart_positions {
     LXW_CHART_BOTTOM
 };
 
+enum lxw_marker_types {
+    LXW_MARKER_NONE = 0,
+    LXW_MARKER_AUTOMATIC,
+    LXW_MARKER_SQUARE,
+    LXW_MARKER_DIAMOND,
+    LXW_MARKER_TRIANGLE,
+    LXW_MARKER_X,
+    LXW_MARKER_STAR,
+    LXW_MARKER_DOT,
+    LXW_MARKER_SHORT_DASH,
+    LXW_MARKER_DASH,
+    LXW_MARKER_LONG_DASH,
+    LXW_MARKER_CIRCLE,
+    LXW_MARKER_PLUS,
+    LXW_MARKER_PICTURE
+};
+
 typedef struct lxw_series_range {
     char *formula;
     char *sheetname;
@@ -223,6 +241,11 @@ typedef struct lxw_chart_title {
 
 } lxw_chart_title;
 
+typedef struct lxw_marker {
+    uint8_t marker_type;
+    lxw_shape_properties properties;
+} lxw_marker;
+
 /**
  * @brief Struct to represent an Excel chart data series.
  *
@@ -235,8 +258,13 @@ typedef struct lxw_chart_series {
     lxw_series_range *categories;
     lxw_series_range *values;
     lxw_chart_title title;
+    lxw_shape_properties properties;
+    lxw_marker marker;
+    uint8_t x2_axis;
+    uint8_t y2_axis;
 
     STAILQ_ENTRY (lxw_chart_series) list_pointers;
+    STAILQ_ENTRY (lxw_chart_series) expose_query;
 
 } lxw_chart_series;
 
@@ -249,8 +277,9 @@ typedef struct lxw_chart_axis {
 
     lxw_chart_title title;
 
-    char num_format[LXW_CHART_NUM_FORMAT_LEN];
+    char num_format[LXW_CHART_NUM_FORMAT_LEN];    
     char default_num_format[LXW_CHART_NUM_FORMAT_LEN];
+    char crossing[LXW_CHART_NUM_FORMAT_LEN];
 
     uint8_t default_major_gridlines;
     uint8_t major_tick_mark;
@@ -258,7 +287,15 @@ typedef struct lxw_chart_axis {
     double min_value;
     double max_value;
 
+    uint8_t position;
+    uint8_t visible;
+
 } lxw_chart_axis;
+
+typedef struct lxw_series_options {
+    uint8_t x2_axis;
+    uint8_t y2_axis;
+} lxw_series_options;
 
 /**
  * @brief Struct to represent an Excel chart.
@@ -274,7 +311,7 @@ typedef struct lxw_chart {
     uint8_t subtype;
     uint16_t series_index;
 
-    void (*write_chart_type) (struct lxw_chart *);
+    void(*write_chart_type) (struct lxw_chart *, uint8_t primary_axes);
     void (*write_plot_area) (struct lxw_chart *);
 
     /**
@@ -289,6 +326,10 @@ typedef struct lxw_chart {
      */
     lxw_chart_axis *y_axis;
 
+    lxw_chart_axis *x2_axis;
+
+    lxw_chart_axis *y2_axis;
+
     lxw_chart_title title;
 
     uint32_t id;
@@ -298,7 +339,7 @@ typedef struct lxw_chart {
     uint32_t axis_id_4;
 
     uint8_t in_use;
-    uint8_t is_scatter;
+    uint8_t is_scatter;    
     uint8_t cat_has_num_fmt;
 
     uint8_t has_horiz_cat_axis;
@@ -318,6 +359,8 @@ typedef struct lxw_chart {
     uint8_t cat_axis_position;
     uint8_t val_axis_position;
 	uint8_t legend_position;
+    uint8_t is_secondary;
+    struct lxw_chart* combined;
 
     struct lxw_chart_series_list *series_list;
 
@@ -334,6 +377,8 @@ extern "C" {
 /* *INDENT-ON* */
 
 lxw_chart *lxw_chart_new(uint8_t type);
+lxw_chart_axis *lxw_axis_new();
+void lxw_axis_free(lxw_chart_axis *axis);
 void lxw_chart_free(lxw_chart *chart);
 void lxw_chart_assemble_xml_file(lxw_chart *chart);
 
@@ -418,6 +463,13 @@ void lxw_chart_assemble_xml_file(lxw_chart *chart);
 lxw_chart_series *chart_add_series(lxw_chart *chart,
                                    const char *categories,
                                    const char *values);
+
+lxw_chart_series *chart_add_series_opt(lxw_chart *chart,
+                                   const char *categories,
+                                   const char *values,
+                                   lxw_series_options *options);
+
+void chart_set_y2_axis(lxw_chart *chart, lxw_chart_axis *axis);
 
 /**
  * @brief Set a series "categories" range using row and column values.
@@ -589,6 +641,8 @@ void chart_axis_set_name_range(lxw_chart_axis *axis, const char *sheetname,
  * @param format   Format for axis's values 
  */
 void chart_axis_set_format(lxw_chart_axis *axis, const char* format);
+
+void chart_axis_set_crossing(lxw_chart_axis *axis, const char* crossing);
 
 /**
  * @brief Set the title of the chart.
