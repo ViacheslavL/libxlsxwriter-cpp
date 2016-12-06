@@ -1,6 +1,5 @@
-add_library(lxw_tmpfileplus tmpfileplus.c)
+add_library(lxw_tmpfileplus OBJECT tmpfileplus.c)
 
-install(TARGETS lxw_tmpfileplus
-    INCLUDES DESTINATION include
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
+set_property(GLOBAL APPEND
+    PROPERTY lxw_third_party_objects
+    $<TARGET_OBJECTS:lxw_tmpfileplus>)
