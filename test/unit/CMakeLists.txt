@@ -101,9 +101,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
 
 add_executable(test_all test_all.c ${test_sources})
 
-set(test_libs xlsxwriter_test zip ioapi ${ZLIB_LIBRARIES})
+set(test_libs xlsxwriter_test lxw_zip lxw_ioapi ${ZLIB_LIBRARIES})
 if (NOT USE_STANDARD_TMP_FILE)
-    list(APPEND test_libs tmpfileplus)
+    list(APPEND test_libs lxw_tmpfileplus)
 endif()
 target_link_libraries(test_all ${test_libs})
 

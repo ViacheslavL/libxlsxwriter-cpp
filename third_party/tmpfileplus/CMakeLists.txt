@@ -1,6 +1,6 @@
-add_library(tmpfileplus tmpfileplus.c)
+add_library(lxw_tmpfileplus tmpfileplus.c)
 
-install(TARGETS tmpfileplus
+install(TARGETS lxw_tmpfileplus
     INCLUDES DESTINATION include
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib)
