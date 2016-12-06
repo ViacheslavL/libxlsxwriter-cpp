@@ -1310,6 +1310,12 @@ _chart_write_marker_data(lxw_chart *self, lxw_marker *marker)
     case LXW_MARKER_TRIANGLE:
         LXW_PUSH_ATTRIBUTES_STR("val", "triangle");
         break;
+    case LXW_MARKER_DIAMOND:
+        LXW_PUSH_ATTRIBUTES_STR("val", "diamond");
+        break;
+    case LXW_MARKER_SQUARE:
+        LXW_PUSH_ATTRIBUTES_STR("val", "square");
+        break;
     default:
         LXW_PUSH_ATTRIBUTES_STR("val", val);
         break;
