@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0.0)
 
 project(libxlsxwriter)
 
+set(CMAKE_DEBUG_POSTFIX d)
+
 # force out of source build so we don't trash the existing Makefiles
 if ("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
     message(FATAL_ERROR " This project requires an out of source build."
@@ -20,6 +22,7 @@ message(STATUS "Configuring a ${CMAKE_BUILD_TYPE} build")
 
 # locate dependencies
 find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
 
 # for configuring shared libraries
 set(CMAKE_MACOSX_RPATH 1)
@@ -53,10 +56,10 @@ endfunction()
 add_subdirectory(third_party)
 add_subdirectory(src)
 add_subdirectory(include)
-add_subdirectory(examples)
+#add_subdirectory(examples)
 
 # enable regression tests
-set(BUILD_TESTING ON CACHE BOOL "Enable regresion tests")
+set(BUILD_TESTING OFF CACHE BOOL "Enable regresion tests")
 if (BUILD_TESTING)
     include(CTest)
     configure_file(

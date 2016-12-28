@@ -6,8 +6,8 @@ set(minizip_sources
     ioapi.c
     zip.c)
 
-add_library(lxw_minizip OBJECT ${minizip_sources})
+if (MSVC)
+    list(APPEND minizip_sources iowin32.c)
+endif()
 
-set_property(GLOBAL APPEND
-    PROPERTY lxw_third_party_objects
-    $<TARGET_OBJECTS:lxw_minizip>)
+add_library(lxw_minizip STATIC ${minizip_sources})

@@ -19,12 +19,10 @@ set(xlsxwriter_srcs
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-get_property(objs GLOBAL PROPERTY lxw_third_party_objects)
+add_library(xlsxwriter ${xlsxwriter_srcs})
+target_link_libraries(xlsxwriter ${ZLIB_LIBRARIES} lxw_tmpfileplus lxw_minizip)
 
-add_library(xlsxwriter ${xlsxwriter_srcs} ${objs})
-target_link_libraries(xlsxwriter ${ZLIB_LIBRARIES})
-
-add_library(xlsxwriter_test STATIC ${xlsxwriter_srcs} ${objs})
+add_library(xlsxwriter_test STATIC ${xlsxwriter_srcs})
 target_compile_definitions(xlsxwriter_test PRIVATE -DTESTING)
 
 install(TARGETS xlsxwriter
