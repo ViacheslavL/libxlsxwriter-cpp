@@ -26,12 +26,13 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 
 # for configuring shared libraries
 set(CMAKE_MACOSX_RPATH 1)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
 
 # set up build dirs
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_ALL_SYMBOLS TRUE)
 
 # set default compiler flags
 if (NOT MSVC)
