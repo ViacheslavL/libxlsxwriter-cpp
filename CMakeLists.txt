@@ -44,6 +44,9 @@ if (NOT MSVC)
     set(CMAKE_C_FLAGS "${tmp}"
         CACHE STRING "libxlsxwriter compile flags"
         FORCE)
+else()
+    set(CMAKE_C_FLAGS_RELEASE "/c /Zi /nologo /D _USRDLL  /D LIBXLSXWRITER_EXPORTS /D _WINDLL /D UNICODE /D _UNICODE /WX- /Od /Ot /D NDEBUG /D_CRT_SECURE_NO_WARNINGS /Gm- /EHsc /MD /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Gz /TC")
+    set(CMAKE_EXE_LINKER_FLAGS "/INCREMENTAL /NOLOGO /DEBUG /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64")
 endif()
 
 # for building tests and examples
