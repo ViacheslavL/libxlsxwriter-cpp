@@ -23,10 +23,6 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-if(MSVC)
-    list(APPEND xlsxwriter_srcs XlsxWriter.def)
-endif()
-
 add_library(xlsxwriter ${xlsxwriter_srcs})
 
 target_link_libraries(xlsxwriter ${ZLIB_LIBRARIES} lxw_tmpfileplus lxw_minizip)
