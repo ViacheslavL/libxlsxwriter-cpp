@@ -26,16 +26,19 @@
  * Workbook object:
  *
  * @code
- *     #include "xlsxwriter.h"
+ *
+ *     #include <xlsxwriter++.hpp>
+ *
+ *     using namespace xlsxwriter;
  *
  *     int main() {
  *
- *         lxw_workbook  *workbook  = workbook_new("filename.xlsx");
- *         lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+ *         workbook_ptr workbook  = std::make_shared<workbook>("filename.xlsx");
+ *         worksheet_ptr worksheet = workbook_add_worksheet(workbook, NULL);
  *
- *         worksheet_write_string(worksheet, 0, 0, "Hello Excel", NULL);
+ *         worksheet->write_string(0, 0, "Hello Excel", NULL);
  *
- *         return workbook_close(workbook);
+ *         return workbook->close();
  *     }
  * @endcode
  *
@@ -52,12 +55,12 @@
 #include <vector>
 #include <memory>
 
-#include "shared_strings.h"
-#include "chart.h"
-#include "drawing.h"
-#include "common.h"
-#include "format.h"
-#include "utility.h"
+#include "shared_strings.hpp"
+#include "chart.hpp"
+#include "drawing.hpp"
+#include "common.hpp"
+#include "format.hpp"
+#include "utility.hpp"
 
 #define LXW_ROW_MAX 1048576
 #define LXW_COL_MAX 16384
@@ -344,6 +347,61 @@ typedef struct lxw_protection {
     char hash[5];
 } lxw_protection;
 
+/*
+ * Worksheet initialization data.
+ */
+typedef struct lxw_worksheet_init_data {
+    uint32_t index;
+    uint8_t hidden;
+    uint8_t optimize;
+    uint16_t *active_sheet;
+    uint16_t *first_sheet;
+    lxw_sst *sst;
+    char *name;
+    char *quoted_name;
+    char *tmpdir;
+
+} lxw_worksheet_init_data;
+
+/* Struct to represent a worksheet row. */
+typedef struct lxw_row {
+    lxw_row_t row_num;
+    double height;
+    lxw_format *format;
+    uint8_t hidden;
+    uint8_t level;
+    uint8_t collapsed;
+    uint8_t row_changed;
+    uint8_t data_changed;
+    uint8_t height_changed;
+    struct lxw_table_cells *cells;
+
+    /* tree management pointers for tree.h. */
+    RB_ENTRY (lxw_row) tree_pointers;
+} lxw_row;
+
+/* Struct to represent a worksheet cell. */
+typedef struct lxw_cell {
+    lxw_row_t row_num;
+    lxw_col_t col_num;
+    enum cell_types type;
+    lxw_format *format;
+
+    union {
+        double number;
+        int32_t string_id;
+        char *string;
+    } u;
+
+    double formula_result;
+    char *user_data1;
+    char *user_data2;
+    char *sst_string;
+
+    /* List pointers for tree.h. */
+    RB_ENTRY (lxw_cell) tree_pointers;
+} lxw_cell;
+
 /**
  * @brief The class to represent an Excel worksheet.
  */
@@ -570,19 +628,16 @@ public:
      * See @ref working_with_dates for more information about handling dates and
      * times in libxlsxwriter.
      */
-    lxw_error worksheet_write_datetime(lxw_worksheet *worksheet,
-                                       lxw_row_t row,
+    lxw_error write_datetime(lxw_row_t row,
                                        lxw_col_t col, lxw_datetime *datetime,
                                        lxw_format *format);
 
-    lxw_error worksheet_write_url_opt(lxw_worksheet *worksheet,
-                                      lxw_row_t row_num,
-                                      lxw_col_t col_num, const char *url,
-                                      lxw_format *format, const char *string,
-                                      const char *tooltip);
+    lxw_error write_url_opt(lxw_row_t row_num,
+                            lxw_col_t col_num, const std::string& url,
+                            const lxw_format_ptr& format, const std::string& string,
+                            const std::string& tooltip);
     /**
      *
-     * @param worksheet pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param url       The url to write to the cell.
@@ -591,11 +646,11 @@ public:
      * @return A #lxw_error code.
      *
      *
-     * The `%worksheet_write_url()` function is used to write a URL/hyperlink to a
+     * The `%write_url()` function is used to write a URL/hyperlink to a
      * worksheet cell specified by `row` and `column`.
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "http://libxlsxwriter.github.io", url_format);
+     *     worksheet->write_url(0, 0, "http://libxlsxwriter.github.io", url_format);
      * @endcode
      *
      * @image html hyperlinks_short.png
@@ -606,10 +661,10 @@ public:
      * blue underline:
      *
      * @code
-     *    lxw_format *url_format   = workbook_add_format(workbook);
+     *    lxw_format_ptr url_format   = workbook->add_format();
      *
-     *    format_set_underline (url_format, LXW_UNDERLINE_SINGLE);
-     *    format_set_font_color(url_format, LXW_COLOR_BLUE);
+     *    format->set_underline (LXW_UNDERLINE_SINGLE);
+     *    format->set_font_color(LXW_COLOR_BLUE);
      *
      * @endcode
      *
@@ -617,24 +672,24 @@ public:
      * and `mailto:` :
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "ftp://www.python.org/",     url_format);
-     *     worksheet_write_url(worksheet, 1, 0, "http://www.python.org/",    url_format);
-     *     worksheet_write_url(worksheet, 2, 0, "https://www.python.org/",   url_format);
-     *     worksheet_write_url(worksheet, 3, 0, "mailto:jmcnamara@cpan.org", url_format);
+     *     worksheet->write_url(0, 0, "ftp://www.python.org/",     url_format);
+     *     worksheet->write_url(1, 0, "http://www.python.org/",    url_format);
+     *     worksheet->write_url(2, 0, "https://www.python.org/",   url_format);
+     *     worksheet->write_url(3, 0, "mailto:jmcnamara@cpan.org", url_format);
      *
      * @endcode
      *
      * An Excel hyperlink is comprised of two elements: the displayed string and
      * the non-displayed link. By default the displayed string is the same as the
      * link. However, it is possible to overwrite it with any other
-     * `libxlsxwriter` type using the appropriate `worksheet_write_*()`
+     * `libxlsxwriter` type using the appropriate `write_*()`
      * function. The most common case is to overwrite the displayed link text with
      * another string:
      *
      * @code
      *  // Write a hyperlink but overwrite the displayed string.
-     *  worksheet_write_url   (worksheet, 2, 0, "http://libxlsxwriter.github.io", url_format);
-     *  worksheet_write_string(worksheet, 2, 0, "Read the documentation.",        url_format);
+     *  worksheet->write_url   (2, 0, "http://libxlsxwriter.github.io", url_format);
+     *  worksheet->write_string(2, 0, "Read the documentation.",        url_format);
      *
      * @endcode
      *
@@ -645,15 +700,15 @@ public:
      * worksheet references:
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "internal:Sheet2!A1",                url_format);
-     *     worksheet_write_url(worksheet, 1, 0, "internal:Sheet2!B2",                url_format);
-     *     worksheet_write_url(worksheet, 2, 0, "internal:Sheet2!A1:B2",             url_format);
-     *     worksheet_write_url(worksheet, 3, 0, "internal:'Sales Data'!A1",          url_format);
-     *     worksheet_write_url(worksheet, 4, 0, "external:c:\\temp\\foo.xlsx",       url_format);
-     *     worksheet_write_url(worksheet, 5, 0, "external:c:\\foo.xlsx#Sheet2!A1",   url_format);
-     *     worksheet_write_url(worksheet, 6, 0, "external:..\\foo.xlsx",             url_format);
-     *     worksheet_write_url(worksheet, 7, 0, "external:..\\foo.xlsx#Sheet2!A1",   url_format);
-     *     worksheet_write_url(worksheet, 8, 0, "external:\\\\NET\\share\\foo.xlsx", url_format);
+     *     worksheet->write_url(0, 0, "internal:Sheet2!A1",                url_format);
+     *     worksheet->write_url(1, 0, "internal:Sheet2!B2",                url_format);
+     *     worksheet->write_url(2, 0, "internal:Sheet2!A1:B2",             url_format);
+     *     worksheet->write_url(3, 0, "internal:'Sales Data'!A1",          url_format);
+     *     worksheet->write_url(4, 0, "external:c:\\temp\\foo.xlsx",       url_format);
+     *     worksheet->write_url(5, 0, "external:c:\\foo.xlsx#Sheet2!A1",   url_format);
+     *     worksheet->write_url(6, 0, "external:..\\foo.xlsx",             url_format);
+     *     worksheet->write_url(7, 0, "external:..\\foo.xlsx#Sheet2!A1",   url_format);
+     *     worksheet->write_url(8, 0, "external:\\\\NET\\share\\foo.xlsx", url_format);
      *
      * @endcode
      *
@@ -665,7 +720,7 @@ public:
      * `#` character:
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "external:c:\\foo.xlsx#Sheet2!A1",   url_format);
+     *     worksheet->write_url(0, 0, "external:c:\\foo.xlsx#Sheet2!A1",   url_format);
      * @endcode
      *
      * You can also link to a named range in the target worksheet: For example say
@@ -673,7 +728,7 @@ public:
      * you could link to it as follows:
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "external:c:\\temp\\foo.xlsx#my_name", url_format);
+     *     worksheet->write_url(0, 0, "external:c:\\temp\\foo.xlsx#my_name", url_format);
      *
      * @endcode
      *
@@ -681,14 +736,14 @@ public:
      * characters are single quoted as follows:
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "internal:'Sales Data'!A1", url_format);
+     *     worksheet->write_url(0, 0, "internal:'Sales Data'!A1", url_format);
      * @endcode
      *
      * Links to network files are also supported. Network files normally begin
      * with two back slashes as follows `\\NETWORK\etc`. In order to represent
      * this in a C string literal the backslashes should be escaped:
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "external:\\\\NET\\share\\foo.xlsx", url_format);
+     *     worksheet->write_url(0, 0, "external:\\\\NET\\share\\foo.xlsx", url_format);
      * @endcode
      *
      *
@@ -696,8 +751,8 @@ public:
      * translated internally to backslashes:
      *
      * @code
-     *     worksheet_write_url(worksheet, 0, 0, "external:c:/temp/foo.xlsx",     url_format);
-     *     worksheet_write_url(worksheet, 1, 0, "external://NET/share/foo.xlsx", url_format);
+     *     worksheet->write_url(0, 0, "external:c:/temp/foo.xlsx",     url_format);
+     *     worksheet->write_url(1, 0, "external://NET/share/foo.xlsx", url_format);
      *
      * @endcode
      *
@@ -710,15 +765,13 @@ public:
      *    correctly by the user and will by passed directly to Excel.
      *
      */
-    lxw_error worksheet_write_url(lxw_worksheet *worksheet,
-                                  lxw_row_t row,
-                                  lxw_col_t col, const char *url,
-                                  lxw_format *format);
+    lxw_error write_url(lxw_row_t row,
+                        lxw_col_t col, const std::string& url,
+                        const lxw_format& format);
 
     /**
      * @brief Write a formatted boolean worksheet cell.
      *
-     * @param worksheet pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param value     The boolean value to write to the cell.
@@ -729,18 +782,16 @@ public:
      * Write an Excel boolean to the cell specified by `row` and `column`:
      *
      * @code
-     *     worksheet_write_boolean(worksheet, 2, 2, 0, my_format);
+     *     worksheet->write_boolean(2, 2, 0, my_format);
      * @endcode
      *
      */
-    lxw_error worksheet_write_boolean(lxw_worksheet *worksheet,
-                                      lxw_row_t row, lxw_col_t col,
-                                      int value, lxw_format *format);
+    lxw_error write_boolean(lxw_row_t row, lxw_col_t col,
+                            bool value, const lxw_format_ptr& format);
 
     /**
      * @brief Write a formatted blank worksheet cell.
      *
-     * @param worksheet pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param format    A pointer to a Format instance or NULL.
@@ -750,7 +801,7 @@ public:
      * Write a blank cell specified by `row` and `column`:
      *
      * @code
-     *     worksheet_write_blank(worksheet, 1, 1, border_format);
+     *     worksheet->write_blank(1, 1, border_format);
      * @endcode
      *
      * This function is used to add formatting to a cell which doesn't contain a
@@ -764,14 +815,12 @@ public:
      * As such, if you write an empty cell without formatting it is ignored.
      *
      */
-    lxw_error worksheet_write_blank(lxw_worksheet *worksheet,
-                                    lxw_row_t row, lxw_col_t col,
-                                    lxw_format *format);
+    lxw_error write_blank(lxw_row_t row, lxw_col_t col,
+                                    const lxw_format_ptr& format);
 
     /**
      * @brief Write a formula to a worksheet cell with a user defined result.
      *
-     * @param worksheet pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param formula   Formula string to write to cell.
@@ -780,13 +829,13 @@ public:
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_write_formula_num()` function writes a formula or Excel
+     * The `%write_formula_num()` function writes a formula or Excel
      * function to the cell specified by `row` and `column` with a user defined
      * result:
      *
      * @code
      *     // Required as a workaround only.
-     *     worksheet_write_formula_num(worksheet, 0, 0, "=1 + 2", NULL, 3);
+     *     worksheet->write_formula_num(0, 0, "=1 + 2", NULL, 3);
      * @endcode
      *
      * Libxlsxwriter doesn't calculate the value of a formula and instead stores
@@ -801,55 +850,53 @@ public:
      * such as Excel Viewer, or some mobile applications will only display the `0`
      * results.
      *
-     * If required, the `%worksheet_write_formula_num()` function can be used to
+     * If required, the `%write_formula_num()` function can be used to
      * specify a formula and its result.
      *
      * This function is rarely required and is only provided for compatibility
      * with some third party applications. For most applications the
-     * worksheet_write_formula() function is the recommended way of writing
+     * worksheet->write_formula() function is the recommended way of writing
      * formulas.
      *
      */
-    lxw_error worksheet_write_formula_num(lxw_worksheet *worksheet,
-                                          lxw_row_t row,
-                                          lxw_col_t col,
-                                          const char *formula,
-                                          lxw_format *format, double result);
+    lxw_error write_formula_num(lxw_row_t row,
+                                lxw_col_t col,
+                                const std::string& formula,
+                                const lxw_format& format, double result);
 
     /**
      * @brief Set the properties for a row of cells.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param height    The row height.
      * @param format    A pointer to a Format instance or NULL.
      *
-     * The `%worksheet_set_row()` function is used to change the default
+     * The `%set_row()` function is used to change the default
      * properties of a row. The most common use for this function is to change the
      * height of a row:
      *
      * @code
      *     // Set the height of Row 1 to 20.
-     *     worksheet_set_row(worksheet, 0, 20, NULL);
+     *     worksheet->set_row(0, 20, NULL);
      * @endcode
      *
      * The other common use for `%worksheet_set_row()` is to set the a @ref
      * format.h "Format" for all cells in the row:
      *
      * @code
-     *     lxw_format *bold = workbook_add_format(workbook);
-     *     format_set_bold(bold);
+     *     lxw_format *bold = workbook->add_format();
+     *     format->set_bold(bold);
      *
      *     // Set the header row to bold.
-     *     worksheet_set_row(worksheet, 0, 15, bold);
+     *     worksheet->set_row(0, 15, bold);
      * @endcode
      *
      * If you wish to set the format of a row without changing the height you can
      * pass the default row height of #LXW_DEF_ROW_HEIGHT = 15:
      *
      * @code
-     *     worksheet_set_row(worksheet, 0, LXW_DEF_ROW_HEIGHT, format);
-     *     worksheet_set_row(worksheet, 0, 15, format); // Same as above.
+     *     worksheet->set_row(0, LXW_DEF_ROW_HEIGHT, format);
+     *     worksheet->set_row(0, 15, format); // Same as above.
      * @endcode
      *
      * The `format` parameter will be applied to any cells in the row that don't
@@ -858,30 +905,28 @@ public:
      *
      * @code
      *     // Row 1 has format1.
-     *     worksheet_set_row(worksheet, 0, 15, format1);
+     *     worksheet->set_row(0, 15, format1);
      *
      *     // Cell A1 in Row 1 defaults to format1.
-     *     worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+     *     worksheet->write_string(0, 0, "Hello", NULL);
      *
      *     // Cell B1 in Row 1 keeps format2.
-     *     worksheet_write_string(worksheet, 0, 1, "Hello", format2);
+     *     worksheet->write_string(0, 1, "Hello", format2);
      * @endcode
      *
      */
-    lxw_error worksheet_set_row(lxw_worksheet *worksheet,
-                                lxw_row_t row, double height, lxw_format *format);
+    lxw_error set_row(lxw_row_t row, double height, const lxw_format& format);
 
     /**
      * @brief Set the properties for a row of cells.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param height    The row height.
      * @param format    A pointer to a Format instance or NULL.
      * @param options   Optional row parameters: hidden, level, collapsed.
      *
-     * The `%worksheet_set_row_opt()` function  is the same as
-     *  `worksheet_set_row()` with an additional `options` parameter.
+     * The `%set_row_opt()` function  is the same as
+     *  `set_row()` with an additional `options` parameter.
      *
      * The `options` parameter is a #lxw_row_col_options struct. It has the
      * following members but currently only the `hidden` property is supported:
@@ -894,43 +939,44 @@ public:
      * example, to hide intermediary steps in a complicated calculation:
      *
      * @code
-     *     lxw_row_col_options options = {.hidden = 1, .level = 0, .collapsed = 0};
+     *     row_col_options options = {};
+     *     options.hidden = 1;
+     *     options.level = 0;
+     *     options.collapsed = 0;
      *
      *     // Hide the fourth row.
-     *     worksheet_set_row(worksheet, 3, 20, NULL, &options);
+     *     worksheet->set_row(3, 20, NULL, options);
      * @endcode
      *
      */
-    lxw_error worksheet_set_row_opt(lxw_worksheet *worksheet,
-                                    lxw_row_t row,
-                                    double height,
-                                    lxw_format *format,
-                                    lxw_row_col_options *options);
+    lxw_error set_row_opt(lxw_row_t row,
+                          double height,
+                          const lxw_format_ptr& format,
+                          const lxw_row_col_options& options);
 
     /**
      * @brief Set the properties for one or more columns of cells.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param first_col The zero indexed first column.
      * @param last_col  The zero indexed last column.
      * @param width     The width of the column(s).
      * @param format    A pointer to a Format instance or NULL.
      *
-     * The `%worksheet_set_column()` function can be used to change the default
+     * The `%set_column()` function can be used to change the default
      * properties of a single column or a range of columns:
      *
      * @code
      *     // Width of columns B:D set to 30.
-     *     worksheet_set_column(worksheet, 1, 3, 30, NULL);
+     *     worksheet->set_column(1, 3, 30, NULL);
      *
      * @endcode
      *
-     * If `%worksheet_set_column()` is applied to a single column the value of
+     * If `%set_column()` is applied to a single column the value of
      * `first_col` and `last_col` should be the same:
      *
      * @code
      *     // Width of column B set to 30.
-     *     worksheet_set_column(worksheet, 1, 1, 30, NULL);
+     *     worksheet->set_column(1, 1, 30, NULL);
      *
      * @endcode
      *
@@ -938,12 +984,12 @@ public:
      * the form of `COLS()` macro:
      *
      * @code
-     *     worksheet_set_column(worksheet, 4, 4, 20, NULL);
-     *     worksheet_set_column(worksheet, 5, 8, 30, NULL);
+     *     worksheet->set_column(4, 4, 20, NULL);
+     *     worksheet->set_column(5, 8, 30, NULL);
      *
      *     // Same as the examples above but clearer.
-     *     worksheet_set_column(worksheet, COLS("E:E"), 20, NULL);
-     *     worksheet_set_column(worksheet, COLS("F:H"), 30, NULL);
+     *     worksheet->set_column(COLS("E:E"), 20, NULL);
+     *     worksheet->set_column(COLS("F:H"), 30, NULL);
      *
      * @endcode
      *
@@ -965,11 +1011,11 @@ public:
      * width of #LXW_DEF_COL_WIDTH = 8.43:
      *
      * @code
-     *     lxw_format *bold = workbook_add_format(workbook);
-     *     format_set_bold(bold);
+     *     lxw_format_ptr format = workbook->add_format();
+     *     format->set_bold();
      *
      *     // Set the first column to bold.
-     *     worksheet_set_column(worksheet, 0, 0, LXW_DEF_COL_HEIGHT, bold);
+     *     worksheet->set_column(0, 0, LXW_DEF_COL_HEIGHT, format);
      * @endcode
      *
      * The `format` parameter will be applied to any cells in the column that
@@ -977,40 +1023,38 @@ public:
      *
      * @code
      *     // Column 1 has format1.
-     *     worksheet_set_column(worksheet, COLS("A:A"), 8.43, format1);
+     *     worksheet->set_column(COLS("A:A"), 8.43, format1);
      *
      *     // Cell A1 in column 1 defaults to format1.
-     *     worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+     *     worksheet->write_string(0, 0, "Hello", NULL);
      *
      *     // Cell A2 in column 1 keeps format2.
-     *     worksheet_write_string(worksheet, 1, 0, "Hello", format2);
+     *     worksheet->write_string(1, 0, "Hello", format2);
      * @endcode
      *
      * As in Excel a row format takes precedence over a default column format:
      *
      * @code
      *     // Row 1 has format1.
-     *     worksheet_set_row(worksheet, 0, 15, format1);
+     *     worksheet->set_row(0, 15, format1);
      *
      *     // Col 1 has format2.
-     *     worksheet_set_column(worksheet, COLS("A:A"), 8.43, format2);
+     *     worksheet->set_column(COLS("A:A"), 8.43, format2);
      *
      *     // Cell A1 defaults to format1, the row format.
-     *     worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+     *     worksheet->write_string(0, 0, "Hello", NULL);
      *
      *    // Cell A2 keeps format2, the column format.
-     *     worksheet_write_string(worksheet, 1, 0, "Hello", NULL);
+     *     worksheet->write_string(1, 0, "Hello", NULL);
      * @endcode
      */
-    lxw_error worksheet_set_column(lxw_worksheet *worksheet,
-                                   lxw_col_t first_col,
-                                   lxw_col_t last_col,
-                                   double width, lxw_format *format);
+    lxw_error set_column(lxw_col_t first_col,
+                         lxw_col_t last_col,
+                         double width, const lxw_format_ptr& format);
 
      /**
       * @brief Set the properties for one or more columns of cells with options.
       *
-      * @param worksheet Pointer to a lxw_worksheet instance to be updated.
       * @param first_col The zero indexed first column.
       * @param last_col  The zero indexed last column.
       * @param width     The width of the column(s).
@@ -1031,23 +1075,24 @@ public:
       * example, to hide intermediary steps in a complicated calculation:
       *
       * @code
-      *     lxw_row_col_options options = {.hidden = 1, .level = 0, .collapsed = 0};
+      *     row_col_options options = {};
+      *     options.hidden = 1;
+      *     options.level = 0;
+      *     options.collapsed = 0;
       *
-      *     worksheet_set_column_opt(worksheet, COLS("A:A"), 8.43, NULL, &options);
+      *     worksheet->set_column_opt(COLS("A:A"), 8.43, NULL, options);
       * @endcode
       *
       */
-    lxw_error worksheet_set_column_opt(lxw_worksheet *worksheet,
-                                       lxw_col_t first_col,
-                                       lxw_col_t last_col,
-                                       double width,
-                                       lxw_format *format,
-                                       lxw_row_col_options *options);
+    lxw_error set_column_opt(lxw_col_t first_col,
+                             lxw_col_t last_col,
+                             double width,
+                             const lxw_format_ptr& format,
+                             const lxw_row_col_options& options);
 
     /**
      * @brief Insert an image in a worksheet cell.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param filename  The image filename, with path if required.
@@ -1058,33 +1103,31 @@ public:
      * be in PNG, JPEG or BMP format:
      *
      * @code
-     *     worksheet_insert_image(worksheet, 2, 1, "logo.png");
+     *     worksheet->insert_image(2, 1, "logo.png");
      * @endcode
      *
      * @image html insert_image.png
      *
-     * The `worksheet_insert_image_opt()` function takes additional optional
+     * The `insert_image_opt()` function takes additional optional
      * parameters to position and scale the image, see below.
      *
      * **Note**:
      * The scaling of a image may be affected if is crosses a row that has its
      * default height changed due to a font that is larger than the default font
      * size or that has text wrapping turned on. To avoid this you should
-     * explicitly set the height of the row using `worksheet_set_row()` if it
+     * explicitly set the height of the row using `set_row()` if it
      * crosses an inserted image.
      *
      * BMP images are only supported for backward compatibility. In general it is
      * best to avoid BMP images since they aren't compressed. If used, BMP images
      * must be 24 bit, true color, bitmaps.
      */
-    lxw_error worksheet_insert_image(lxw_worksheet *worksheet,
-                                     lxw_row_t row, lxw_col_t col,
-                                     const char *filename);
+    lxw_error insert_image(lxw_row_t row, lxw_col_t col,
+                           const std::string& filename);
 
     /**
      * @brief Insert an image in a worksheet cell, with options.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param filename  The image filename, with path if required.
@@ -1092,51 +1135,52 @@ public:
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_insert_image_opt()` function is like
-     * `worksheet_insert_image()` function except that it takes an optional
-     * #lxw_image_options struct to scale and position the image:
+     * The `%insert_image_opt()` function is like
+     * `insert_image()` function except that it takes an optional
+     * #image_options struct to scale and position the image:
      *
      * @code
-     *    lxw_image_options options = {.x_offset = 30,  .y_offset = 10,
-     *                                 .x_scale  = 0.5, .y_scale  = 0.5};
+     *    image_options options = {}
+     *    options.x_offset = 30;
+     *    options.y_offset = 10;
+     *    options.x_scale  = 0.5;
+     *    options.y_scale  = 0.5;
      *
-     *    worksheet_insert_image_opt(worksheet, 2, 1, "logo.png", &options);
+     *    worksheet->insert_image_opt(2, 1, "logo.png", options);
      *
      * @endcode
      *
      * @image html insert_image_opt.png
      *
      * @note See the notes about row scaling and BMP images in
-     * `worksheet_insert_image()` above.
+     * `insert_image()` above.
      */
-    lxw_error worksheet_insert_image_opt(lxw_worksheet *worksheet,
-                                         lxw_row_t row, lxw_col_t col,
-                                         const char *filename,
-                                         lxw_image_options *options);
+    lxw_error insert_image_opt(lxw_row_t row, lxw_col_t col,
+                               const std::string filename,
+                               const image_options& options);
     /**
      * @brief Insert a chart object into a worksheet.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
-     * @param chart     A #lxw_chart object created via workbook_add_chart().
+     * @param chart     A #chart object created via workbook->add_chart().
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_insert_chart()` can be used to insert a chart into a
+     * The `%insert_chart()` can be used to insert a chart into a
      * worksheet. The chart object must be created first using the
-     * `workbook_add_chart()` function and configured using the @ref chart.h
+     * `add_chart()` function and configured using the @ref chart.hpp
      * functions.
      *
      * @code
      *     // Create a chart object.
-     *     lxw_chart *chart = workbook_add_chart(workbook, LXW_CHART_LINE);
+     *     chart_ptr chart = workbook->add_chart(LXW_CHART_LINE);
      *
      *     // Add a data series to the chart.
-     *     chart_add_series(chart, NULL, "=Sheet1!$A$1:$A$6");
+     *     chart->add_series(NULL, "=Sheet1!$A$1:$A$6");
      *
      *     // Insert the chart into the worksheet
-     *     worksheet_insert_chart(worksheet, 0, 2, chart);
+     *     worksheet->insert_chart(0, 2, chart);
      * @endcode
      *
      * @image html chart_working.png
@@ -1146,51 +1190,49 @@ public:
      *
      * A chart may only be inserted into a worksheet once. If several similar
      * charts are required then each one must be created separately with
-     * `%worksheet_insert_chart()`.
+     * `%insert_chart()`.
      *
      */
-    lxw_error worksheet_insert_chart(lxw_worksheet *worksheet,
-                                     lxw_row_t row, lxw_col_t col,
-                                     lxw_chart *chart);
+    lxw_error insert_chart(lxw_row_t row, lxw_col_t col, const chart_ptr& chart);
 
     /**
      * @brief Insert a chart object into a worksheet, with options.
      *
-     * @param worksheet    Pointer to a lxw_worksheet instance to be updated.
      * @param row          The zero indexed row number.
      * @param col          The zero indexed column number.
-     * @param chart        A #lxw_chart object created via workbook_add_chart().
+     * @param chart        A #lxw_chart object created via workbook->add_chart().
      * @param user_options Optional chart parameters.
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_insert_chart_opt()` function is like
-     * `worksheet_insert_chart()` function except that it takes an optional
-     * #lxw_image_options struct to scale and position the image of the chart:
+     * The `%insert_chart_opt()` function is like
+     * `insert_chart()` function except that it takes an optional
+     * #image_options struct to scale and position the image of the chart:
      *
      * @code
-     *    lxw_image_options options = {.x_offset = 30,  .y_offset = 10,
-     *                                 .x_scale  = 0.5, .y_scale  = 0.75};
+     *    image_options options = {}
+     *    options.x_offset = 30;
+     *    options.y_offset = 10;
+     *    options.x_scale  = 0.5;
+     *    options.y_scale  = 0.75;
      *
-     *    worksheet_insert_chart_opt(worksheet, 0, 2, chart, &options);
+     *    worksheet->insert_chart_opt(0, 2, chart, options);
      *
      * @endcode
      *
      * @image html chart_line_opt.png
      *
-     * The #lxw_image_options struct is the same struct used in
-     * `worksheet_insert_image_opt()` to position and scale images.
+     * The #image_options struct is the same struct used in
+     * `insert_image_opt()` to position and scale images.
      *
      */
-    lxw_error worksheet_insert_chart_opt(lxw_worksheet *worksheet,
-                                         lxw_row_t row, lxw_col_t col,
-                                         lxw_chart *chart,
-                                         lxw_image_options *user_options);
+    lxw_error insert_chart_opt(lxw_row_t row, lxw_col_t col,
+                               const chart_ptr& chart,
+                               const image_options& user_options);
 
     /**
      * @brief Merge a range of cells.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param first_row The first row of the range. (All zero indexed.)
      * @param first_col The first column of the range.
      * @param last_row  The last row of the range.
@@ -1200,62 +1242,61 @@ public:
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_merge_range()` function allows cells to be merged together
+     * The `%merge_range()` function allows cells to be merged together
      * so that they act as a single area.
      *
      * Excel generally merges and centers cells at same time. To get similar
-     * behavior with libxlsxwriter you need to apply a @ref format.h "Format"
+     * behavior with libxlsxwriter you need to apply a @ref format.hpp "Format"
      * object with the appropriate alignment:
      *
      * @code
-     *     lxw_format *merge_format = workbook_add_format(workbook);
-     *     format_set_align(merge_format, LXW_ALIGN_CENTER);
+     *     format_ptr merge_format = workbook->add_format();
+     *     merge_format->set_align(LXW_ALIGN_CENTER);
      *
-     *     worksheet_merge_range(worksheet, 1, 1, 1, 3, "Merged Range", merge_format);
+     *     worksheet->merge_range(1, 1, 1, 3, "Merged Range", merge_format);
      *
      * @endcode
      *
      * It is possible to apply other formatting to the merged cells as well:
      *
      * @code
-     *    format_set_align   (merge_format, LXW_ALIGN_CENTER);
-     *    format_set_align   (merge_format, LXW_ALIGN_VERTICAL_CENTER);
-     *    format_set_border  (merge_format, LXW_BORDER_DOUBLE);
-     *    format_set_bold    (merge_format);
-     *    format_set_bg_color(merge_format, 0xD7E4BC);
+     *    merge_format->set_align   (LXW_ALIGN_CENTER);
+     *    merge_format->set_align   (LXW_ALIGN_VERTICAL_CENTER);
+     *    merge_format->set_border  (LXW_BORDER_DOUBLE);
+     *    merge_format->set_bold    ();
+     *    merge_format->set_bg_color(0xD7E4BC);
      *
-     *    worksheet_merge_range(worksheet, 2, 1, 3, 3, "Merged Range", merge_format);
+     *    worksheet->merge_range(2, 1, 3, 3, "Merged Range", merge_format);
      *
      * @endcode
      *
      * @image html merge.png
      *
-     * The `%worksheet_merge_range()` function writes a `char*` string using
-     * `worksheet_write_string()`. In order to write other data types, such as a
+     * The `%merge_range()` function writes a `char*` string using
+     * `write_string()`. In order to write other data types, such as a
      * number or a formula, you can overwrite the first cell with a call to one of
      * the other write functions. The same Format should be used as was used in
      * the merged range.
      *
      * @code
      *    // First write a range with a blank string.
-     *    worksheet_merge_range (worksheet, 1, 1, 1, 3, "", format);
+     *    worksheet->merge_range (1, 1, 1, 3, "", format);
      *
      *    // Then overwrite the first cell with a number.
-     *    worksheet_write_number(worksheet, 1, 1, 123, format);
+     *    worksheet->write_number(1, 1, 123, format);
      * @endcode
      *
      * @note Merged ranges generally don’t work in libxlsxwriter when the Workbook
      * #lxw_workbook_options `constant_memory` mode is enabled.
      */
-    lxw_error worksheet_merge_range(lxw_worksheet *worksheet, lxw_row_t first_row,
-                                    lxw_col_t first_col, lxw_row_t last_row,
-                                    lxw_col_t last_col, const char *string,
-                                    lxw_format *format);
+    lxw_error merge_range(lxw_row_t first_row,
+                          lxw_col_t first_col, lxw_row_t last_row,
+                          lxw_col_t last_col, const std::string& string,
+                          const lxw_format& format);
 
     /**
      * @brief Set the autofilter area in the worksheet.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param first_row The first row of the range. (All zero indexed.)
      * @param first_col The first column of the range.
      * @param last_row  The last row of the range.
@@ -1263,7 +1304,7 @@ public:
      *
      * @return A #lxw_error code.
      *
-     * The `%worksheet_autofilter()` function allows an autofilter to be added to
+     * The `%autofilter()` function allows an autofilter to be added to
      * a worksheet.
      *
      * An autofilter is a way of adding drop down lists to the headers of a 2D
@@ -1275,33 +1316,31 @@ public:
      * To add an autofilter to a worksheet:
      *
      * @code
-     *     worksheet_autofilter(worksheet, 0, 0, 50, 3);
+     *     worksheet->autofilter(0, 0, 50, 3);
      *
      *     // Same as above using the RANGE() macro.
-     *     worksheet_autofilter(worksheet, RANGE("A1:D51"));
+     *     worksheet->autofilter(RANGE("A1:D51"));
      * @endcode
      *
      * Note: it isn't currently possible to apply filter conditions to the
      * autofilter.
      */
-    lxw_error worksheet_autofilter(lxw_worksheet *worksheet, lxw_row_t first_row,
-                                   lxw_col_t first_col, lxw_row_t last_row,
-                                   lxw_col_t last_col);
+    lxw_error autofilter(lxw_row_t first_row,
+                         lxw_col_t first_col, lxw_row_t last_row,
+                         lxw_col_t last_col);
 
      /**
       * @brief Make a worksheet the active, i.e., visible worksheet.
       *
-      * @param worksheet Pointer to a lxw_worksheet instance to be updated.
-      *
-      * The `%worksheet_activate()` function is used to specify which worksheet is
+      * The `%activate()` function is used to specify which worksheet is
       * initially visible in a multi-sheet workbook:
       *
       * @code
-      *     lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-      *     lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-      *     lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
+      *     worksheet_ptr worksheet1 = workbook->add_worksheet(NULL);
+      *     worksheet_ptr worksheet2 = workbook->add_worksheet(NULL);
+      *     worksheet_ptr worksheet3 = workbook->add_worksheet(NULL);
       *
-      *     worksheet_activate(worksheet3);
+      *     worksheet3->activate();
       * @endcode
       *
       * @image html worksheet_activate.png
@@ -1312,40 +1351,36 @@ public:
       * The default active worksheet is the first worksheet.
       *
       */
-    void worksheet_activate(lxw_worksheet *worksheet);
+    void activate();
 
      /**
       * @brief Set a worksheet tab as selected.
       *
-      * @param worksheet Pointer to a lxw_worksheet instance to be updated.
-      *
-      * The `%worksheet_select()` function is used to indicate that a worksheet is
+      * The `%select()` function is used to indicate that a worksheet is
       * selected in a multi-sheet workbook:
       *
       * @code
-      *     worksheet_activate(worksheet1);
-      *     worksheet_select(worksheet2);
-      *     worksheet_select(worksheet3);
+      *     worksheet1->activate();
+      *     worksheet2->select();
+      *     worksheet3->select();
       *
       * @endcode
       *
       * A selected worksheet has its tab highlighted. Selecting worksheets is a
       * way of grouping them together so that, for example, several worksheets
       * could be printed in one go. A worksheet that has been activated via the
-      * `worksheet_activate()` function will also appear as selected.
+      * `activate()` function will also appear as selected.
       *
       */
-    void worksheet_select(lxw_worksheet *worksheet);
+    void select();
 
     /**
      * @brief Hide the current worksheet.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
-     *
-     * The `%worksheet_hide()` function is used to hide a worksheet:
+     * The `%hide()` function is used to hide a worksheet:
      *
      * @code
-     *     worksheet_hide(worksheet2);
+     *     worksheet2->hide();
      * @endcode
      *
      * You may wish to hide a worksheet in order to avoid confusing a user with
@@ -1360,36 +1395,33 @@ public:
      * another sheet:
      *
      * @code
-     *     worksheet_activate(worksheet2);
-     *     worksheet_hide(worksheet1);
+     *     worksheet1->activate();
+     *     worksheet2->hide();
      * @endcode
      */
-    void worksheet_hide(lxw_worksheet *worksheet);
+    void hide();
 
     /**
      * @brief Set current worksheet as the first visible sheet tab.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
-     *
-     * The `worksheet_activate()` function determines which worksheet is initially
+     * The `activate()` function determines which worksheet is initially
      * selected.  However, if there are a large number of worksheets the selected
      * worksheet may not appear on the screen. To avoid this you can select the
      * leftmost visible worksheet tab using `%worksheet_set_first_sheet()`:
      *
      * @code
-     *     worksheet_set_first_sheet(worksheet19); // First visible worksheet tab.
-     *     worksheet_activate(worksheet20);        // First visible worksheet.
+     *     worksheet19->set_first_sheet(); // First visible worksheet tab.
+     *     worksheet20->activate();        // First visible worksheet.
      * @endcode
      *
      * This function is not required very often. The default value is the first
      * worksheet.
      */
-    void worksheet_set_first_sheet(lxw_worksheet *worksheet);
+    void set_first_sheet();
 
     /**
      * @brief Split and freeze a worksheet into panes.
      *
-     * @param worksheet Pointer to a lxw_worksheet instance to be updated.
      * @param row       The cell row (zero indexed).
      * @param col       The cell column (zero indexed).
      *
@@ -1409,23 +1441,21 @@ public:
      * Examples:
      *
      * @code
-     *     worksheet_freeze_panes(worksheet1, 1, 0); // Freeze the first row.
-     *     worksheet_freeze_panes(worksheet2, 0, 1); // Freeze the first column.
-     *     worksheet_freeze_panes(worksheet3, 1, 1); // Freeze first row/column.
+     *     worksheet1->freeze_panes(1, 0); // Freeze the first row.
+     *     worksheet2->freeze_panes(0, 1); // Freeze the first column.
+     *     worksheet3->freeze_panes(1, 1); // Freeze first row/column.
      *
      * @endcode
      *
      */
-    void worksheet_freeze_panes(lxw_worksheet *worksheet,
-                                lxw_row_t row, lxw_col_t col);
+    void freeze_panes(lxw_row_t row, lxw_col_t col);
     /**
      * @brief Split a worksheet into panes.
      *
-     * @param worksheet  Pointer to a lxw_worksheet instance to be updated.
      * @param vertical   The position for the vertical split.
      * @param horizontal The position for the horizontal split.
      *
-     * The `%worksheet_split_panes()` function can be used to divide a worksheet
+     * The `%split_panes()` function can be used to divide a worksheet
      * into horizontal or vertical regions known as panes. This function is
      * different from the `worksheet_freeze_panes()` function in that the splits
      * between the panes will be visible to the user and each pane will have its
@@ -1442,37 +1472,33 @@ public:
      * Examples:
      *
      * @code
-     *     worksheet_split_panes(worksheet1, 15, 0);    // First row.
-     *     worksheet_split_panes(worksheet2, 0,  8.43); // First column.
-     *     worksheet_split_panes(worksheet3, 15, 8.43); // First row and column.
+     *     worksheet1->split_panes(15, 0);    // First row.
+     *     worksheet2->split_panes(0,  8.43); // First column.
+     *     worksheet3->split_panes(15, 8.43); // First row and column.
      *
      * @endcode
      *
      */
-    void worksheet_split_panes(lxw_worksheet *worksheet,
-                               double vertical, double horizontal);
+    void split_panes(double vertical, double horizontal);
 
-    /* worksheet_freeze_panes() with infrequent options. Undocumented for now. */
-    void worksheet_freeze_panes_opt(lxw_worksheet *worksheet,
-                                    lxw_row_t first_row, lxw_col_t first_col,
-                                    lxw_row_t top_row, lxw_col_t left_col,
-                                    uint8_t type);
+    /* freeze_panes() with infrequent options. Undocumented for now. */
+    void freeze_panes_opt(lxw_row_t first_row, lxw_col_t first_col,
+                          lxw_row_t top_row, lxw_col_t left_col,
+                          uint8_t type);
 
-    /* worksheet_split_panes() with infrequent options. Undocumented for now. */
-    void worksheet_split_panes_opt(lxw_worksheet *worksheet,
-                                   double vertical, double horizontal,
-                                   lxw_row_t top_row, lxw_col_t left_col);
+    /* split_panes() with infrequent options. Undocumented for now. */
+    void split_panes_opt(double vertical, double horizontal,
+                         lxw_row_t top_row, lxw_col_t left_col);
     /**
      * @brief Set the selected cell or cells in a worksheet:
      *
-     * @param worksheet   Pointer to a lxw_worksheet instance to be updated.
      * @param first_row   The first row of the range. (All zero indexed.)
      * @param first_col   The first column of the range.
      * @param last_row    The last row of the range.
      * @param last_col    The last col of the range.
      *
      *
-     * The `%worksheet_set_selection()` function can be used to specify which cell
+     * The `%set_selection()` function can be used to specify which cell
      * or range of cells is selected in a worksheet: The most common requirement
      * is to select a single cell, in which case the `first_` and `last_`
      * parameters should be the same.
@@ -1483,10 +1509,10 @@ public:
      * Examples:
      *
      * @code
-     *     worksheet_set_selection(worksheet1, 3, 3, 3, 3);     // Cell D4.
-     *     worksheet_set_selection(worksheet2, 3, 3, 6, 6);     // Cells D4 to G7.
-     *     worksheet_set_selection(worksheet3, 6, 6, 3, 3);     // Cells G7 to D4.
-     *     worksheet_set_selection(worksheet5, RANGE("D4:G7")); // Using the RANGE macro.
+     *     worksheet1->set_selection(3, 3, 3, 3);     // Cell D4.
+     *     worksheet2->set_selection(3, 3, 6, 6);     // Cells D4 to G7.
+     *     worksheet3->set_selection(6, 6, 3, 3);     // Cells G7 to D4.
+     *     worksheet5->set_selection(RANGE("D4:G7")); // Using the RANGE macro.
      *
      * @endcode
      *
@@ -1504,10 +1530,10 @@ public:
      * to landscape:
      *
      * @code
-     *     worksheet_set_landscape(worksheet);
+     *     worksheet->set_landscape();
      * @endcode
      */
-    void worksheet_set_landscape(lxw_worksheet *worksheet);
+    void set_landscape();
 
     /**
      * @brief Set the page orientation as portrait.
@@ -1592,8 +1618,8 @@ public:
      * printer supports. Therefore, it is best to stick to standard paper types:
      *
      * @code
-     *     worksheet.set_paper(1);  // US Letter
-     *     worksheet.set_paper(9);  // A4
+     *     worksheet->set_paper(1);  // US Letter
+     *     worksheet->set_paper(9);  // A4
      * @endcode
      *
      * If you do not specify a paper type the worksheet will print using the
@@ -1614,7 +1640,7 @@ public:
      * any parameter will give the default Excel value as shown above.
      *
      * @code
-     *    worksheet.set_margins(1.3, 1.2, -1, -1);
+     *    worksheet->set_margins(1.3, 1.2, -1, -1);
      * @endcode
      *
      */
@@ -1704,7 +1730,7 @@ public:
      * You can have text in each of the justification regions:
      *
      * @code
-     *     worksheet.set_header("&LCiao&CBello&RCielo");
+     *     worksheet->set_header("&LCiao&CBello&RCielo");
      *
      *      ---------------------------------------------------------------
      *     |                                                               |
@@ -1718,14 +1744,14 @@ public:
      * default format:
      *
      * @code
-     *     worksheet.set_header("&CPage &P of &N");
+     *     worksheet->set_header("&CPage &P of &N");
      *
      *      ---------------------------------------------------------------
      *     |                                                               |
      *     |                        Page 1 of 6                            |
      *     |                                                               |
      *
-     *     worksheet.set_header("&CUpdated at &T");
+     *     worksheet->set_header("&CUpdated at &T");
      *
      *      ---------------------------------------------------------------
      *     |                                                               |
@@ -1738,8 +1764,8 @@ public:
      * the control character `&n` where `n` is the font size:
      *
      * @code
-     *     worksheet.set_header("&C&30Hello Big");
-     *     worksheet.set_header("&C&10Hello Small");
+     *     worksheet->set_header("&C&30Hello Big");
+     *     worksheet->set_header("&C&10Hello Small");
      *
      * @endcode
      *
@@ -1749,9 +1775,9 @@ public:
      * "Courier New" or "Times New Roman" and `style` is one of the standard
      *
      * @code
-     *     worksheet.set_header("&C&\"Courier New,Italic\"Hello");
-     *     worksheet.set_header("&C&\"Courier New,Bold Italic\"Hello");
-     *     worksheet.set_header("&C&\"Times New Roman,Regular\"Hello");
+     *     worksheet->set_header("&C&\"Courier New,Italic\"Hello");
+     *     worksheet->set_header("&C&\"Courier New,Bold Italic\"Hello");
+     *     worksheet->set_header("&C&\"Times New Roman,Regular\"Hello");
      *
      * @endcode
      *
@@ -1791,7 +1817,7 @@ public:
      * use a double ampersand `&&`:
      *
      * @code
-     *     worksheet.set_header("&CCuriouser && Curiouser - Attorneys at Law");
+     *     worksheet->set_header("&CCuriouser && Curiouser - Attorneys at Law");
      * @endcode
      *
      * Note, the header or footer string must be less than 255 characters. Strings
@@ -1829,7 +1855,7 @@ public:
      *
      *    lxw_header_footer_options header_options = { 0.2 };
      *
-     *    worksheet.set_header_opt("Some text", &header_options);
+     *    worksheet->set_header_opt("Some text", &header_options);
      *
      * @endcode
      *
@@ -1867,8 +1893,8 @@ public:
      *    std::vector<lxw_row_t> breaks1 = {20, 0}; // 1 page break. Zero indicates the end.
      *    std::vector<lxw_row_t> breaks2 = {20, 40, 60, 80, 0};
      *
-     *    worksheet.set_h_pagebreaks(breaks1);
-     *    worksheet.set_h_pagebreaks(breaks2);
+     *    worksheet->set_h_pagebreaks(breaks1);
+     *    worksheet->set_h_pagebreaks(breaks2);
      * @endcode
      *
      * To create a page break between rows 20 and 21 you must specify the break at
@@ -1878,7 +1904,7 @@ public:
      *    // Break between row 20 and 21.
      *    std::vector<lxw_row_t> breaks = {20, 0};
      *
-     *    worksheet.set_h_pagebreaks(breaks);
+     *    worksheet->set_h_pagebreaks(breaks);
      * @endcode
      *
      * There is an Excel limitation of 1023 horizontal page breaks per worksheet.
@@ -1888,7 +1914,7 @@ public:
      * breaks.
      *
      */
-    lxw_error worksheet_set_h_pagebreaks(const std::vector<lxw_row_t> breaks);
+    lxw_error set_h_pagebreaks(const std::vector<lxw_row_t> breaks);
 
     /**
      * @brief Set the vertical page breaks on a worksheet.
@@ -1908,8 +1934,8 @@ public:
      *    std::vector<lxw_col_t> breaks1 = {20, 0}; // 1 page break. Zero indicates the end.
      *    std::vector<lxw_col_t> breaks2 = {20, 40, 60, 80, 0};
      *
-     *    worksheet.set_v_pagebreaks(breaks1);
-     *    worksheet.set_v_pagebreaks(breaks2);
+     *    worksheet->set_v_pagebreaks(breaks1);
+     *    worksheet->set_v_pagebreaks(breaks2);
      * @endcode
      *
      * To create a page break between columns 20 and 21 you must specify the break
@@ -1919,7 +1945,7 @@ public:
      *    // Break between column 20 and 21.
      *    std::vector<lxw_col_t> breaks = {20, 0};
      *
-     *    worksheet.set_v_pagebreaks(breaks);
+     *    worksheet->set_v_pagebreaks(breaks);
      * @endcode
      *
      * There is an Excel limitation of 1023 vertical page breaks per worksheet.
@@ -1938,7 +1964,7 @@ public:
      * print direction. This is referred to by Excel as the sheet "page order":
      *
      * @code
-     *     worksheet.print_across();
+     *     worksheet->print_across();
      * @endcode
      *
      * The default page order is shown below for a worksheet that extends over 4
@@ -1964,10 +1990,10 @@ public:
      * Set the worksheet zoom factor in the range `10 <= zoom <= 400`:
      *
      * @code
-     *     worksheet.set_zoom(50);
-     *     worksheet.set_zoom(75);
-     *     worksheet.set_zoom(300);
-     *     worksheet.set_zoom(400);
+     *     worksheet->set_zoom(50);
+     *     worksheet->set_zoom(75);
+     *     worksheet->set_zoom(300);
+     *     worksheet->set_zoom(400);
      * @endcode
      *
      * The default zoom factor is 100. It isn't possible to set the zoom to
@@ -1988,9 +2014,9 @@ public:
      * @ref lxw_gridlines.
      *
      * @code
-     *    worksheet.gridlines(LXW_HIDE_ALL_GRIDLINES);
+     *    worksheet->gridlines(LXW_HIDE_ALL_GRIDLINES);
      *
-     *    worksheet.gridlines(LXW_SHOW_PRINT_GRIDLINES);
+     *    worksheet->gridlines(LXW_SHOW_PRINT_GRIDLINES);
      * @endcode
      *
      * The Excel default is that the screen gridlines are on  and the printed
@@ -2006,7 +2032,7 @@ public:
      * page:
      *
      * @code
-     *     worksheet.center_horizontally();
+     *     worksheet->center_horizontally();
      * @endcode
      *
      */
@@ -2019,7 +2045,7 @@ public:
      * page:
      *
      * @code
-     *     worksheet.center_vertically();
+     *     worksheet->center_vertically();
      * @endcode
      *
      */
@@ -2036,7 +2062,7 @@ public:
      * This function sets the printer option to print these headers:
      *
      * @code
-     *    worksheet.print_row_col_headers();
+     *    worksheet->print_row_col_headers();
      * @endcode
      *
      */
@@ -2057,8 +2083,8 @@ public:
      * and `last_row` are zero based:
      *
      * @code
-     *     worksheet.repeat_rows(0, 0); // Repeat the first row.
-     *     worksheet.repeat_rows(0, 1); // Repeat the first two rows.
+     *     worksheet->repeat_rows(0, 0); // Repeat the first row.
+     *     worksheet->repeat_rows(0, 1); // Repeat the first two rows.
      * @endcode
      */
     lxw_error repeat_rows(lxw_row_t first_row, lxw_row_t last_row);
@@ -2078,8 +2104,8 @@ public:
      * and `last_col` are zero based:
      *
      * @code
-     *     worksheet.repeat_columns(0, 0); // Repeat the first col.
-     *     worksheet.repeat_columns(0, 1); // Repeat the first two cols.
+     *     worksheet->repeat_columns(0, 0); // Repeat the first col.
+     *     worksheet->repeat_columns(0, 1); // Repeat the first two cols.
      * @endcode
      */
     lxw_error repeat_columns(lxw_col_t first_col, lxw_col_t last_col);
@@ -2099,16 +2125,16 @@ public:
      * printed. The RANGE() macro is often convenient for this.
      *
      * @code
-     *     worksheet.print_area(0, 0, 41, 10); // A1:K42.
+     *     worksheet->print_area(0, 0, 41, 10); // A1:K42.
      *
      *     // Same as:
-     *     worksheet.print_area(RANGE("A1:K42"));
+     *     worksheet->print_area(RANGE("A1:K42"));
      * @endcode
      *
      * In order to set a row or column range you must specify the entire range:
      *
      * @code
-     *     worksheet.print_area(RANGE("A1:H1048576")); // Same as A:H.
+     *     worksheet->print_area(RANGE("A1:H1048576")); // Same as A:H.
      * @endcode
      */
     lxw_error print_area(lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
@@ -2126,9 +2152,9 @@ public:
      * number of pages even if the page size or margins change:
      *
      * @code
-     *     worksheet.fit_to_pages(1, 1); // Fit to 1x1 pages.
-     *     worksheet.fit_to_pages(2, 1); // Fit to 2x1 pages.
-     *     worksheet.fit_to_pages(1, 2); // Fit to 1x2 pages.
+     *     worksheet->fit_to_pages(1, 1); // Fit to 1x1 pages.
+     *     worksheet->fit_to_pages(2, 1); // Fit to 2x1 pages.
+     *     worksheet->fit_to_pages(1, 2); // Fit to 1x2 pages.
      * @endcode
      *
      * The print area can be defined using the `print_area()` function
@@ -2140,7 +2166,7 @@ public:
      *
      * @code
      *     // 1 page wide and as long as necessary.
-     *     worksheet.fit_to_pages(worksheet, 1, 0);
+     *     worksheet->fit_to_pages(worksheet, 1, 0);
      * @endcode
      *
      * **Note**:
@@ -2171,7 +2197,7 @@ public:
      *
      * @code
      *     // Start print from page 2.
-     *     worksheet.set_start_page(2);
+     *     worksheet->set_start_page(2);
      * @endcode
      */
     void set_start_page(uint16_t start_page);
@@ -2185,8 +2211,8 @@ public:
      * must be in the range `10 <= scale <= 400`:
      *
      * @code
-     *     worksheet.set_print_scale(75);
-     *     worksheet.set_print_scale(400);
+     *     worksheet->set_print_scale(75);
+     *     worksheet->set_print_scale(400);
      * @endcode
      *
      * The default scale factor is 100. Note, `%worksheet_set_print_scale()` does
@@ -2210,7 +2236,7 @@ public:
      * top left, to right-to-left, with the `A1` cell in the top right.
      *
      * @code
-     *     worksheet.right_to_left();
+     *     worksheet->right_to_left();
      * @endcode
      *
      * This is useful when creating Arabic, Hebrew or other near or far eastern
@@ -2225,7 +2251,7 @@ public:
      * appear in cells:
      *
      * @code
-     *     worksheet.hide_zero();
+     *     worksheet->hide_zero();
      * @endcode
      */
     void worksheet_hide_zero();
@@ -2519,76 +2545,10 @@ private:
     STATIC void _worksheet_write_sheet_protection(lxw_worksheet *worksheet);
 #endif /* TESTING */
 
-} worksheet;
+};
 
-/*
- * Worksheet initialization data.
- */
-typedef struct lxw_worksheet_init_data {
-    uint32_t index;
-    uint8_t hidden;
-    uint8_t optimize;
-    uint16_t *active_sheet;
-    uint16_t *first_sheet;
-    lxw_sst *sst;
-    char *name;
-    char *quoted_name;
-    char *tmpdir;
+typedef std::shared_ptr<worksheet> worksheet_ptr;
 
-} lxw_worksheet_init_data;
-
-/* Struct to represent a worksheet row. */
-typedef struct lxw_row {
-    lxw_row_t row_num;
-    double height;
-    lxw_format *format;
-    uint8_t hidden;
-    uint8_t level;
-    uint8_t collapsed;
-    uint8_t row_changed;
-    uint8_t data_changed;
-    uint8_t height_changed;
-    struct lxw_table_cells *cells;
-
-    /* tree management pointers for tree.h. */
-    RB_ENTRY (lxw_row) tree_pointers;
-} lxw_row;
-
-/* Struct to represent a worksheet cell. */
-typedef struct lxw_cell {
-    lxw_row_t row_num;
-    lxw_col_t col_num;
-    enum cell_types type;
-    lxw_format *format;
-
-    union {
-        double number;
-        int32_t string_id;
-        char *string;
-    } u;
-
-    double formula_result;
-    char *user_data1;
-    char *user_data2;
-    char *sst_string;
-
-    /* List pointers for tree.h. */
-    RB_ENTRY (lxw_cell) tree_pointers;
-} lxw_cell;
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-
-}
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // xlsxwriter
 
 #endif /* __LXW_WORKSHEET_H__ */
