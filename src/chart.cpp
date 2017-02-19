@@ -216,16 +216,16 @@ lxw_chart *lxw_chart_new(uint8_t type)
     lxw_strcpy(chart->x2_axis->default_num_format, "General");
     lxw_strcpy(chart->y2_axis->default_num_format, "General");
 
-    chart->x_axis->default_major_gridlines = LXW_FALSE;
-    chart->y_axis->default_major_gridlines = LXW_TRUE;
+    chart->x_axis->default_major_gridlines = false;
+    chart->y_axis->default_major_gridlines = true;
 
-    chart->x_axis->visible = LXW_TRUE;
-    chart->y_axis->visible = LXW_TRUE;
-    chart->x2_axis->visible = LXW_FALSE;
-    chart->y2_axis->visible = LXW_TRUE;
+    chart->x_axis->visible = true;
+    chart->y_axis->visible = true;
+    chart->x2_axis->visible = false;
+    chart->y2_axis->visible = true;
     
-    chart->x2_axis->default_major_gridlines = LXW_FALSE;
-    chart->y2_axis->default_major_gridlines = LXW_FALSE;
+    chart->x2_axis->default_major_gridlines = false;
+    chart->y2_axis->default_major_gridlines = false;
 
     chart->x_axis->position = LXW_CHART_BOTTOM;
     chart->y_axis->position = LXW_CHART_LEFT;
@@ -234,8 +234,8 @@ lxw_chart *lxw_chart_new(uint8_t type)
 
     chart->series_overlap_1 = 100;
 
-    chart->has_horiz_cat_axis = LXW_FALSE;
-    chart->has_horiz_val_axis = LXW_TRUE;
+    chart->has_horiz_cat_axis = false;
+    chart->has_horiz_val_axis = true;
 
     return chart;
 
@@ -1460,7 +1460,7 @@ _chart_write_val(lxw_chart *self, lxw_chart_series *series)
 
     /* Write the data cache elements. The string_cache is set to false since
      * this should always be a number series. */
-    _chart_write_data_cache(self, series->values, LXW_FALSE);
+    _chart_write_data_cache(self, series->values, false);
 
     lxw_xml_end_tag(self->file, "c:val");
 }
@@ -1475,7 +1475,7 @@ _chart_write_y_val(lxw_chart *self, lxw_chart_series *series)
 
     /* Write the data cache elements. The string_cache is set to false since
      * this should always be a number series. */
-    _chart_write_data_cache(self, series->values, LXW_FALSE);
+    _chart_write_data_cache(self, series->values, false);
 
     lxw_xml_end_tag(self->file, "c:yVal");
 }
@@ -2554,13 +2554,13 @@ _chart_write_scatter_plot_area(lxw_chart *self)
     _chart_write_layout(self);
 
     /* Write subclass chart type elements for primary and secondary axes. */
-    self->write_chart_type(self, LXW_TRUE);
-    self->write_chart_type(self, LXW_FALSE);
+    self->write_chart_type(self, true);
+    self->write_chart_type(self, false);
 
     /* Write the c:catAx element. */
     _chart_write_cat_val_axis(self);
 
-    self->has_horiz_val_axis = LXW_TRUE;
+    self->has_horiz_val_axis = true;
 
     val_axis_args args = {
         .x_axis = self->x_axis,
@@ -2586,7 +2586,7 @@ _chart_write_pie_plot_area(lxw_chart *self)
     _chart_write_layout(self);
 
     /* Write subclass chart type elements for primary and secondary axes. */
-    self->write_chart_type(self, LXW_TRUE);
+    self->write_chart_type(self, true);
 
     lxw_xml_end_tag(self->file, "c:plotArea");
 }
@@ -2606,8 +2606,8 @@ _chart_write_plot_area(lxw_chart *self)
     _chart_write_layout(self);
 
     /* Write subclass chart type elements for primary and secondary axes. */
-    self->write_chart_type(self, LXW_TRUE);
-    self->write_chart_type(self, LXW_FALSE);
+    self->write_chart_type(self, true);
+    self->write_chart_type(self, false);
 
     /* Write combined chart, if exist*/
     
@@ -2619,8 +2619,8 @@ _chart_write_plot_area(lxw_chart *self)
         second_chart->id = second_chart->is_secondary ? self->id + 1000 : self->id;
         second_chart->file = self->file;
         second_chart->series_index = self->series_index;      
-        second_chart->write_chart_type(self->combined, LXW_TRUE);
-        second_chart->write_chart_type(self->combined, LXW_FALSE);
+        second_chart->write_chart_type(self->combined, true);
+        second_chart->write_chart_type(self->combined, false);
     }
     
     
@@ -2724,21 +2724,21 @@ _chart_initialize_bar_chart(lxw_chart *self, uint8_t type)
     self->y_axis = tmp;
 
     /*Also reverse some of the defaults. */
-    self->x_axis->default_major_gridlines = LXW_FALSE;
-    self->y_axis->default_major_gridlines = LXW_TRUE;
-    self->has_horiz_cat_axis = LXW_TRUE;
-    self->has_horiz_val_axis = LXW_FALSE;
+    self->x_axis->default_major_gridlines = false;
+    self->y_axis->default_major_gridlines = true;
+    self->has_horiz_cat_axis = true;
+    self->has_horiz_val_axis = false;
 
     if (type == LXW_CHART_BAR_STACKED) {
         self->grouping = LXW_GROUPING_STACKED;
-        self->has_overlap = LXW_TRUE;
+        self->has_overlap = true;
         self->subtype = LXW_CHART_SUBTYPE_STACKED;
     }
 
     if (type == LXW_CHART_BAR_STACKED_PERCENT) {
         self->grouping = LXW_GROUPING_PERCENTSTACKED;
         lxw_strcpy((self->y_axis)->default_num_format, "0%");
-        self->has_overlap = LXW_TRUE;
+        self->has_overlap = true;
         self->subtype = LXW_CHART_SUBTYPE_STACKED;
     }
 
@@ -2757,18 +2757,18 @@ _chart_initialize_bar_chart(lxw_chart *self, uint8_t type)
 STATIC void
 _chart_initialize_column_chart(lxw_chart *self, uint8_t type)
 {
-    self->has_horiz_val_axis = LXW_FALSE;
+    self->has_horiz_val_axis = false;
 
     if (type == LXW_CHART_COLUMN_STACKED) {
         self->grouping = LXW_GROUPING_STACKED;
-        self->has_overlap = LXW_TRUE;
+        self->has_overlap = true;
         self->subtype = LXW_CHART_SUBTYPE_STACKED;
     }
 
     if (type == LXW_CHART_COLUMN_STACKED_PERCENT) {
         self->grouping = LXW_GROUPING_PERCENTSTACKED;
         lxw_strcpy((self->y_axis)->default_num_format, "0%");
-        self->has_overlap = LXW_TRUE;
+        self->has_overlap = true;
         self->subtype = LXW_CHART_SUBTYPE_STACKED;
     }
 
@@ -2783,7 +2783,7 @@ _chart_initialize_column_chart(lxw_chart *self, uint8_t type)
 STATIC void
 _chart_initialize_doughnut_chart(lxw_chart *self)
 {
-    self->has_markers = LXW_FALSE;
+    self->has_markers = false;
 
     /* Initialize the function pointers for this chart type. */
     self->write_chart_type = _chart_write_doughnut_chart;
@@ -2796,7 +2796,7 @@ _chart_initialize_doughnut_chart(lxw_chart *self)
 STATIC void
 _chart_initialize_line_chart(lxw_chart *self)
 {
-    self->has_markers = LXW_TRUE;
+    self->has_markers = true;
     self->grouping = LXW_GROUPING_STANDARD;
 
     /* Initialize the function pointers for this chart type. */
@@ -2810,7 +2810,7 @@ _chart_initialize_line_chart(lxw_chart *self)
 STATIC void
 _chart_initialize_pie_chart(lxw_chart *self)
 {
-    self->has_markers = LXW_FALSE;
+    self->has_markers = false;
 
     /* Initialize the function pointers for this chart type. */
     self->write_chart_type = _chart_write_pie_chart;
@@ -2823,10 +2823,10 @@ _chart_initialize_pie_chart(lxw_chart *self)
 STATIC void
 _chart_initialize_scatter_chart(lxw_chart *self)
 {
-    self->has_horiz_val_axis = LXW_FALSE;
+    self->has_horiz_val_axis = false;
     self->cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
-    self->is_scatter = LXW_TRUE;
-    self->has_markers = LXW_TRUE;
+    self->is_scatter = true;
+    self->has_markers = true;
 
     /* Initialize the function pointers for this chart type. */
     self->write_chart_type = _chart_write_scatter_chart;
@@ -2840,10 +2840,10 @@ STATIC void
 _chart_initialize_radar_chart(lxw_chart *self, uint8_t type)
 {
     if (type == LXW_CHART_RADAR)
-        self->has_markers = LXW_TRUE;
+        self->has_markers = true;
 
-    self->x_axis->default_major_gridlines = LXW_TRUE;
-    self->y_axis->major_tick_mark = LXW_TRUE;
+    self->x_axis->default_major_gridlines = true;
+    self->y_axis->major_tick_mark = true;
 
     /* Initialize the function pointers for this chart type. */
     self->write_chart_type = _chart_write_radar_chart;
@@ -2954,7 +2954,7 @@ lxw_chart_add_data_cache(lxw_series_range *range, uint8_t *data,
     struct lxw_series_data_point *data_point;
     uint16_t i;
 
-    range->ignore_cache = LXW_TRUE;
+    range->ignore_cache = true;
     range->num_data_points = rows;
 
     /* Initialize the series range data cache. */
@@ -3036,7 +3036,7 @@ lxw_chart_series *chart_add_series_opt(lxw_chart *chart, const char *categories,
         {
             series->x2_axis = options->x2_axis;
             series->y2_axis = options->y2_axis;
-            chart->is_secondary = LXW_TRUE;
+            chart->is_secondary = true;
         }
     }
     return series;
@@ -3206,7 +3206,7 @@ chart_title_set_name_range(lxw_chart *self, const char *sheetname,
 void
 chart_title_off(lxw_chart *self)
 {
-    self->title.off = LXW_TRUE;
+    self->title.off = true;
 }
 
 /*

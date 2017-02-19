@@ -193,7 +193,7 @@ _prepare_fonts(lxw_workbook *self)
             if (hash_element) {
                 /* Font has already been used. */
                 format->font_index = *(uint16_t *) hash_element->value;
-                format->has_font = LXW_FALSE;
+                format->has_font = false;
                 free(key);
             }
             else {
@@ -239,7 +239,7 @@ _prepare_borders(lxw_workbook *self)
             if (hash_element) {
                 /* Border has already been used. */
                 format->border_index = *(uint16_t *) hash_element->value;
-                format->has_border = LXW_FALSE;
+                format->has_border = false;
                 free(key);
             }
             else {
@@ -345,7 +345,7 @@ _prepare_fills(lxw_workbook *self)
             if (hash_element) {
                 /* Fill has already been used. */
                 format->fill_index = *(uint16_t *) hash_element->value;
-                format->has_fill = LXW_FALSE;
+                format->has_fill = false;
                 free(key);
             }
             else {
@@ -637,7 +637,7 @@ _populate_range_data_cache(lxw_workbook *self, lxw_series_range *range)
      */
     if (range->first_row != range->last_row
         && range->first_col != range->last_col) {
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
 
@@ -647,13 +647,13 @@ _populate_range_data_cache(lxw_workbook *self, lxw_series_range *range)
         LXW_WARN_FORMAT2("workbook_add_chart(): worksheet name '%s' "
                          "in chart formula '%s' doesn't exist.",
                          range->sheetname, range->formula);
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
 
     /* We can't read the data when worksheet optimization is on. */
     if (worksheet->optimize) {
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
 
@@ -666,7 +666,7 @@ _populate_range_data_cache(lxw_workbook *self, lxw_series_range *range)
 
             data_point = calloc(1, sizeof(struct lxw_series_data_point));
             if (!data_point) {
-                range->ignore_cache = LXW_TRUE;
+                range->ignore_cache = true;
                 return;
             }
 
@@ -679,12 +679,12 @@ _populate_range_data_cache(lxw_workbook *self, lxw_series_range *range)
 
                 if (cell_obj->type == STRING_CELL) {
                     data_point->string = lxw_strdup(cell_obj->sst_string);
-                    data_point->is_string = LXW_TRUE;
-                    range->has_string_cache = LXW_TRUE;
+                    data_point->is_string = true;
+                    range->has_string_cache = true;
                 }
             }
             else {
-                data_point->no_data = LXW_TRUE;
+                data_point->no_data = true;
             }
 
             STAILQ_INSERT_TAIL(range->data_cache, data_point, list_pointers);
@@ -712,7 +712,7 @@ _populate_range_dimensions(lxw_workbook *self, lxw_series_range *range)
      * isn't a valid range.
      */
     if (!range->formula && !range->sheetname) {
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
 
@@ -724,7 +724,7 @@ _populate_range_dimensions(lxw_workbook *self, lxw_series_range *range)
 
     /* Ignore non-contiguous range like (Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5) */
     if (range->formula[0] == '(') {
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
 
@@ -735,7 +735,7 @@ _populate_range_dimensions(lxw_workbook *self, lxw_series_range *range)
     tmp_str = strchr(formula, '!');
 
     if (tmp_str == NULL) {
-        range->ignore_cache = LXW_TRUE;
+        range->ignore_cache = true;
         return;
     }
     else {
@@ -755,7 +755,7 @@ _populate_range_dimensions(lxw_workbook *self, lxw_series_range *range)
             LXW_WARN_FORMAT2("workbook_add_chart(): worksheet name '%s' "
                              "in chart formula '%s' doesn't exist.",
                              sheetname, range->formula);
-            range->ignore_cache = LXW_TRUE;
+            range->ignore_cache = true;
             return;
         }
 
@@ -860,13 +860,13 @@ _prepare_drawings(lxw_workbook *self)
         STAILQ_FOREACH(image_options, worksheet->image_data, list_pointers) {
 
             if (image_options->image_type == LXW_IMAGE_PNG)
-                self->has_png = LXW_TRUE;
+                self->has_png = true;
 
             if (image_options->image_type == LXW_IMAGE_JPEG)
-                self->has_jpeg = LXW_TRUE;
+                self->has_jpeg = true;
 
             if (image_options->image_type == LXW_IMAGE_BMP)
-                self->has_bmp = LXW_TRUE;
+                self->has_bmp = true;
 
             image_ref_id++;
 
@@ -913,7 +913,7 @@ _prepare_defined_names(lxw_workbook *self)
 
             /* Autofilters are the only defined name to set the hidden flag. */
             _store_defined_name(self, "_xlnm._FilterDatabase", app_name,
-                                range, worksheet->index, LXW_TRUE);
+                                range, worksheet->index, true);
         }
 
         /*
@@ -929,10 +929,10 @@ _prepare_defined_names(lxw_workbook *self)
                 && worksheet->print_area.last_row == LXW_ROW_MAX - 1) {
 
                 lxw_col_to_name(first_col,
-                                worksheet->print_area.first_col, LXW_FALSE);
+                                worksheet->print_area.first_col, false);
 
                 lxw_col_to_name(last_col,
-                                worksheet->print_area.last_col, LXW_FALSE);
+                                worksheet->print_area.last_col, false);
 
                 lxw_snprintf(area, LXW_MAX_CELL_RANGE_LENGTH - 1, "$%s:$%s",
                              first_col, last_col);
@@ -959,7 +959,7 @@ _prepare_defined_names(lxw_workbook *self)
                          worksheet->quoted_name, area);
 
             _store_defined_name(self, "_xlnm.Print_Area", app_name,
-                                range, worksheet->index, LXW_FALSE);
+                                range, worksheet->index, false);
         }
 
         /*
@@ -972,10 +972,10 @@ _prepare_defined_names(lxw_workbook *self)
                              "%s!Print_Titles", worksheet->quoted_name);
 
                 lxw_col_to_name(first_col,
-                                worksheet->repeat_cols.first_col, LXW_FALSE);
+                                worksheet->repeat_cols.first_col, false);
 
                 lxw_col_to_name(last_col,
-                                worksheet->repeat_cols.last_col, LXW_FALSE);
+                                worksheet->repeat_cols.last_col, false);
 
                 lxw_snprintf(range, LXW_DEFINED_NAME_LENGTH,
                              "%s!$%s:$%s,%s!$%d:$%d",
@@ -985,7 +985,7 @@ _prepare_defined_names(lxw_workbook *self)
                              worksheet->repeat_rows.last_row + 1);
 
                 _store_defined_name(self, "_xlnm.Print_Titles", app_name,
-                                    range, worksheet->index, LXW_FALSE);
+                                    range, worksheet->index, false);
             }
             else if (worksheet->repeat_rows.in_use) {
 
@@ -998,24 +998,24 @@ _prepare_defined_names(lxw_workbook *self)
                              worksheet->repeat_rows.last_row + 1);
 
                 _store_defined_name(self, "_xlnm.Print_Titles", app_name,
-                                    range, worksheet->index, LXW_FALSE);
+                                    range, worksheet->index, false);
             }
             else if (worksheet->repeat_cols.in_use) {
                 lxw_snprintf(app_name, LXW_DEFINED_NAME_LENGTH,
                              "%s!Print_Titles", worksheet->quoted_name);
 
                 lxw_col_to_name(first_col,
-                                worksheet->repeat_cols.first_col, LXW_FALSE);
+                                worksheet->repeat_cols.first_col, false);
 
                 lxw_col_to_name(last_col,
-                                worksheet->repeat_cols.last_col, LXW_FALSE);
+                                worksheet->repeat_cols.last_col, false);
 
                 lxw_snprintf(range, LXW_DEFINED_NAME_LENGTH,
                              "%s!$%s:$%s", worksheet->quoted_name,
                              first_col, last_col);
 
                 _store_defined_name(self, "_xlnm.Print_Titles", app_name,
-                                    range, worksheet->index, LXW_FALSE);
+                                    range, worksheet->index, false);
             }
         }
     }
@@ -1598,7 +1598,7 @@ lxw_error
 workbook_define_name(lxw_workbook *self, const char *name,
                      const char *formula)
 {
-    return _store_defined_name(self, name, NULL, formula, -1, LXW_FALSE);
+    return _store_defined_name(self, name, NULL, formula, -1, false);
 }
 
 /*

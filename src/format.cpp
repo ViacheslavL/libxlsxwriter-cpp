@@ -36,44 +36,44 @@ lxw_format_new()
     format->num_format[0] = '\0';
     format->num_format_index = 0;
     format->font_index = 0;
-    format->has_font = LXW_FALSE;
-    format->has_dxf_font = LXW_FALSE;
+    format->has_font = false;
+    format->has_dxf_font = false;
     format->font_size = 11;
-    format->bold = LXW_FALSE;
-    format->italic = LXW_FALSE;
+    format->bold = false;
+    format->italic = false;
     format->font_color = LXW_COLOR_UNSET;
-    format->underline = LXW_FALSE;
-    format->font_strikeout = LXW_FALSE;
-    format->font_outline = LXW_FALSE;
-    format->font_shadow = LXW_FALSE;
-    format->font_script = LXW_FALSE;
+    format->underline = false;
+    format->font_strikeout = false;
+    format->font_outline = false;
+    format->font_shadow = false;
+    format->font_script = false;
     format->font_family = LXW_DEFAULT_FONT_FAMILY;
-    format->font_charset = LXW_FALSE;
-    format->font_condense = LXW_FALSE;
-    format->font_extend = LXW_FALSE;
-    format->theme = LXW_FALSE;
-    format->hyperlink = LXW_FALSE;
+    format->font_charset = false;
+    format->font_condense = false;
+    format->font_extend = false;
+    format->theme = false;
+    format->hyperlink = false;
 
-    format->hidden = LXW_FALSE;
-    format->locked = LXW_TRUE;
+    format->hidden = false;
+    format->locked = true;
 
     format->text_h_align = LXW_ALIGN_NONE;
-    format->text_wrap = LXW_FALSE;
+    format->text_wrap = false;
     format->text_v_align = LXW_ALIGN_NONE;
-    format->text_justlast = LXW_FALSE;
+    format->text_justlast = false;
     format->rotation = 0;
 
     format->fg_color = LXW_COLOR_UNSET;
     format->bg_color = LXW_COLOR_UNSET;
     format->pattern = LXW_PATTERN_NONE;
-    format->has_fill = LXW_FALSE;
-    format->has_dxf_fill = LXW_FALSE;
+    format->has_fill = false;
+    format->has_dxf_fill = false;
     format->fill_index = 0;
     format->fill_count = 0;
 
     format->border_index = 0;
-    format->has_border = LXW_FALSE;
-    format->has_dxf_border = LXW_FALSE;
+    format->has_border = false;
+    format->has_dxf_border = false;
     format->border_count = 0;
 
     format->bottom = LXW_BORDER_NONE;
@@ -89,12 +89,12 @@ lxw_format_new()
     format->diag_color = LXW_COLOR_UNSET;
 
     format->indent = 0;
-    format->shrink = LXW_FALSE;
-    format->merge_range = LXW_FALSE;
+    format->shrink = false;
+    format->merge_range = false;
     format->reading_order = 0;
-    format->just_distrib = LXW_FALSE;
-    format->color_indexed = LXW_FALSE;
-    format->font_only = LXW_FALSE;
+    format->just_distrib = false;
+    format->color_indexed = false;
+    format->font_only = false;
 
     return format;
 
@@ -331,7 +331,7 @@ format_set_font_color(lxw_format *self, lxw_color_t color)
 void
 format_set_bold(lxw_format *self)
 {
-    self->bold = LXW_TRUE;
+    self->bold = true;
 }
 
 /*
@@ -341,7 +341,7 @@ format_set_bold(lxw_format *self)
 void
 format_set_italic(lxw_format *self)
 {
-    self->italic = LXW_TRUE;
+    self->italic = true;
 }
 
 /*
@@ -361,7 +361,7 @@ format_set_underline(lxw_format *self, uint8_t style)
 void
 format_set_font_strikeout(lxw_format *self)
 {
-    self->font_strikeout = LXW_TRUE;
+    self->font_strikeout = true;
 }
 
 /*
@@ -380,7 +380,7 @@ format_set_font_script(lxw_format *self, uint8_t style)
 void
 format_set_font_outline(lxw_format *self)
 {
-    self->font_outline = LXW_TRUE;
+    self->font_outline = true;
 }
 
 /*
@@ -389,7 +389,7 @@ format_set_font_outline(lxw_format *self)
 void
 format_set_font_shadow(lxw_format *self)
 {
-    self->font_shadow = LXW_TRUE;
+    self->font_shadow = true;
 }
 
 /*
@@ -407,7 +407,7 @@ format_set_num_format(lxw_format *self, const char *num_format)
 void
 format_set_unlocked(lxw_format *self)
 {
-    self->locked = LXW_FALSE;
+    self->locked = false;
 }
 
 /*
@@ -416,7 +416,7 @@ format_set_unlocked(lxw_format *self)
 void
 format_set_hidden(lxw_format *self)
 {
-    self->hidden = LXW_TRUE;
+    self->hidden = true;
 }
 
 /*
@@ -441,7 +441,7 @@ format_set_align(lxw_format *self, uint8_t value)
 void
 format_set_text_wrap(lxw_format *self)
 {
-    self->text_wrap = LXW_TRUE;
+    self->text_wrap = true;
 }
 
 /*
@@ -481,7 +481,7 @@ format_set_indent(lxw_format *self, uint8_t value)
 void
 format_set_shrink(lxw_format *self)
 {
-    self->shrink = LXW_TRUE;
+    self->shrink = true;
 }
 
 /*
@@ -490,7 +490,7 @@ format_set_shrink(lxw_format *self)
 void
 format_set_text_justlast(lxw_format *self)
 {
-    self->text_justlast = LXW_TRUE;
+    self->text_justlast = true;
 }
 
 /*
@@ -706,7 +706,7 @@ format_set_font_scheme(lxw_format *self, const char *font_scheme)
 void
 format_set_font_condense(lxw_format *self)
 {
-    self->font_condense = LXW_TRUE;
+    self->font_condense = true;
 }
 
 /*
@@ -715,7 +715,7 @@ format_set_font_condense(lxw_format *self)
 void
 format_set_font_extend(lxw_format *self)
 {
-    self->font_extend = LXW_TRUE;
+    self->font_extend = true;
 }
 
 /*

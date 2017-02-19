@@ -138,7 +138,7 @@ _write_t(lxw_sst *self, char *string)
 STATIC void
 _write_si(lxw_sst *self, char *string)
 {
-    uint8_t escaped_string = LXW_FALSE;
+    uint8_t escaped_string = false;
 
     lxw_xml_start_tag(self->file, "si", NULL);
 
@@ -147,7 +147,7 @@ _write_si(lxw_sst *self, char *string)
                 "\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16"
                 "\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F")) {
         string = lxw_escape_control_characters(string);
-        escaped_string = LXW_TRUE;
+        escaped_string = true;
     }
 
     /* Write the t element. */

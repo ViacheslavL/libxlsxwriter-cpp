@@ -169,10 +169,10 @@ lxw_worksheet_new(lxw_worksheet_init_data *init_data)
     worksheet->page_start = 0;
     worksheet->print_scale = 100;
     worksheet->fit_page = 0;
-    worksheet->orientation = LXW_TRUE;
+    worksheet->orientation = true;
     worksheet->page_order = 0;
-    worksheet->page_setup_changed = LXW_FALSE;
-    worksheet->page_view = LXW_FALSE;
+    worksheet->page_setup_changed = false;
+    worksheet->page_view = false;
     worksheet->paper_size = 0;
     worksheet->vertical_dpi = 0;
     worksheet->horizontal_dpi = 0;
@@ -186,9 +186,9 @@ lxw_worksheet_new(lxw_worksheet_init_data *init_data)
     worksheet->screen_gridlines = 1;
     worksheet->print_options_changed = 0;
     worksheet->zoom = 100;
-    worksheet->zoom_scale_normal = LXW_TRUE;
-    worksheet->show_zeros = LXW_TRUE;
-    worksheet->outline_on = LXW_TRUE;
+    worksheet->zoom_scale_normal = true;
+    worksheet->show_zeros = true;
+    worksheet->outline_on = true;
     worksheet->tab_color = LXW_COLOR_UNSET;
 
     if (init_data) {
@@ -690,12 +690,12 @@ _insert_cell(lxw_worksheet *self, lxw_row_t row_num, lxw_col_t col_num,
     lxw_row *row = _get_row(self, row_num);
 
     if (!self->optimize) {
-        row->data_changed = LXW_TRUE;
+        row->data_changed = true;
         _insert_cell_list(row->cells, cell, col_num);
     }
     else {
         if (row) {
-            row->data_changed = LXW_TRUE;
+            row->data_changed = true;
 
             /* Overwrite an existing cell if necessary. */
             if (self->array[col_num])
@@ -1100,7 +1100,7 @@ _worksheet_write_split_panes(lxw_worksheet *self)
     lxw_col_t left_col = self->panes.left_col;
     double x_split = self->panes.x_split;
     double y_split = self->panes.y_split;
-    uint8_t has_selection = LXW_FALSE;
+    uint8_t has_selection = false;
 
     char row_cell[LXW_MAX_CELL_NAME_LENGTH];
     char col_cell[LXW_MAX_CELL_NAME_LENGTH];
@@ -1111,7 +1111,7 @@ _worksheet_write_split_panes(lxw_worksheet *self)
     if (!STAILQ_EMPTY(self->selections)) {
         user_selection = STAILQ_FIRST(self->selections);
         STAILQ_REMOVE_HEAD(self->selections, list_pointers);
-        has_selection = LXW_TRUE;
+        has_selection = true;
     }
     else {
         /* or else create a new blank selection. */
@@ -1901,7 +1901,7 @@ lxw_worksheet_prepare_image(lxw_worksheet *self,
 
     if (!self->drawing) {
         self->drawing = lxw_drawing_new();
-        self->drawing->embedded = LXW_TRUE;
+        self->drawing->embedded = true;
         RETURN_VOID_ON_MEM_ERROR(self->drawing);
 
         relationship = calloc(1, sizeof(lxw_rel_tuple));
@@ -1988,7 +1988,7 @@ lxw_worksheet_prepare_chart(lxw_worksheet *self,
 
     if (!self->drawing) {
         self->drawing = lxw_drawing_new();
-        self->drawing->embedded = LXW_TRUE;
+        self->drawing->embedded = true;
         RETURN_VOID_ON_MEM_ERROR(self->drawing);
 
         relationship = calloc(1, sizeof(lxw_rel_tuple));
@@ -2678,11 +2678,11 @@ lxw_worksheet_write_single_row(lxw_worksheet *self)
     /* Reset the row. */
     row->height = LXW_DEF_ROW_HEIGHT;
     row->format = NULL;
-    row->hidden = LXW_FALSE;
+    row->hidden = false;
     row->level = 0;
-    row->collapsed = LXW_FALSE;
-    row->data_changed = LXW_FALSE;
-    row->row_changed = LXW_FALSE;
+    row->collapsed = false;
+    row->data_changed = false;
+    row->row_changed = false;
 }
 
 /*
@@ -2695,7 +2695,7 @@ _worksheet_write_col_info(lxw_worksheet *self, lxw_col_options *options)
     struct xml_attribute *attribute;
 
     double width = options->width;
-    uint8_t has_custom_width = LXW_TRUE;
+    uint8_t has_custom_width = true;
     int32_t xf_index = 0;
     double max_digit_width = 7.0;       /* For Calabri 11. */
     double padding = 5.0;
@@ -2712,7 +2712,7 @@ _worksheet_write_col_info(lxw_worksheet *self, lxw_col_options *options)
         if (options->hidden)
             width = 0;
         else
-            has_custom_width = LXW_FALSE;
+            has_custom_width = false;
 
     }
 
@@ -3387,7 +3387,7 @@ worksheet_write_number(lxw_worksheet *self,
     lxw_cell *cell;
     lxw_error err;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3422,7 +3422,7 @@ worksheet_write_string(lxw_worksheet *self,
             return LXW_ERROR_NULL_PARAMETER_IGNORED;
     }
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3475,7 +3475,7 @@ worksheet_write_formula_num(lxw_worksheet *self,
     if (!formula)
         return LXW_ERROR_NULL_PARAMETER_IGNORED;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3541,7 +3541,7 @@ worksheet_write_array_formula_num(lxw_worksheet *self,
         return LXW_ERROR_NULL_PARAMETER_IGNORED;
 
     /* Check that column number is valid and store the max value */
-    err = _check_dimensions(self, last_row, last_col, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, last_row, last_col, false, false);
     if (err)
         return err;
 
@@ -3621,7 +3621,7 @@ worksheet_write_blank(lxw_worksheet *self,
     if (!format)
         return LXW_NO_ERROR;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3643,7 +3643,7 @@ worksheet_write_boolean(lxw_worksheet *self,
     lxw_cell *cell;
     lxw_error err;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
 
     if (err)
         return err;
@@ -3668,7 +3668,7 @@ worksheet_write_datetime(lxw_worksheet *self,
     double excel_date;
     lxw_error err;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3710,7 +3710,7 @@ worksheet_write_url_opt(lxw_worksheet *self,
     if (self->hlink_count > LXW_MAX_NUMBER_URLS)
         return LXW_ERROR_WORKSHEET_MAX_NUMBER_URLS_EXCEEDED;
 
-    err = _check_dimensions(self, row_num, col_num, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, col_num, false, false);
     if (err)
         return err;
 
@@ -3918,11 +3918,11 @@ worksheet_set_column_opt(lxw_worksheet *self,
                          lxw_row_col_options *user_options)
 {
     lxw_col_options *copied_options;
-    uint8_t ignore_row = LXW_TRUE;
-    uint8_t ignore_col = LXW_TRUE;
-    uint8_t hidden = LXW_FALSE;
+    uint8_t ignore_row = true;
+    uint8_t ignore_col = true;
+    uint8_t hidden = false;
     uint8_t level = 0;
-    uint8_t collapsed = LXW_FALSE;
+    uint8_t collapsed = false;
     lxw_col_t col;
     lxw_error err;
 
@@ -3943,7 +3943,7 @@ worksheet_set_column_opt(lxw_worksheet *self,
      * NOTE: The check shouldn't modify the row dimensions and should only
      *       modify the column dimensions in certain cases. */
     if (format != NULL || (width != LXW_DEF_COL_WIDTH && hidden))
-        ignore_col = LXW_FALSE;
+        ignore_col = false;
 
     err = _check_dimensions(self, 0, firstcol, ignore_row, ignore_col);
 
@@ -4014,7 +4014,7 @@ worksheet_set_column_opt(lxw_worksheet *self,
     }
 
     /* Store the column change to allow optimizations. */
-    self->col_size_changed = LXW_TRUE;
+    self->col_size_changed = true;
 
     return LXW_NO_ERROR;
 }
@@ -4042,9 +4042,9 @@ worksheet_set_row_opt(lxw_worksheet *self,
 {
 
     lxw_col_t min_col;
-    uint8_t hidden = LXW_FALSE;
+    uint8_t hidden = false;
     uint8_t level = 0;
-    uint8_t collapsed = LXW_FALSE;
+    uint8_t collapsed = false;
     lxw_row *row;
     lxw_error err;
 
@@ -4060,13 +4060,13 @@ worksheet_set_row_opt(lxw_worksheet *self,
     else
         min_col = 0;
 
-    err = _check_dimensions(self, row_num, min_col, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, row_num, min_col, false, false);
     if (err)
         return err;
 
     /* If the height is 0 the row is hidden and the height is the default. */
     if (height == 0) {
-        hidden = LXW_TRUE;
+        hidden = true;
         height = self->default_row_height;
     }
 
@@ -4077,10 +4077,10 @@ worksheet_set_row_opt(lxw_worksheet *self,
     row->hidden = hidden;
     row->level = level;
     row->collapsed = collapsed;
-    row->row_changed = LXW_TRUE;
+    row->row_changed = true;
 
     if (height != self->default_row_height)
-        row->height_changed = LXW_TRUE;
+        row->height_changed = true;
 
     return LXW_NO_ERROR;
 }
@@ -4127,7 +4127,7 @@ worksheet_merge_range(lxw_worksheet *self, lxw_row_t first_row,
     }
 
     /* Check that column number is valid and store the max value */
-    err = _check_dimensions(self, last_row, last_col, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, last_row, last_col, false, false);
     if (err)
         return err;
 
@@ -4188,11 +4188,11 @@ worksheet_autofilter(lxw_worksheet *self, lxw_row_t first_row,
     }
 
     /* Check that column number is valid and store the max value */
-    err = _check_dimensions(self, last_row, last_col, LXW_FALSE, LXW_FALSE);
+    err = _check_dimensions(self, last_row, last_col, false, false);
     if (err)
         return err;
 
-    self->autofilter.in_use = LXW_TRUE;
+    self->autofilter.in_use = true;
     self->autofilter.first_row = first_row;
     self->autofilter.first_col = first_col;
     self->autofilter.last_row = last_row;
@@ -4208,10 +4208,10 @@ worksheet_autofilter(lxw_worksheet *self, lxw_row_t first_row,
 void
 worksheet_select(lxw_worksheet *self)
 {
-    self->selected = LXW_TRUE;
+    self->selected = true;
 
     /* Selected worksheet can't be hidden. */
-    self->hidden = LXW_FALSE;
+    self->hidden = false;
 }
 
 /*
@@ -4221,11 +4221,11 @@ worksheet_select(lxw_worksheet *self)
 void
 worksheet_activate(lxw_worksheet *self)
 {
-    self->selected = LXW_TRUE;
-    self->active = LXW_TRUE;
+    self->selected = true;
+    self->active = true;
 
     /* Active worksheet can't be hidden. */
-    self->hidden = LXW_FALSE;
+    self->hidden = false;
 
     *self->active_sheet = self->index;
 }
@@ -4239,7 +4239,7 @@ void
 worksheet_set_first_sheet(lxw_worksheet *self)
 {
     /* Active worksheet can't be hidden. */
-    self->hidden = LXW_FALSE;
+    self->hidden = false;
 
     *self->first_sheet = self->index;
 }
@@ -4250,10 +4250,10 @@ worksheet_set_first_sheet(lxw_worksheet *self)
 void
 worksheet_hide(lxw_worksheet *self)
 {
-    self->hidden = LXW_TRUE;
+    self->hidden = true;
 
     /* A hidden worksheet shouldn't be active or selected. */
-    self->selected = LXW_FALSE;
+    self->selected = false;
 
     /* If this is active_sheet or first_sheet reset the workbook value. */
     if (*self->first_sheet == self->index)
@@ -4384,7 +4384,7 @@ void
 worksheet_set_portrait(lxw_worksheet *self)
 {
     self->orientation = LXW_PORTRAIT;
-    self->page_setup_changed = LXW_TRUE;
+    self->page_setup_changed = true;
 }
 
 /*
@@ -4394,7 +4394,7 @@ void
 worksheet_set_landscape(lxw_worksheet *self)
 {
     self->orientation = LXW_LANDSCAPE;
-    self->page_setup_changed = LXW_TRUE;
+    self->page_setup_changed = true;
 }
 
 /*
@@ -4403,7 +4403,7 @@ worksheet_set_landscape(lxw_worksheet *self)
 void
 worksheet_set_page_view(lxw_worksheet *self)
 {
-    self->page_view = LXW_TRUE;
+    self->page_view = true;
 }
 
 /*
@@ -4413,7 +4413,7 @@ void
 worksheet_set_paper(lxw_worksheet *self, uint8_t paper_size)
 {
     self->paper_size = paper_size;
-    self->page_setup_changed = LXW_TRUE;
+    self->page_setup_changed = true;
 }
 
 /*
@@ -4423,7 +4423,7 @@ void
 worksheet_print_across(lxw_worksheet *self)
 {
     self->page_order = LXW_PRINT_ACROSS;
-    self->page_setup_changed = LXW_TRUE;
+    self->page_setup_changed = true;
 }
 
 /*
@@ -4584,7 +4584,7 @@ worksheet_repeat_rows(lxw_worksheet *self, lxw_row_t first_row,
     if (err)
         return err;
 
-    self->repeat_rows.in_use = LXW_TRUE;
+    self->repeat_rows.in_use = true;
     self->repeat_rows.first_row = first_row;
     self->repeat_rows.last_row = last_row;
 
@@ -4611,7 +4611,7 @@ worksheet_repeat_columns(lxw_worksheet *self, lxw_col_t first_col,
     if (err)
         return err;
 
-    self->repeat_cols.in_use = LXW_TRUE;
+    self->repeat_cols.in_use = true;
     self->repeat_cols.first_col = first_col;
     self->repeat_cols.last_col = last_col;
 
@@ -4652,7 +4652,7 @@ worksheet_print_area(lxw_worksheet *self, lxw_row_t first_row,
         return LXW_NO_ERROR;
     }
 
-    self->print_area.in_use = LXW_TRUE;
+    self->print_area.in_use = true;
     self->print_area.first_row = first_row;
     self->print_area.last_row = last_row;
     self->print_area.first_col = first_col;
@@ -4693,10 +4693,10 @@ worksheet_set_print_scale(lxw_worksheet *self, uint16_t scale)
         return;
 
     /* Turn off "fit to page" option. */
-    self->fit_page = LXW_FALSE;
+    self->fit_page = false;
 
     self->print_scale = scale;
-    self->page_setup_changed = LXW_TRUE;
+    self->page_setup_changed = true;
 }
 
 /*
@@ -4775,7 +4775,7 @@ worksheet_set_zoom(lxw_worksheet *self, uint16_t scale)
 void
 worksheet_hide_zero(lxw_worksheet *self)
 {
-    self->show_zeros = LXW_FALSE;
+    self->show_zeros = false;
 }
 
 /*
@@ -4784,7 +4784,7 @@ worksheet_hide_zero(lxw_worksheet *self)
 void
 worksheet_right_to_left(lxw_worksheet *self)
 {
-    self->right_to_left = LXW_TRUE;
+    self->right_to_left = true;
 }
 
 /*
@@ -4818,7 +4818,7 @@ worksheet_protect(lxw_worksheet *self, const char *password,
         lxw_snprintf(protect->hash, 5, "%X", hash);
     }
 
-    protect->is_configured = LXW_TRUE;
+    protect->is_configured = true;
 }
 
 /*
@@ -4833,13 +4833,13 @@ worksheet_set_default_row(lxw_worksheet *self, double height,
 
     if (height != self->default_row_height) {
         self->default_row_height = height;
-        self->row_size_changed = LXW_TRUE;
+        self->row_size_changed = true;
     }
 
     if (hide_unused_rows)
-        self->default_row_zeroed = LXW_TRUE;
+        self->default_row_zeroed = true;
 
-    self->default_row_set = LXW_TRUE;
+    self->default_row_set = true;
 }
 
 /*
@@ -4990,7 +4990,7 @@ worksheet_insert_chart_opt(lxw_worksheet *self,
 
     STAILQ_INSERT_TAIL(self->chart_data, options, list_pointers);
 
-    chart->in_use = LXW_TRUE;
+    chart->in_use = true;
 
     return LXW_NO_ERROR;
 }
