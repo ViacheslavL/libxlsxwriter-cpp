@@ -2592,6 +2592,7 @@ _chart_write_pie_plot_area(lxw_chart *self)
 }
 
 
+STATIC
 void _chart_initialize(lxw_chart *self, uint8_t type);
 /*
  * Write the <c:plotArea> element.

@@ -102,6 +102,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
 add_executable(test_all test_all.c ${test_sources})
 
 target_link_libraries(test_all
-    xlsxwriter_test ${ZLIB_LIBRARIES})
+    xlsxwriter_test lxw_tmpfileplus lxw_minizip ${ZLIB_LIBRARIES})
 
 add_test(NAME unit_test_all COMMAND test_all)
