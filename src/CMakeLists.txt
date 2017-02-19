@@ -1,21 +1,21 @@
 set(xlsxwriter_srcs
-    app.c
-    chart.c
-    content_types.c
-    core.c
-    custom.c
-    drawing.c
-    format.c
-    hash_table.c
-    packager.c
-    relationships.c
-    shared_strings.c
-    styles.c
-    theme.c
-    utility.c
-    workbook.c
-    worksheet.c
-    xmlwriter.c)
+    app.cpp
+    chart.cpp
+    content_types.cpp
+    core.cpp
+    custom.cpp
+    drawing.cpp
+    format.cpp
+    hash_table.cpp
+    packager.cpp
+    relationships.cpp
+    shared_strings.cpp
+    styles.cpp
+    theme.cpp
+    utility.cpp
+    workbook.cpp
+    worksheet.cpp
+    xmlwriter.cpp)
 
 if (MSVC)
     list(APPEND xlsxwriter_srcs XlsxWriter.def)
