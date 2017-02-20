@@ -165,14 +165,14 @@ STAILQ_HEAD(lxw_chart_data, lxw_image_options);
  * * `level`
  * * `collapsed`
  */
-typedef struct lxw_row_col_options {
+struct lxw_row_col_options {
     /** Hide the row/column */
     uint8_t hidden;
     uint8_t level;
     uint8_t collapsed;
-} lxw_row_col_options;
+};
 
-typedef struct lxw_col_options {
+struct lxw_col_options {
     lxw_col_t firstcol;
     lxw_col_t lastcol;
     double width;
@@ -180,46 +180,46 @@ typedef struct lxw_col_options {
     uint8_t hidden;
     uint8_t level;
     uint8_t collapsed;
-} lxw_col_options;
+};
 
-typedef struct lxw_merged_range {
+struct lxw_merged_range {
     lxw_row_t first_row;
     lxw_row_t last_row;
     lxw_col_t first_col;
     lxw_col_t last_col;
 
     STAILQ_ENTRY (lxw_merged_range) list_pointers;
-} lxw_merged_range;
+};
 
-typedef struct lxw_repeat_rows {
+struct lxw_repeat_rows {
     uint8_t in_use;
     lxw_row_t first_row;
     lxw_row_t last_row;
-} lxw_repeat_rows;
+};
 
-typedef struct lxw_repeat_cols {
+struct lxw_repeat_cols {
     uint8_t in_use;
     lxw_col_t first_col;
     lxw_col_t last_col;
-} lxw_repeat_cols;
+};
 
-typedef struct lxw_print_area {
-    uint8_t in_use;
-    lxw_row_t first_row;
-    lxw_row_t last_row;
-    lxw_col_t first_col;
-    lxw_col_t last_col;
-} lxw_print_area;
-
-typedef struct lxw_autofilter {
+struct lxw_print_area {
     uint8_t in_use;
     lxw_row_t first_row;
     lxw_row_t last_row;
     lxw_col_t first_col;
     lxw_col_t last_col;
-} lxw_autofilter;
+};
 
-typedef struct lxw_panes {
+struct lxw_autofilter {
+    uint8_t in_use;
+    lxw_row_t first_row;
+    lxw_row_t last_row;
+    lxw_col_t first_col;
+    lxw_col_t last_col;
+};
+
+struct lxw_panes {
     uint8_t type;
     lxw_row_t first_row;
     lxw_col_t first_col;
@@ -227,16 +227,16 @@ typedef struct lxw_panes {
     lxw_col_t left_col;
     double x_split;
     double y_split;
-} lxw_panes;
+};
 
-typedef struct lxw_selection {
+struct lxw_selection {
     char pane[LXW_PANE_NAME_LENGTH];
     char active_cell[LXW_MAX_CELL_RANGE_LENGTH];
     char sqref[LXW_MAX_CELL_RANGE_LENGTH];
 
     STAILQ_ENTRY (lxw_selection) list_pointers;
 
-} lxw_selection;
+};
 
 /**
  * @brief Options for inserted images
@@ -244,7 +244,7 @@ typedef struct lxw_selection {
  * Options for modifying images inserted via `worksheet_insert_image_opt()`.
  *
  */
-typedef struct lxw_image_options {
+struct lxw_image_options {
 
     /** Offset from the left of the cell in pixels. */
     int32_t x_offset;
@@ -260,9 +260,9 @@ typedef struct lxw_image_options {
 
     lxw_row_t row;
     lxw_col_t col;
-    char *filename;
-    char *url;
-    char *tip;
+    std::string filename;
+    std::string url;
+    std::string tip;
     uint8_t anchor;
 
     /* Internal metadata. */
@@ -270,15 +270,15 @@ typedef struct lxw_image_options {
     uint8_t image_type;
     double width;
     double height;
-    char *short_name;
-    char *extension;
+    std::string short_name;
+    std::string extension;
     double x_dpi;
     double y_dpi;
     lxw_chart *chart;
 
     STAILQ_ENTRY (lxw_image_options) list_pointers;
 
-} lxw_image_options;
+};
 
 /**
  * @brief Header and footer options.
@@ -295,7 +295,7 @@ typedef struct lxw_header_footer_options {
 /**
  * @brief Worksheet protection options.
  */
-typedef struct lxw_protection {
+struct lxw_protection {
     /** Turn off selection of locked cells. This in on in Excel by default.*/
     uint8_t no_select_locked_cells;
 
@@ -345,23 +345,23 @@ typedef struct lxw_protection {
     uint8_t content;
     uint8_t is_configured;
     char hash[5];
-} lxw_protection;
+};
 
 /*
  * Worksheet initialization data.
  */
-typedef struct lxw_worksheet_init_data {
+struct lxw_worksheet_init_data {
     uint32_t index;
     uint8_t hidden;
     uint8_t optimize;
     uint16_t *active_sheet;
     uint16_t *first_sheet;
     lxw_sst *sst;
-    char *name;
-    char *quoted_name;
-    char *tmpdir;
+    std::string name;
+    std::string quoted_name;
+    std::string tmpdir;
 
-} lxw_worksheet_init_data;
+};
 
 /* Struct to represent a worksheet row. */
 typedef struct lxw_row {
@@ -421,8 +421,8 @@ public:
      * specified by `row` and `column`:
      *
      * @code
-     *     worksheet.write_number(0, 0, 123456, NULL);
-     *     worksheet.write_number(1, 0, 2.3451, NULL);
+     *     worksheet->write_number(0, 0, 123456, NULL);
+     *     worksheet->write_number(1, 0, 2.3451, NULL);
      * @endcode
      *
      * @image html write_number01.png
@@ -439,7 +439,7 @@ public:
      *     std::shared_ptr<lxw_format> format = workbook.add_format();
      *     format->set_num_format("$#,##0.00");
      *
-     *     worksheet.write_number(0, 0, 1234.567, format);
+     *     worksheet->write_number(0, 0, 1234.567, format);
      * @endcode
      *
      * @image html write_number02.png
@@ -473,9 +473,9 @@ public:
      *
      * @code
      *     lxw_format_ptr format = workbook->add_format();
-     *     format.set_bold();
+     *     format->set_bold();
      *
-     *     worksheet.write_string(0, 0, "This phrase is Bold!", format);
+     *     worksheet->write_string(0, 0, "This phrase is Bold!", format);
      * @endcode
      *
      * @image html write_string02.png
@@ -485,7 +485,7 @@ public:
      * a UTF-8 source:
      *
      * @code
-     *    worksheet.write_string(0, 0, "Это фраза на русском!", NULL);
+     *    worksheet->write_string(0, 0, "Это фраза на русском!", NULL);
      * @endcode
      *
      * @image html write_string03.png
@@ -570,41 +570,39 @@ public:
      * specify the range:
      *
      * @code
-     *     worksheet.write_array_formula(4, 0, 6, 0,     "{=TREND(C5:C7,B5:B7)}", NULL);
+     *     worksheet->write_array_formula(4, 0, 6, 0,     "{=TREND(C5:C7,B5:B7)}", NULL);
      *
      *     // Same as above using the RANGE() macro.
-     *     worksheet.write_array_formula(RANGE("A5:A7"), "{=TREND(C5:C7,B5:B7)}", NULL);
+     *     worksheet->write_array_formula(RANGE("A5:A7"), "{=TREND(C5:C7,B5:B7)}", NULL);
      * @endcode
      *
      * If the array formula returns a single value then the `first_` and `last_`
      * parameters should be the same:
      *
      * @code
-     *     worksheet.write_array_formula(1, 0, 1, 0,     "{=SUM(B1:C1*B2:C2)}", NULL);
-     *     worksheet.write_array_formula(RANGE("A2:A2"), "{=SUM(B1:C1*B2:C2)}", NULL);
+     *     worksheet->write_array_formula(1, 0, 1, 0,     "{=SUM(B1:C1*B2:C2)}", NULL);
+     *     worksheet->write_array_formula(RANGE("A2:A2"), "{=SUM(B1:C1*B2:C2)}", NULL);
      * @endcode
      *
      */
-    lxw_error write_array_formula(lxw_worksheet *worksheet,
-                                            lxw_row_t first_row,
-                                            lxw_col_t first_col,
-                                            lxw_row_t last_row,
-                                            lxw_col_t last_col,
-                                            const char *formula,
-                                            const std::shared_ptr<lxw_format> *format);
+    lxw_error write_array_formula(lxw_row_t first_row,
+                                  lxw_col_t first_col,
+                                  lxw_row_t last_row,
+                                  lxw_col_t last_col,
+                                  const std::string& formula,
+                                  const std::shared_ptr<lxw_format>& format);
 
     lxw_error write_array_formula_num(lxw_row_t first_row,
                                       lxw_col_t first_col,
                                       lxw_row_t last_row,
                                       lxw_col_t last_col,
                                       const std::string& formula,
-                                      const std::shared_ptr<lxw_format> format,
+                                      const std::shared_ptr<lxw_format>& format,
                                       double result);
 
     /**
      * @brief Write a date or time to a worksheet cell.
      *
-     * @param worksheet pointer to a lxw_worksheet instance to be updated.
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param datetime  The datetime to write to the cell.
@@ -630,7 +628,7 @@ public:
      */
     lxw_error write_datetime(lxw_row_t row,
                                        lxw_col_t col, lxw_datetime *datetime,
-                                       lxw_format *format);
+                                       const lxw_format_ptr& format);
 
     lxw_error write_url_opt(lxw_row_t row_num,
                             lxw_col_t col_num, const std::string& url,
@@ -767,7 +765,7 @@ public:
      */
     lxw_error write_url(lxw_row_t row,
                         lxw_col_t col, const std::string& url,
-                        const lxw_format& format);
+                        const lxw_format_ptr& format);
 
     /**
      * @brief Write a formatted boolean worksheet cell.
@@ -816,7 +814,7 @@ public:
      *
      */
     lxw_error write_blank(lxw_row_t row, lxw_col_t col,
-                                    const lxw_format_ptr& format);
+                          const lxw_format_ptr& format);
 
     /**
      * @brief Write a formula to a worksheet cell with a user defined result.
@@ -2516,33 +2514,31 @@ private:
     /* Declarations required for unit testing. */
 #ifdef TESTING
 
-    STATIC void _worksheet_xml_declaration(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_worksheet(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_dimension(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_view(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_views(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_format_pr(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_data(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_page_margins(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_page_setup(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_col_info(lxw_worksheet *worksheet,
-                                          lxw_col_options *options);
-    STATIC void _write_row(lxw_worksheet *worksheet, lxw_row *row, char *spans);
-    STATIC lxw_row *_get_row_list(struct lxw_table_rows *table,
+    void _xml_declaration();
+    void _write_worksheet();
+    void _write_dimension();
+    void _write_sheet_view();
+    void _write_sheet_views();
+    void _write_sheet_format_pr();
+    void _write_sheet_data();
+    void _write_page_margins();
+    void _write_page_setup();
+    void _write_col_info(lxw_col_options *options);
+    void _write_row(lxw_row *row, char *spans);
+    lxw_row *_get_row_list(struct lxw_table_rows *table,
                                   lxw_row_t row_num);
 
-    STATIC void _worksheet_write_merge_cell(lxw_worksheet *worksheet,
-                                            lxw_merged_range *merged_range);
-    STATIC void _worksheet_write_merge_cells(lxw_worksheet *worksheet);
+    void _write_merge_cell(lxw_merged_range *merged_range);
+    void _write_merge_cells();
 
-    STATIC void _worksheet_write_odd_header(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_odd_footer(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_header_footer(lxw_worksheet *worksheet);
+    void _write_odd_header();
+    void _write_odd_footer();
+    void _write_header_footer();
 
-    STATIC void _worksheet_write_print_options(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_pr(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_tab_color(lxw_worksheet *worksheet);
-    STATIC void _worksheet_write_sheet_protection(lxw_worksheet *worksheet);
+    void _write_print_options();
+    void _write_sheet_pr();
+    void _write_tab_color();
+    void _write_sheet_protection();
 #endif /* TESTING */
 
 };
