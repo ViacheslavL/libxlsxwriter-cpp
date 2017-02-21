@@ -17,27 +17,6 @@
 #include <map>
 #include <list>
 
-/* Define the queue.h TAILQ structs for the App structs. */
-STAILQ_HEAD(lxw_heading_pairs, lxw_heading_pair);
-STAILQ_HEAD(lxw_part_names, lxw_part_name);
-
-typedef struct lxw_heading_pair {
-
-    char *key;
-    char *value;
-
-    STAILQ_ENTRY (lxw_heading_pair) list_pointers;
-
-} lxw_heading_pair;
-
-typedef struct lxw_part_name {
-
-    char *name;
-
-    STAILQ_ENTRY (lxw_part_name) list_pointers;
-
-} lxw_part_name;
-
 namespace xlsxwriter {
 
 /* Class to represent an App object. */
