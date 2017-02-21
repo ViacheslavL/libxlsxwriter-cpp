@@ -51,6 +51,8 @@
 #include "hash_table.hpp"
 #include "common.hpp"
 
+#include <map>
+
 #define LXW_DEFINED_NAME_LENGTH 128
 
 /* Define the tree.h RB structs for the red-black head types. */
@@ -632,22 +634,6 @@ private:
 };
 
 } // namespace xlsxwriter
-
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-
-}
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
 
 #endif /* __LXW_WORKBOOK_H__ */
 

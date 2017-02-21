@@ -37,14 +37,6 @@ typedef uint32_t lxw_row_t;
  */
 typedef uint16_t lxw_col_t;
 
-/** Boolean values used in libxlsxwriter. */
-enum lxw_boolean {
-    /** False value. */
-    LXW_FALSE,
-    /** True value. */
-    LXW_TRUE
-};
-
 /**
  * @brief Error codes from libxlsxwriter functions.
  *

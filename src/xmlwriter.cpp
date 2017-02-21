@@ -126,8 +126,8 @@ lxw_xml_empty_tag_unencoded(FILE * xmlfile,
  */
 void
 lxw_xml_data_element(FILE * xmlfile,
-                     const char *tag,
-                     const char *data, struct xml_attribute_list *attributes)
+                     const std::string& tag,
+                     const std::string& data, struct xml_attribute_list *attributes)
 {
     fprintf(xmlfile, "<%s", tag);
 

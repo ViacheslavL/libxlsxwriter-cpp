@@ -11,8 +11,11 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "xlsxwriter/workbook.h"
-#include "xlsxwriter/common.h"
+#include "workbook.hpp"
+#include "common.hpp"
+
+#include <map>
+#include <list>
 
 /* Define the queue.h TAILQ structs for the App structs. */
 STAILQ_HEAD(lxw_heading_pairs, lxw_heading_pair);
@@ -35,45 +38,54 @@ typedef struct lxw_part_name {
 
 } lxw_part_name;
 
-/* Struct to represent an App object. */
-typedef struct lxw_app {
+namespace xlsxwriter {
+
+/* Class to represent an App object. */
+class app {
+public:
+
+    app();
+    ~app();
+    void _assemble_xml_file();
+    void _add_part_name(const std::string& name);
+    void _add_heading_pair(const std::string& key, const std::string& value);
+
+    /* Declarations required for unit testing. */
+    void _xml_declaration();
+
+private:
 
     FILE *file;
 
-    struct lxw_heading_pairs *heading_pairs;
-    struct lxw_part_names *part_names;
-    lxw_doc_properties *properties;
+    std::map<std::string, std::string> heading_pairs;
+    std::list<std::string> part_names;
+    doc_properties properties;
 
     uint32_t num_heading_pairs;
     uint32_t num_part_names;
 
-} lxw_app;
+    void _write_titles_of_parts();
+    void _write_vt_vector_heading_pairs();
+    void _write_vt_variant(const std::string &key, const std::string &value);
+    void _write_vt_i4(const std::string &value);
+    void _write_vt_lpstr(const std::string &str);
+    void _write_scale_crop();
+    void _write_properties();
+    void _write_application();
+    void _write_doc_security();
+    void _write_vt_vector_lpstr_named_parts();
+    void _write_heading_pairs();
+    void _write_manager();
+    void _write_links_up_to_date();
+    void _write_shared_doc();
+    void _write_hyperlink_base();
+    void _write_hyperlinks_changed();
+    void _write_app_version();
+    void _app_add_part_name(const std::string &name);
+    void _app_add_heading_pair(const std::string &key, const std::string &value);
+    void _write_company();
+};
 
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-lxw_app *lxw_app_new();
-void lxw_app_free(lxw_app *app);
-void lxw_app_assemble_xml_file(lxw_app *self);
-void lxw_app_add_part_name(lxw_app *self, const char *name);
-void lxw_app_add_heading_pair(lxw_app *self, const char *key,
-                              const char *value);
-
-/* Declarations required for unit testing. */
-#ifdef TESTING
-
-STATIC void _app_xml_declaration(lxw_app *self);
-
-#endif /* TESTING */
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
 #endif /* __LXW_APP_H__ */

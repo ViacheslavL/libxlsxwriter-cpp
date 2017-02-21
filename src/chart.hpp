@@ -313,11 +313,11 @@ class chart {
 
 public:
 
-    lxw_chart *lxw_chart_new(uint8_t type);
-    lxw_chart_axis *lxw_axis_new();
-    void lxw_axis_free(lxw_chart_axis *axis);
-    void lxw_chart_free(lxw_chart *chart);
-    void lxw_chart_assemble_xml_file(lxw_chart *chart);
+    chart(uint8_t type);
+
+    ~chart();
+
+    void lxw_chart_assemble_xml_file();
 
 
     /**
@@ -398,16 +398,11 @@ public:
      * @endcode
      *
      */
-    lxw_chart_series *chart_add_series(lxw_chart *chart,
-                                       const char *categories,
-                                       const char *values);
+    std::shared_ptr<chart_series> chart_add_series(const std::string& categories, const std::string& values);
 
-    lxw_chart_series *chart_add_series_opt(lxw_chart *chart,
-                                       const char *categories,
-                                       const char *values,
-                                       lxw_series_options *options);
+    std::shared_ptr<chart_series> chart_add_series_opt(const std::string& categories, const std::string&values, const series_options& options);
 
-    void chart_set_y2_axis(lxw_chart *chart, lxw_chart_axis *axis);
+    void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
     /**
      * @brief Set a series "categories" range using row and column values.
@@ -550,7 +545,7 @@ public:
      *
      * This function is applicable to category, date and value axes.
      */
-    void chart_axis_set_name(lxw_chart_axis *axis, const char *name);
+    void chart_axis_set_name(lxw_chart_axis *axis, const std::string& name);
 
     /**
      * @brief Set a chart axis name formula using row and column values.

@@ -17,7 +17,7 @@
 #define __LXW_UTILITY_H__
 
 #include <stdint.h>
-#include "common.h"
+#include "common.hpp"
 
 
 /**

@@ -22,7 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "common.h"
+#include "common.hpp"
+
+#include <string>
 
 #define LXW_MAX_ATTRIBUTE_LENGTH 256
 #define LXW_ATTR_32              32
@@ -161,8 +163,8 @@ void lxw_xml_empty_tag_unencoded(FILE * xmlfile,
  * @param attributes An optional list of attributes to add to the tag.
  */
 void lxw_xml_data_element(FILE * xmlfile,
-                          const char *tag,
-                          const char *data,
+                          const std::string& tag,
+                          const std::string& data,
                           struct xml_attribute_list *attributes);
 
 char *lxw_escape_control_characters(const char *string);

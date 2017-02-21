@@ -447,7 +447,7 @@ public:
      */
     lxw_error write_number(lxw_row_t row,
                            lxw_col_t col, double number,
-                           const lxw_format_ptr& format);
+                           const format_ptr& format);
     /**
      * @brief Write a string to a worksheet cell.
      *
@@ -472,7 +472,7 @@ public:
      * @ref format.h "Format" object:
      *
      * @code
-     *     lxw_format_ptr format = workbook->add_format();
+     *     format_ptr format = workbook->add_format();
      *     format->set_bold();
      *
      *     worksheet->write_string(0, 0, "This phrase is Bold!", format);
@@ -493,7 +493,7 @@ public:
      */
     lxw_error write_string(lxw_row_t row,
                            lxw_col_t col, const std::string& string,
-                           const lxw_format_ptr& format);
+                           const format_ptr& format);
     /**
      * @brief Write a formula to a worksheet cell.
      *
@@ -628,11 +628,11 @@ public:
      */
     lxw_error write_datetime(lxw_row_t row,
                                        lxw_col_t col, lxw_datetime *datetime,
-                                       const lxw_format_ptr& format);
+                                       const format_ptr& format);
 
     lxw_error write_url_opt(lxw_row_t row_num,
                             lxw_col_t col_num, const std::string& url,
-                            const lxw_format_ptr& format, const std::string& string,
+                            const format_ptr& format, const std::string& string,
                             const std::string& tooltip);
     /**
      *
@@ -659,7 +659,7 @@ public:
      * blue underline:
      *
      * @code
-     *    lxw_format_ptr url_format   = workbook->add_format();
+     *    format_ptr url_format   = workbook->add_format();
      *
      *    format->set_underline (LXW_UNDERLINE_SINGLE);
      *    format->set_font_color(LXW_COLOR_BLUE);
@@ -765,7 +765,7 @@ public:
      */
     lxw_error write_url(lxw_row_t row,
                         lxw_col_t col, const std::string& url,
-                        const lxw_format_ptr& format);
+                        const format_ptr& format);
 
     /**
      * @brief Write a formatted boolean worksheet cell.
@@ -785,7 +785,7 @@ public:
      *
      */
     lxw_error write_boolean(lxw_row_t row, lxw_col_t col,
-                            bool value, const lxw_format_ptr& format);
+                            bool value, const format_ptr& format);
 
     /**
      * @brief Write a formatted blank worksheet cell.
@@ -814,7 +814,7 @@ public:
      *
      */
     lxw_error write_blank(lxw_row_t row, lxw_col_t col,
-                          const lxw_format_ptr& format);
+                          const format_ptr& format);
 
     /**
      * @brief Write a formula to a worksheet cell with a user defined result.
@@ -949,7 +949,7 @@ public:
      */
     lxw_error set_row_opt(lxw_row_t row,
                           double height,
-                          const lxw_format_ptr& format,
+                          const format_ptr& format,
                           const lxw_row_col_options& options);
 
     /**
@@ -1009,7 +1009,7 @@ public:
      * width of #LXW_DEF_COL_WIDTH = 8.43:
      *
      * @code
-     *     lxw_format_ptr format = workbook->add_format();
+     *     format_ptr format = workbook->add_format();
      *     format->set_bold();
      *
      *     // Set the first column to bold.
@@ -1048,7 +1048,7 @@ public:
      */
     lxw_error set_column(lxw_col_t first_col,
                          lxw_col_t last_col,
-                         double width, const lxw_format_ptr& format);
+                         double width, const format_ptr& format);
 
      /**
       * @brief Set the properties for one or more columns of cells with options.
@@ -1085,7 +1085,7 @@ public:
     lxw_error set_column_opt(lxw_col_t first_col,
                              lxw_col_t last_col,
                              double width,
-                             const lxw_format_ptr& format,
+                             const format_ptr& format,
                              const lxw_row_col_options& options);
 
     /**

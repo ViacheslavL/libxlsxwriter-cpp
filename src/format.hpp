@@ -33,7 +33,7 @@
  * follows:
  *
  * @code
- *     lxw_format_ptr format = workbook->add_format();
+ *     format_ptr format = workbook->add_format();
  * @endcode
  *
  * The members of the lxw_format struct aren't modified directly. Instead the
@@ -42,7 +42,7 @@
  *
  * @code
  *    // Create the Format.
- *    lxw_format_ptr format = workbook->add_format();
+ *    format_ptr format = workbook->add_format();
  *
  *    // Set some of the format properties.
  *    format->set_bold();
@@ -62,9 +62,9 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "hash_table.h"
+#include "hash_table.hpp"
 
-#include "common.h"
+#include "common.hpp"
 
 #include <memory>
 
@@ -323,6 +323,58 @@ enum lxw_format_borders {
     LXW_BORDER_SLANT_DASH_DOT
 };
 
+/*
+ * Struct to represent the font component of a format.
+ */
+struct lxw_font {
+
+    std::string font_name;
+    uint16_t font_size;
+    uint8_t bold;
+    uint8_t italic;
+    lxw_color_t font_color;
+    uint8_t underline;
+    uint8_t font_strikeout;
+    uint8_t font_outline;
+    uint8_t font_shadow;
+    uint8_t font_script;
+    uint8_t font_family;
+    uint8_t font_charset;
+    uint8_t font_condense;
+    uint8_t font_extend;
+};
+
+/*
+ * Struct to represent the border component of a format.
+ */
+struct lxw_border {
+
+    uint8_t bottom;
+    uint8_t diag_border;
+    uint8_t diag_type;
+    uint8_t left;
+    uint8_t right;
+    uint8_t top;
+
+    lxw_color_t bottom_color;
+    lxw_color_t diag_color;
+    lxw_color_t left_color;
+    lxw_color_t right_color;
+    lxw_color_t top_color;
+
+};
+
+/*
+ * Struct to represent the fill component of a format.
+ */
+struct lxw_fill {
+
+    lxw_color_t fg_color;
+    lxw_color_t bg_color;
+    uint8_t pattern;
+
+};
+
 /**
  * @brief Struct to represent the formatting properties of an Excel format.
  *
@@ -335,7 +387,7 @@ enum lxw_format_borders {
  *
  * @code
  *    // Create the Format.
- *    lxw_format_ptr format = workbook->add_format();
+ *    format_ptr format = workbook->add_format();
  *
  *    // Set some of the format properties.
  *    format.set_bold();
@@ -1151,72 +1203,8 @@ private:
     STAILQ_ENTRY (lxw_format) list_pointers;
 };
 
-typedef std::shared_ptr<lxw_format> lxw_format_ptr;
+typedef std::shared_ptr<lxw_format> format_ptr;
 
-/*
- * Struct to represent the font component of a format.
- */
-typedef struct lxw_font {
-
-    char font_name[LXW_FORMAT_FIELD_LEN];
-    uint16_t font_size;
-    uint8_t bold;
-    uint8_t italic;
-    lxw_color_t font_color;
-    uint8_t underline;
-    uint8_t font_strikeout;
-    uint8_t font_outline;
-    uint8_t font_shadow;
-    uint8_t font_script;
-    uint8_t font_family;
-    uint8_t font_charset;
-    uint8_t font_condense;
-    uint8_t font_extend;
-} lxw_font;
-
-/*
- * Struct to represent the border component of a format.
- */
-typedef struct lxw_border {
-
-    uint8_t bottom;
-    uint8_t diag_border;
-    uint8_t diag_type;
-    uint8_t left;
-    uint8_t right;
-    uint8_t top;
-
-    lxw_color_t bottom_color;
-    lxw_color_t diag_color;
-    lxw_color_t left_color;
-    lxw_color_t right_color;
-    lxw_color_t top_color;
-
-} lxw_border;
-
-/*
- * Struct to represent the fill component of a format.
- */
-typedef struct lxw_fill {
-
-    lxw_color_t fg_color;
-    lxw_color_t bg_color;
-    uint8_t pattern;
-
-} lxw_fill;
-
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-} // xlsxwriter
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
 #endif /* __LXW_FORMAT_H__ */

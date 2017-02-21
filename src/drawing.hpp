@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#include "common.h"
+#include "common.hpp"
 
 STAILQ_HEAD(lxw_drawing_objects, lxw_drawing_object);
 

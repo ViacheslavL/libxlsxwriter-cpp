@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "common.h"
+#include "common.hpp"
 
 /* Define a tree.h RB structure for storing shared strings. */
 RB_HEAD(sst_rb_tree, sst_element);
