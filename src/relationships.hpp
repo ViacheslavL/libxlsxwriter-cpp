@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-#include "common.h"
+#include "common.hpp"
 
 /* Define the queue.h STAILQ structs for the generic data structs. */
 STAILQ_HEAD(lxw_rel_tuples, lxw_rel_tuple);

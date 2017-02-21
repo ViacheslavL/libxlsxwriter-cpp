@@ -57,8 +57,8 @@
  * `libxlsxwriter` are shown below.
  *
  */
-#ifndef __LXW_FORMAT_H__
-#define __LXW_FORMAT_H__
+#ifndef __FORMAT_HPP__
+#define __FORMAT_HPP__
 
 #include <stdint.h>
 #include <string.h>

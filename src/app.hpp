@@ -6,11 +6,9 @@
  * app - A libxlsxwriter library for creating Excel XLSX app files.
  *
  */
-#ifndef __LXW_APP_H__
-#define __LXW_APP_H__
+#ifndef __LXW_APP_HPP__
+#define __LXW_APP_HPP__
 
-#include <stdint.h>
-#include <string.h>
 #include "workbook.hpp"
 #include "common.hpp"
 
@@ -67,4 +65,4 @@ private:
 
 } // namespace xlsxwriter
 
-#endif /* __LXW_APP_H__ */
+#endif /* __LXW_APP_HPP__ */

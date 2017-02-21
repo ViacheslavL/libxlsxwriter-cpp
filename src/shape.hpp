@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "format.hpp"
 
+namespace xlsxwriter {
+
 enum lxw_dash_types {
     LXW_DASH_SOLID,
     LXW_DASH_ROUND_BOT,
@@ -97,5 +99,7 @@ typedef struct lxw_shape_properties {
     struct lxw_line line;
     struct lxw_pattern pattern;
 } lxw_shape_properties;
+
+} // namespace xlsxwriter
 
 #endif

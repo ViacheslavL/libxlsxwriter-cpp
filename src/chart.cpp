@@ -7,20 +7,16 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/chart.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "chart.hpp"
+#include "utility.hpp"
 #include <math.h>
 
-#ifndef NAN
-#define NAN (0./0.)
-#define isnan(x) ((x)!=(x))
-#endif 
-
+namespace xlsxwriter {
 
 typedef struct val_axis_args {
-    lxw_chart_axis *x_axis;
-    lxw_chart_axis *y_axis;
+    chart_axis *x_axis;
+    chart_axis *y_axis;
     uint32_t id_1;
     uint32_t id_2;
 } val_axis_args;
@@ -38,9 +34,9 @@ typedef struct val_axis_args {
 /*
  * Free a series range object.
  */
-STATIC void
-_chart_free_range(lxw_series_range *range)
+void void_chart_free_range(lxw_series_range *range)
 {
+    /*
     struct lxw_series_data_point *data_point;
 
     if (!range)
@@ -58,13 +54,14 @@ _chart_free_range(lxw_series_range *range)
     free(range->formula);
     free(range->sheetname);
     free(range);
+    */
 }
 
 /*
  * Free a series object.
  */
-STATIC void
-_chart_series_free(lxw_chart_series *series)
+/*
+void chart_series::series_free(lxw_chart_series *series)
 {
     if (!series)
         return;
@@ -78,11 +75,12 @@ _chart_series_free(lxw_chart_series *series)
     free(series);
 }
 
+*/
+
 /*
  * Initialize the data cache in a range object.
  */
-STATIC int
-_chart_init_data_cache(lxw_series_range *range)
+int _char_init_data_cache(lxw_series_range *range)
 {
     /* Initialize the series range data cache. */
     range->data_cache = calloc(1, sizeof(struct lxw_series_data_points));
@@ -92,56 +90,10 @@ _chart_init_data_cache(lxw_series_range *range)
     return 0;
 }
 
-void lxw_axis_free(lxw_chart_axis *axis)
-{
-    if (!axis)
-        return;
-    free(axis->title.name);
-    _chart_free_range(axis->title.range);
-    free(axis);
-}
-
-/*
- * Free a chart object.
- */
-void
-lxw_chart_free(lxw_chart *chart)
-{
-    lxw_chart_series *series;
-
-    if (!chart)
-        return;
-
-    if (chart->series_list) {
-        while (!STAILQ_EMPTY(chart->series_list)) {
-            series = STAILQ_FIRST(chart->series_list);
-            STAILQ_REMOVE_HEAD(chart->series_list, list_pointers);
-
-            _chart_series_free(series);
-        }
-
-        free(chart->series_list);
-    }
-
-    if (chart->x_axis)
-        lxw_axis_free(chart->x_axis);
-
-    if (chart->y_axis)
-        lxw_axis_free(chart->y_axis);
-
-    if (chart->x2_axis)
-        lxw_axis_free(chart->x2_axis);
-
-    if (chart->y2_axis)
-        lxw_axis_free(chart->y2_axis);    
-
-    free(chart->title.name);
-    free(chart);
-}
-
 /*
  * Create a new axis object
  */
+/*
 lxw_chart_axis *lxw_axis_new()
 {
     lxw_chart_axis *axis = calloc(1, sizeof(struct lxw_chart_axis));
@@ -155,131 +107,120 @@ lxw_chart_axis *lxw_axis_new()
     return axis;
 mem_error:
     return NULL;
-}
+}*/
 
 /*
  * Create a new chart object.
  */
-lxw_chart *lxw_chart_new(uint8_t type)
+chart::chart(uint8_t type)
 {
-    lxw_chart *chart = calloc(1, sizeof(lxw_chart));
-    GOTO_LABEL_ON_MEM_ERROR(chart, mem_error);
 
-    chart->series_list = calloc(1, sizeof(struct lxw_chart_series_list));
-    GOTO_LABEL_ON_MEM_ERROR(chart->series_list, mem_error);
-    STAILQ_INIT(chart->series_list);
+    x_axis = std::make_shared<chart_axis>();
 
-    chart->x_axis = lxw_axis_new();
-    GOTO_LABEL_ON_MEM_ERROR(chart->x_axis, mem_error);
+    y_axis = std::make_shared<chart_axis>();
 
-    chart->y_axis = lxw_axis_new();
-    GOTO_LABEL_ON_MEM_ERROR(chart->y_axis, mem_error);
+    x2_axis = std::make_shared<chart_axis>();
 
-    chart->x2_axis = lxw_axis_new();
-    GOTO_LABEL_ON_MEM_ERROR(chart->x_axis, mem_error);
+    y2_axis = std::make_shared<chart_axis>();
 
-    chart->y2_axis = lxw_axis_new();
-    GOTO_LABEL_ON_MEM_ERROR(chart->y_axis, mem_error);
-
-    chart->title.range = calloc(1, sizeof(lxw_series_range));
-    GOTO_LABEL_ON_MEM_ERROR(chart->title.range, mem_error);
+    title.range = calloc(1, sizeof(lxw_series_range));
+    GOTO_LABEL_ON_MEM_ERROR(title.range, mem_error);
 
     /* Initialize the ranges in the chart titles. */
-    if (_chart_init_data_cache(chart->title.range) != LXW_NO_ERROR)
+    if (_chart_init_data_cache(title.range) != LXW_NO_ERROR)
         goto mem_error;
 
-    if (_chart_init_data_cache(chart->x_axis->title.range) != LXW_NO_ERROR)
+    if (_chart_init_data_cache(x_axis->title.range) != LXW_NO_ERROR)
         goto mem_error;
 
-    if (_chart_init_data_cache(chart->y_axis->title.range) != LXW_NO_ERROR)
+    if (_chart_init_data_cache(y_axis->title.range) != LXW_NO_ERROR)
         goto mem_error;
 
-    if (_chart_init_data_cache(chart->x2_axis->title.range) != LXW_NO_ERROR)
+    if (_chart_init_data_cache(x2_axis->title.range) != LXW_NO_ERROR)
         goto mem_error;
 
-    if (_chart_init_data_cache(chart->y2_axis->title.range) != LXW_NO_ERROR)
+    if (_chart_init_data_cache(y2_axis->title.range) != LXW_NO_ERROR)
         goto mem_error;
 
-    chart->type = type;
-    chart->style_id = 2;
-    chart->hole_size = 50;
+    type = type;
+    style_id = 2;
+    hole_size = 50;
 
     /* Set the default axis positions. */
-    chart->cat_axis_position = LXW_CHART_BOTTOM;
-    chart->val_axis_position = LXW_CHART_LEFT;
+    cat_axis_position = LXW_CHART_BOTTOM;
+    val_axis_position = LXW_CHART_LEFT;
 
     /* Set the default legend position */
-    chart->legend_position = LXW_CHART_RIGHT;
+    legend_position = LXW_CHART_RIGHT;
 
-    lxw_strcpy(chart->x_axis->default_num_format, "General");
-    lxw_strcpy(chart->y_axis->default_num_format, "General");
-    lxw_strcpy(chart->x2_axis->default_num_format, "General");
-    lxw_strcpy(chart->y2_axis->default_num_format, "General");
+    lxw_strcpy(x_axis->default_num_format, "General");
+    lxw_strcpy(y_axis->default_num_format, "General");
+    lxw_strcpy(x2_axis->default_num_format, "General");
+    lxw_strcpy(y2_axis->default_num_format, "General");
 
-    chart->x_axis->default_major_gridlines = false;
-    chart->y_axis->default_major_gridlines = true;
+    x_axis->default_major_gridlines = false;
+    y_axis->default_major_gridlines = true;
 
-    chart->x_axis->visible = true;
-    chart->y_axis->visible = true;
-    chart->x2_axis->visible = false;
-    chart->y2_axis->visible = true;
+    x_axis->visible = true;
+    y_axis->visible = true;
+    x2_axis->visible = false;
+    y2_axis->visible = true;
     
-    chart->x2_axis->default_major_gridlines = false;
-    chart->y2_axis->default_major_gridlines = false;
+    x2_axis->default_major_gridlines = false;
+    y2_axis->default_major_gridlines = false;
 
-    chart->x_axis->position = LXW_CHART_BOTTOM;
-    chart->y_axis->position = LXW_CHART_LEFT;
-    chart->x2_axis->position = LXW_CHART_TOP;
-    chart->y2_axis->position = LXW_CHART_RIGHT;
+    x_axis->position = LXW_CHART_BOTTOM;
+    y_axis->position = LXW_CHART_LEFT;
+    x2_axis->position = LXW_CHART_TOP;
+    y2_axis->position = LXW_CHART_RIGHT;
 
-    chart->series_overlap_1 = 100;
+    series_overlap_1 = 100;
 
-    chart->has_horiz_cat_axis = false;
-    chart->has_horiz_val_axis = true;
+    has_horiz_cat_axis = false;
+    has_horiz_val_axis = true;
+}
 
-    return chart;
-
-mem_error:
-    lxw_chart_free(chart);
-    return NULL;
+/*
+ * Free a chart object.
+ */
+chart::~chart()
+{
 }
 
 /*
  * Add unique ids for primary or secondary axes.
  */
-STATIC void
-_chart_add_axis_ids(lxw_chart *self, uint8_t primary)
+void chart::_add_axis_ids(bool primary)
 {
-    uint32_t chart_id = 50010000 + self->id;
-    uint32_t axis_count = 1 + (self->axis_id_1 > 0) + (self->axis_id_2 > 0) + (self->axis_id_3 > 0) + (self->axis_id_4 > 0);
+    uint32_t chart_id = 50010000 + id;
+    uint32_t axis_count = 1 + (axis_id_1 > 0) + (axis_id_2 > 0) + (axis_id_3 > 0) + (axis_id_4 > 0);
 
     uint32_t id_1 = chart_id + axis_count;
     uint32_t id_2 = id_1 + 1;
 
     if (primary)
     {
-        self->axis_id_1 = id_1;
-        self->axis_id_2 = id_2;
+        axis_id_1 = id_1;
+        axis_id_2 = id_2;
     }
     else
     {
-        self->axis_id_3 = id_1;
-        self->axis_id_4 = id_2;
+        axis_id_3 = id_1;
+        axis_id_4 = id_2;
     }
 }
 
 /*
  * Utility function to set a chart range.
  */
-STATIC void
-_chart_set_range(lxw_series_range *range, const char *sheetname,
+void chart::_set_range(lxw_series_range *range, const std::string& sheetname,
                  lxw_row_t first_row, lxw_col_t first_col,
                  lxw_row_t last_row, lxw_col_t last_col)
 {
-    char formula[LXW_MAX_FORMULA_RANGE_LENGTH] = { 0 };
+    std::string formula;
 
     /* Set the range properties. */
-    range->sheetname = lxw_strdup(sheetname);
+    range->sheetname = sheetname;
     range->first_row = first_row;
     range->first_col = first_col;
     range->last_row = last_row;
@@ -292,7 +233,7 @@ _chart_set_range(lxw_series_range *range, const char *sheetname,
     lxw_rowcol_to_formula_abs(formula, sheetname,
                               first_row, first_col, last_row, last_col);
 
-    range->formula = lxw_strdup(formula);
+    range->formula = formula;
 }
 
 /*****************************************************************************
@@ -313,8 +254,7 @@ _chart_xml_declaration(lxw_chart *self)
 /*
  * Write the <c:chartSpace> element.
  */
-STATIC void
-_chart_write_chart_space(lxw_chart *self)
+void chart::_write_chart_space()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -327,7 +267,7 @@ _chart_write_chart_space(lxw_chart *self)
     LXW_PUSH_ATTRIBUTES_STR("xmlns:a", xmlns_a);
     LXW_PUSH_ATTRIBUTES_STR("xmlns:r", xmlns_r);
 
-    lxw_xml_start_tag(self->file, "c:chartSpace", &attributes);
+    lxw_xml_start_tag(file, "c:chartSpace", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -335,8 +275,7 @@ _chart_write_chart_space(lxw_chart *self)
 /*
  * Write the <c:lang> element.
  */
-STATIC void
-_chart_write_lang(lxw_chart *self)
+void chart::_write_lang()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -344,7 +283,7 @@ _chart_write_lang(lxw_chart *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("val", "en-US");
 
-    lxw_xml_empty_tag(self->file, "c:lang", &attributes);
+    lxw_xml_empty_tag(file, "c:lang", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -352,20 +291,19 @@ _chart_write_lang(lxw_chart *self)
 /*
  * Write the <c:style> element.
  */
-STATIC void
-_chart_write_style(lxw_chart *self)
+void chart::_write_style()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     /* Don"t write an element for the default style, 2. */
-    if (self->style_id == 2)
+    if (style_id == 2)
         return;
 
     LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", self->style_id);
+    LXW_PUSH_ATTRIBUTES_INT("val", style_id);
 
-    lxw_xml_empty_tag(self->file, "c:style", &attributes);
+    lxw_xml_empty_tag(file, "c:style", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -373,17 +311,15 @@ _chart_write_style(lxw_chart *self)
 /*
  * Write the <c:layout> element.
  */
-STATIC void
-_chart_write_layout(lxw_chart *self)
+void chart::_write_layout()
 {
-    lxw_xml_empty_tag(self->file, "c:layout", NULL);
+    lxw_xml_empty_tag(file, "c:layout", NULL);
 }
 
 /*
  * Write the <c:grouping> element.
  */
-STATIC void
-_chart_write_grouping(lxw_chart *self, uint8_t grouping)
+void chart::_write_grouping(uint8_t grouping)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -399,7 +335,7 @@ _chart_write_grouping(lxw_chart *self, uint8_t grouping)
     else
         LXW_PUSH_ATTRIBUTES_STR("val", "clustered");
 
-    lxw_xml_empty_tag(self->file, "c:grouping", &attributes);
+    lxw_xml_empty_tag(file, "c:grouping", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -407,20 +343,19 @@ _chart_write_grouping(lxw_chart *self, uint8_t grouping)
 /*
  * Write the <c:radarStyle> element.
  */
-STATIC void
-_chart_write_radar_style(lxw_chart *self)
+void chart::_write_radar_style()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
 
-    if (self->type == LXW_CHART_RADAR_FILLED)
+    if (type == LXW_CHART_RADAR_FILLED)
         LXW_PUSH_ATTRIBUTES_STR("val", "filled");
     else
         LXW_PUSH_ATTRIBUTES_STR("val", "marker");
 
-    lxw_xml_empty_tag(self->file, "c:radarStyle", &attributes);
+    lxw_xml_empty_tag(file, "c:radarStyle", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -428,8 +363,7 @@ _chart_write_radar_style(lxw_chart *self)
 /*
  * Write the <c:varyColors> element.
  */
-STATIC void
-_chart_write_vary_colors(lxw_chart *self)
+void chart::_write_vary_colors()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -437,7 +371,7 @@ _chart_write_vary_colors(lxw_chart *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("val", "1");
 
-    lxw_xml_empty_tag(self->file, "c:varyColors", &attributes);
+    lxw_xml_empty_tag(file, "c:varyColors", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -445,16 +379,15 @@ _chart_write_vary_colors(lxw_chart *self)
 /*
  * Write the <c:firstSliceAng> element.
  */
-STATIC void
-_chart_write_first_slice_ang(lxw_chart *self)
+void chart::_write_first_slice_ang()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", self->rotation);
+    LXW_PUSH_ATTRIBUTES_INT("val", rotation);
 
-    lxw_xml_empty_tag(self->file, "c:firstSliceAng", &attributes);
+    lxw_xml_empty_tag(file, "c:firstSliceAng", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -462,16 +395,15 @@ _chart_write_first_slice_ang(lxw_chart *self)
 /*
  * Write the <c:holeSize> element.
  */
-STATIC void
-_chart_write_hole_size(lxw_chart *self)
+void chart::_write_hole_size()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", self->hole_size);
+    LXW_PUSH_ATTRIBUTES_INT("val", hole_size);
 
-    lxw_xml_empty_tag(self->file, "c:holeSize", &attributes);
+    lxw_xml_empty_tag(file, "c:holeSize", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -479,17 +411,15 @@ _chart_write_hole_size(lxw_chart *self)
 /*
  * Write the <a:t> element.
  */
-STATIC void
-_chart_write_a_t(lxw_chart *self, char *name)
+void chart::_write_a_t(const std::string& name)
 {
-    lxw_xml_data_element(self->file, "a:t", name, NULL);
+    lxw_xml_data_element(file, "a:t", name, NULL);
 }
 
 /*
  * Write the <a:endParaRPr> element.
  */
-STATIC void
-_chart_write_a_end_para_rpr(lxw_chart *self)
+void chart::_write_a_end_para_rpr()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -497,7 +427,7 @@ _chart_write_a_end_para_rpr(lxw_chart *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("lang", "en-US");
 
-    lxw_xml_empty_tag(self->file, "a:endParaRPr", &attributes);
+    lxw_xml_empty_tag(file, "a:endParaRPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -505,17 +435,15 @@ _chart_write_a_end_para_rpr(lxw_chart *self)
 /*
  * Write the <a:defRPr> element.
  */
-STATIC void
-_chart_write_a_def_rpr(lxw_chart *self)
+void chart::_write_a_def_rpr()
 {
-    lxw_xml_empty_tag(self->file, "a:defRPr", NULL);
+    lxw_xml_empty_tag(file, "a:defRPr", NULL);
 }
 
 /*
  * Write the <a:rPr> element.
  */
-STATIC void
-_chart_write_a_r_pr(lxw_chart *self)
+void chart::_write_a_r_pr()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -524,7 +452,7 @@ _chart_write_a_r_pr(lxw_chart *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("lang", lang);
 
-    lxw_xml_empty_tag(self->file, "a:rPr", &attributes);
+    lxw_xml_empty_tag(file, "a:rPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -532,39 +460,36 @@ _chart_write_a_r_pr(lxw_chart *self)
 /*
  * Write the <a:r> element.
  */
-STATIC void
-_chart_write_a_r(lxw_chart *self, char *name)
+void chart::_write_a_r(const std::string& name)
 {
-    lxw_xml_start_tag(self->file, "a:r", NULL);
+    lxw_xml_start_tag(file, "a:r", NULL);
 
     /* Write the a:rPr element. */
-    _chart_write_a_r_pr(self);
+    _write_a_r_pr();
 
     /* Write the a:t element. */
-    _chart_write_a_t(self, name);
+    _write_a_t(name);
 
-    lxw_xml_end_tag(self->file, "a:r");
+    lxw_xml_end_tag(file, "a:r");
 }
 
 /*
  * Write the <a:pPr> element.
  */
-STATIC void
-_chart_write_a_p_pr(lxw_chart *self)
+void chart::_write_a_p_pr()
 {
-    lxw_xml_start_tag(self->file, "a:pPr", NULL);
+    lxw_xml_start_tag(file, "a:pPr", NULL);
 
     /* Write the a:defRPr element. */
-    _chart_write_a_def_rpr(self);
+    _write_a_def_rpr();
 
-    lxw_xml_end_tag(self->file, "a:pPr");
+    lxw_xml_end_tag(file, "a:pPr");
 }
 
 /*
  * Write the <a:pPr> element for pie chart legends.
  */
-STATIC void
-_chart_write_a_p_pr_pie(lxw_chart *self)
+void chart::_write_a_p_pr_pie()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -572,12 +497,12 @@ _chart_write_a_p_pr_pie(lxw_chart *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("rtl", "0");
 
-    lxw_xml_start_tag(self->file, "a:pPr", &attributes);
+    lxw_xml_start_tag(file, "a:pPr", &attributes);
 
     /* Write the a:defRPr element. */
-    _chart_write_a_def_rpr(self);
+    _write_a_def_rpr();
 
-    lxw_xml_end_tag(self->file, "a:pPr");
+    lxw_xml_end_tag(file, "a:pPr");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -585,82 +510,76 @@ _chart_write_a_p_pr_pie(lxw_chart *self)
 /*
  * Write the <a:pPr> element.
  */
-STATIC void
-_chart_write_a_p_pr_rich(lxw_chart *self)
+void chart::_write_a_p_pr_rich()
 {
-    lxw_xml_start_tag(self->file, "a:pPr", NULL);
+    lxw_xml_start_tag(file, "a:pPr", NULL);
 
     /* Write the a:defRPr element. */
-    _chart_write_a_def_rpr(self);
+    _write_a_def_rpr();
 
-    lxw_xml_end_tag(self->file, "a:pPr");
+    lxw_xml_end_tag(file, "a:pPr");
 }
 
 /*
  * Write the <a:p> element.
  */
-STATIC void
-_chart_write_a_p(lxw_chart *self)
+void chart::_chart_write_a_p()
 {
-    lxw_xml_start_tag(self->file, "a:p", NULL);
+    lxw_xml_start_tag(file, "a:p", NULL);
 
     /* Write the a:pPr element. */
-    _chart_write_a_p_pr(self);
+    _write_a_p_pr();
 
     /* Write the a:endParaRPr element. */
-    _chart_write_a_end_para_rpr(self);
+    _write_a_end_para_rpr();
 
-    lxw_xml_end_tag(self->file, "a:p");
+    lxw_xml_end_tag(file, "a:p");
 }
 
 /*
  * Write the <a:p> element for pie chart legends.
  */
-STATIC void
-_chart_write_a_p_pie(lxw_chart *self)
+void chart::_write_a_p_pie()
 {
-    lxw_xml_start_tag(self->file, "a:p", NULL);
+    lxw_xml_start_tag(file, "a:p", NULL);
 
     /* Write the a:pPr element. */
-    _chart_write_a_p_pr_pie(self);
+    _write_a_p_pr_pie();
 
     /* Write the a:endParaRPr element. */
-    _chart_write_a_end_para_rpr(self);
+    _write_a_end_para_rpr();
 
-    lxw_xml_end_tag(self->file, "a:p");
+    lxw_xml_end_tag(file, "a:p");
 }
 
 /*
  * Write the <a:p> element.
  */
-STATIC void
-_chart_write_a_p_rich(lxw_chart *self, char *name)
+void chart::_write_a_p_rich(const std::string& name)
 {
-    lxw_xml_start_tag(self->file, "a:p", NULL);
+    lxw_xml_start_tag(file, "a:p", NULL);
 
     /* Write the a:pPr element. */
-    _chart_write_a_p_pr_rich(self);
+    _write_a_p_pr_rich();
 
     /* Write the a:r element. */
-    _chart_write_a_r(self, name);
+    _write_a_r(name);
 
-    lxw_xml_end_tag(self->file, "a:p");
+    lxw_xml_end_tag(file, "a:p");
 }
 
 /*
  * Write the <a:lstStyle> element.
  */
-STATIC void
-_chart_write_a_lst_style(lxw_chart *self)
+void chart::_write_a_lst_style()
 {
-    lxw_xml_empty_tag(self->file, "a:lstStyle", NULL);
+    lxw_xml_empty_tag(file, "a:lstStyle", NULL);
 }
 
 /*
  * Write the <a:bodyPr> element.
  */
-STATIC void
-_chart_write_a_body_pr(lxw_chart *self, lxw_chart_title *title)
+void chart::_write_a_body_pr(lxw_chart_title *title)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -672,7 +591,7 @@ _chart_write_a_body_pr(lxw_chart *self, lxw_chart_title *title)
         LXW_PUSH_ATTRIBUTES_STR("vert", "horz");
     }
 
-    lxw_xml_empty_tag(self->file, "a:bodyPr", &attributes);
+    lxw_xml_empty_tag(file, "a:bodyPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -680,8 +599,7 @@ _chart_write_a_body_pr(lxw_chart *self, lxw_chart_title *title)
 /*
  * Write the <c:ptCount> element.
  */
-STATIC void
-_chart_write_pt_count(lxw_chart *self, uint16_t num_data_points)
+void chart::_write_pt_count(uint16_t num_data_points)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -689,7 +607,7 @@ _chart_write_pt_count(lxw_chart *self, uint16_t num_data_points)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_INT("val", num_data_points);
 
-    lxw_xml_empty_tag(self->file, "c:ptCount", &attributes);
+    lxw_xml_empty_tag(file, "c:ptCount", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -697,40 +615,35 @@ _chart_write_pt_count(lxw_chart *self, uint16_t num_data_points)
 /*
  * Write the <c:v> element.
  */
-STATIC void
-_chart_write_v_num(lxw_chart *self, double number)
+void chart::_write_v_num(double number)
 {
     char data[LXW_ATTR_32];
 
     lxw_snprintf(data, LXW_ATTR_32, "%.16g", number);
 
-    lxw_xml_data_element(self->file, "c:v", data, NULL);
+    lxw_xml_data_element(file, "c:v", data, NULL);
 }
 
 /*
  * Write the <c:v> element.
  */
-STATIC void
-_chart_write_v_str(lxw_chart *self, char *str)
+void chart::_write_v_str(const std::string& str)
 {
-    lxw_xml_data_element(self->file, "c:v", str, NULL);
+    lxw_xml_data_element(file, "c:v", str, NULL);
 }
 
 /*
  * Write the <c:f> element.
  */
-STATIC void
-_chart_write_f(lxw_chart *self, char *formula)
+void chart::_write_f(const std::string& formula)
 {
-    lxw_xml_data_element(self->file, "c:f", formula, NULL);
+    lxw_xml_data_element(file, "c:f", formula, NULL);
 }
 
 /*
  * Write the <c:pt> element.
  */
-STATIC void
-_chart_write_pt(lxw_chart *self, uint16_t index,
-                lxw_series_data_point *data_point)
+void chart::_write_pt(uint16_t index, lxw_series_data_point *data_point)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -742,14 +655,14 @@ _chart_write_pt(lxw_chart *self, uint16_t index,
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_INT("idx", index);
 
-    lxw_xml_start_tag(self->file, "c:pt", &attributes);
+    lxw_xml_start_tag(file, "c:pt", &attributes);
 
     if (data_point->is_string && data_point->string)
-        _chart_write_v_str(self, data_point->string);
+        _write_v_str(data_point->string);
     else
-        _chart_write_v_num(self, data_point->number);
+        _write_v_num(data_point->number);
 
-    lxw_xml_end_tag(self->file, "c:pt");
+    lxw_xml_end_tag(file, "c:pt");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -3125,26 +3038,23 @@ chart_series_set_values(lxw_chart_series *series, const char *sheetname,
 /*
  * Set an axis caption.
  */
-void
-chart_axis_set_name(lxw_chart_axis *axis, const char *name)
+void chart_axis::set_name(const std::string& name)
 {
-    if (!name)
+    if (name.empty())
         return;
 
     if (name[0] == '=')
-        axis->title.range->formula = lxw_strdup(name + 1);
+        title.range->formula = lxw_strdup(name + 1);
     else
-        axis->title.name = lxw_strdup(name);
+        title.name = name;
 }
 
 /*
  * Set an axis caption, with a range instead or a formula..
  */
-void
-chart_axis_set_name_range(lxw_chart_axis *axis, const char *sheetname,
-                          lxw_row_t row, lxw_col_t col)
+void chart_axis::set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col)
 {
-    if (!sheetname) {
+    if (sheetname.empty*()) {
         LXW_WARN("chart_axis_set_name_range(): sheetname must be specified");
         return;
     }
@@ -3161,8 +3071,7 @@ chart_axis_set_format(lxw_chart_axis *axis, const char* format)
 	lxw_strcpy(axis->num_format, format);
 }
 
-void
-chart_axis_set_crossing(lxw_chart_axis *axis, const char* crossing)
+void chart_axis::set_crossing(lxw_chart_axis *axis, const char* crossing)
 {
     if (!crossing)
         return;
@@ -3172,8 +3081,7 @@ chart_axis_set_crossing(lxw_chart_axis *axis, const char* crossing)
 /*
  * Set the chart title.
  */
-void
-chart_title_set_name(lxw_chart *self, const char *name)
+void chart::title_set_name(const std::string& name)
 {
     if (!name)
         return;
@@ -3187,8 +3095,7 @@ chart_title_set_name(lxw_chart *self, const char *name)
 /*
  * Set the chart title, with a range instead or a formula.
  */
-void
-chart_title_set_name_range(lxw_chart *self, const char *sheetname,
+void chart::title_set_name_range(const std::string& sheetname,
                            lxw_row_t row, lxw_col_t col)
 {
     if (!sheetname) {
@@ -3203,20 +3110,18 @@ chart_title_set_name_range(lxw_chart *self, const char *sheetname,
 /*
  * Turn off the chart title.
  */
-void
-chart_title_off(lxw_chart *self)
+void chart::title_off()
 {
-    self->title.off = true;
+    title.off = true;
 }
 
 /*
  * Set the Pie/Doughnut chart rotation: the angle of the first slice.
  */
-void
-chart_set_rotation(lxw_chart *self, uint16_t rotation)
+void chart::set_rotation(uint16_t rotation)
 {
     if (rotation <= 360)
-        self->rotation = rotation;
+        this->rotation = rotation;
     else
         LXW_WARN_FORMAT1("chart_set_rotation(): Chart rotation '%d' outside "
                          "range: 0 <= rotation <= 360", rotation);
@@ -3225,12 +3130,13 @@ chart_set_rotation(lxw_chart *self, uint16_t rotation)
 /*
  * Set the Doughnut chart hole size.
  */
-void
-chart_set_hole_size(lxw_chart *self, uint8_t size)
+void chart::set_hole_size(uint8_t size)
 {
     if (size >= 10 && size <= 90)
-        self->hole_size = size;
+        hole_size = size;
     else
         LXW_WARN_FORMAT1("chart_set_hole_size(): Hole size '%d' outside "
                          "Excel range: 10 <= size <= 90", size);
 }
+
+} //namespace xlsxwriter

@@ -17,15 +17,12 @@
 /* Define the queue.h STAILQ structs for the generic data structs. */
 STAILQ_HEAD(lxw_rel_tuples, lxw_rel_tuple);
 
-typedef struct lxw_rel_tuple {
+struct lxw_rel_tuple {
 
     char *type;
     char *target;
     char *target_mode;
-
-    STAILQ_ENTRY (lxw_rel_tuple) list_pointers;
-
-} lxw_rel_tuple;
+};
 
 /*
  * Struct to represent a relationships.

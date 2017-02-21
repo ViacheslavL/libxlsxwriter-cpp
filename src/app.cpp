@@ -133,7 +133,6 @@ void app::_write_vt_vector_heading_pairs()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
-    lxw_heading_pair *heading_pair;
 
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_INT("size", num_heading_pairs * 2);
@@ -157,7 +156,6 @@ void app::_write_vt_vector_lpstr_named_parts()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
-    lxw_part_name *part_name;
 
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_INT("size", num_part_names);

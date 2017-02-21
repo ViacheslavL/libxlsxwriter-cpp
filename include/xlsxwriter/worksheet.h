@@ -28,20 +28,22 @@
  * @code
  *     #include "xlsxwriter.h"
  *
+ *     using namespace xlsxwriter;
+ *
  *     int main() {
  *
- *         lxw_workbook  *workbook  = workbook_new("filename.xlsx");
- *         lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+ *         lxw_workbook_ptr  workbook  = std::make_shared<workbook>("filename.xlsx");
+ *         lxw_worksheet_ptr worksheet = workbook->add_worksheet();
  *
- *         worksheet_write_string(worksheet, 0, 0, "Hello Excel", NULL);
+ *         worksheet->write_string(0, 0, "Hello Excel");
  *
- *         return workbook_close(workbook);
+ *         return workbook_close();
  *     }
  * @endcode
  *
  */
-#ifndef __LXW_WORKSHEET_H__
-#define __LXW_WORKSHEET_H__
+#ifndef __WORKSHEET_HPP__
+#define __WORKSHEET_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -235,7 +237,7 @@ typedef struct lxw_selection {
  * Options for modifying images inserted via `worksheet_insert_image_opt()`.
  *
  */
-typedef struct lxw_image_options {
+struct lxw_image_options {
 
     /** Offset from the left of the cell in pixels. */
     int32_t x_offset;
@@ -251,9 +253,9 @@ typedef struct lxw_image_options {
 
     lxw_row_t row;
     lxw_col_t col;
-    char *filename;
-    char *url;
-    char *tip;
+    std::string filename;
+    std::string url;
+    std::string tip;
     uint8_t anchor;
 
     /* Internal metadata. */
@@ -261,15 +263,15 @@ typedef struct lxw_image_options {
     uint8_t image_type;
     double width;
     double height;
-    char *short_name;
-    char *extension;
+    std::string short_name;
+    std::string extension;
     double x_dpi;
     double y_dpi;
-    lxw_chart *chart;
+    chart *chart;
 
     STAILQ_ENTRY (lxw_image_options) list_pointers;
 
-} lxw_image_options;
+};
 
 /**
  * @brief Header and footer options.

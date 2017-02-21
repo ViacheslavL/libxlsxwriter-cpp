@@ -190,7 +190,7 @@ lxw_rowcol_to_range_abs(char *range,
  * Sheet1!$A$1:$C$5 formula reference with absolute values.
  */
 void
-lxw_rowcol_to_formula_abs(char *formula, const char *sheetname,
+lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
                           lxw_row_t first_row, lxw_col_t first_col,
                           lxw_row_t last_row, lxw_col_t last_col)
 {

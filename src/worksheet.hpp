@@ -4,47 +4,8 @@
  * Copyright 2014-2016, John McNamara, jmcnamara@cpan.org. See LICENSE.txt.
  */
 
-/**
- * @page worksheet_page The Worksheet object
- *
- * The Worksheet object represents an Excel worksheet. It handles
- * operations such as writing data to cells or formatting worksheet
- * layout.
- *
- * See @ref worksheet.h for full details of the functionality.
- *
- * @file worksheet.h
- *
- * @brief Functions related to adding data and formatting to a worksheet.
- *
- * The Worksheet object represents an Excel worksheet. It handles
- * operations such as writing data to cells or formatting worksheet
- * layout.
- *
- * A Worksheet object isn't created directly. Instead a worksheet is
- * created by calling the workbook_add_worksheet() function from a
- * Workbook object:
- *
- * @code
- *
- *     #include <xlsxwriter++.hpp>
- *
- *     using namespace xlsxwriter;
- *
- *     int main() {
- *
- *         workbook_ptr workbook  = std::make_shared<workbook>("filename.xlsx");
- *         worksheet_ptr worksheet = workbook_add_worksheet(workbook, NULL);
- *
- *         worksheet->write_string(0, 0, "Hello Excel", NULL);
- *
- *         return workbook->close();
- *     }
- * @endcode
- *
- */
-#ifndef __LXW_WORKSHEET_H__
-#define __LXW_WORKSHEET_H__
+#ifndef __LXW_WORKSHEET_HPP__
+#define __LXW_WORKSHEET_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,10 +14,12 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <memory>
 
 #include "shared_strings.hpp"
 #include "chart.hpp"
+#include "relationships.hpp"
 #include "drawing.hpp"
 #include "common.hpp"
 #include "format.hpp"
@@ -244,7 +207,7 @@ struct lxw_selection {
  * Options for modifying images inserted via `worksheet_insert_image_opt()`.
  *
  */
-struct lxw_image_options {
+struct image_options {
 
     /** Offset from the left of the cell in pixels. */
     int32_t x_offset;
@@ -277,7 +240,6 @@ struct lxw_image_options {
     lxw_chart *chart;
 
     STAILQ_ENTRY (lxw_image_options) list_pointers;
-
 };
 
 /**
@@ -403,7 +365,39 @@ typedef struct lxw_cell {
 } lxw_cell;
 
 /**
- * @brief The class to represent an Excel worksheet.
+ * @class worksheet The Worksheet object
+ *
+ * The Worksheet object represents an Excel worksheet. It handles
+ * operations such as writing data to cells or formatting worksheet
+ * layout.
+ *
+ * @brief Functions related to adding data and formatting to a worksheet.
+ *
+ * The Worksheet object represents an Excel worksheet. It handles
+ * operations such as writing data to cells or formatting worksheet
+ * layout.
+ *
+ * A Worksheet object isn't created directly. Instead a worksheet is
+ * created by calling the workbook_add_worksheet() function from a
+ * Workbook object:
+ *
+ * @code
+ *
+ *     #include <xlsxwriter++.hpp>
+ *
+ *     using namespace xlsxwriter;
+ *
+ *     int main() {
+ *
+ *         workbook_ptr workbook  = std::make_shared<workbook>("filename.xlsx");
+ *         worksheet_ptr worksheet = workbook_add_worksheet(workbook, NULL);
+ *
+ *         worksheet->write_string(0, 0, "Hello Excel", NULL);
+ *
+ *         return workbook->close();
+ *     }
+ * @endcode
+ *
  */
 class worksheet {
 public:
@@ -542,7 +536,7 @@ public:
      *
      */
     lxw_error write_formula(lxw_row_t row,
-                            lxw_col_t col, const string& formula,
+                            lxw_col_t col, const std::string& formula,
                             const std::shared_ptr<lxw_format>& format);
     /**
      * @brief Write an array formula to a worksheet cell.
@@ -1515,9 +1509,8 @@ public:
      * @endcode
      *
      */
-    void worksheet_set_selection(lxw_worksheet *worksheet,
-                                 lxw_row_t first_row, lxw_col_t first_col,
-                                 lxw_row_t last_row, lxw_col_t last_col);
+    void set_selection(lxw_row_t first_row, lxw_col_t first_col,
+                       lxw_row_t last_row, lxw_col_t last_col);
 
     /**
      * @brief Set the page orientation as landscape.
@@ -2182,8 +2175,7 @@ public:
      *   default to "US Letter".
      *
      */
-    void fit_to_pages(lxw_worksheet *worksheet, uint16_t width,
-                                uint16_t height);
+    void fit_to_pages(uint16_t width, uint16_t height);
 
     /**
      * @brief Set the start page number when printing.
@@ -2380,25 +2372,19 @@ public:
      */
     void set_default_row(double height, uint8_t hide_unused_rows);
 
-    lxw_worksheet *lxw_worksheet_new(lxw_worksheet_init_data *init_data);
+    void assemble_xml_file();
+    void write_single_row();
 
-    void lxw_worksheet_free(lxw_worksheet *worksheet);
+    void prepare_image(uint16_t image_ref_id, uint16_t drawing_id,
+                       lxw_image_options *image_data);
 
-    void lxw_worksheet_assemble_xml_file(lxw_worksheet *worksheet);
-    void lxw_worksheet_write_single_row(lxw_worksheet *worksheet);
+    void prepare_chart(uint16_t chart_ref_id, uint16_t drawing_id,
+                       lxw_image_options *image_data);
 
-    void lxw_worksheet_prepare_image(lxw_worksheet *worksheet,
-                                     uint16_t image_ref_id, uint16_t drawing_id,
-                                     lxw_image_options *image_data);
-
-    void lxw_worksheet_prepare_chart(lxw_worksheet *worksheet,
-                                     uint16_t chart_ref_id, uint16_t drawing_id,
-                                     lxw_image_options *image_data);
-
-    lxw_row *lxw_worksheet_find_row(lxw_worksheet *worksheet, lxw_row_t row_num);
-    lxw_cell *lxw_worksheet_find_cell(lxw_row *row, lxw_col_t col_num);
+    lxw_row *find_row(lxw_row_t row_num);
+    lxw_cell *find_cell(lxw_row *row, lxw_col_t col_num);
 private:
-    FILE *file;
+    FILE *file_;
     FILE *optimize_tmpfile;
     struct lxw_table_rows *table;
     struct lxw_table_rows *hyperlinks;
@@ -2461,7 +2447,7 @@ private:
     uint8_t print_gridlines;
     uint8_t print_headers;
     uint8_t print_options_changed;
-    uint8_t right_to_left;
+    uint8_t right_to_left_;
     uint8_t screen_gridlines;
     uint8_t show_zeros;
     uint8_t vba_codename;
@@ -2484,13 +2470,13 @@ private:
     uint8_t default_row_set;
 
     uint8_t header_footer_changed;
-    char header[LXW_HEADER_FOOTER_MAX];
-    char footer[LXW_HEADER_FOOTER_MAX];
+    std::string header;
+    std::string footer;
 
-    struct lxw_repeat_rows repeat_rows;
-    struct lxw_repeat_cols repeat_cols;
-    struct lxw_print_area print_area;
-    struct lxw_autofilter autofilter;
+    lxw_repeat_rows repeat_rows_;
+    lxw_repeat_cols repeat_cols;
+    lxw_print_area print_area_;
+    lxw_autofilter autofilter_;
 
     uint16_t merged_range_count;
 
@@ -2499,21 +2485,19 @@ private:
     uint16_t hbreaks_count;
     uint16_t vbreaks_count;
 
-    struct lxw_rel_tuples *external_hyperlinks;
-    struct lxw_rel_tuples *external_drawing_links;
-    struct lxw_rel_tuples *drawing_links;
+    std::list<lxw_rel_tuple> *external_hyperlinks;
+    std::list<lxw_rel_tuple> *external_drawing_links;
+    std::list<lxw_rel_tuple> *drawing_links;
 
-    struct lxw_panes panes;
+    lxw_panes panes;
 
-    struct lxw_protection protection;
+    lxw_protection protection;
 
     lxw_drawing *drawing;
 
     STAILQ_ENTRY (lxw_worksheet) list_pointers;
 
     /* Declarations required for unit testing. */
-#ifdef TESTING
-
     void _xml_declaration();
     void _write_worksheet();
     void _write_dimension();
@@ -2539,8 +2523,6 @@ private:
     void _write_sheet_pr();
     void _write_tab_color();
     void _write_sheet_protection();
-#endif /* TESTING */
-
 };
 
 typedef std::shared_ptr<worksheet> worksheet_ptr;

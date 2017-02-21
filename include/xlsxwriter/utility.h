@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 #include "common.h"
-
+#include <string>
 
 /**
  * @brief Convert an Excel `A1` cell string into a `(row, col)` pair.
@@ -134,9 +134,9 @@ void lxw_rowcol_to_range_abs(char *range,
                              lxw_row_t first_row, lxw_col_t first_col,
                              lxw_row_t last_row, lxw_col_t last_col);
 
-void lxw_rowcol_to_formula_abs(char *formula, const char *sheetname,
-                               lxw_row_t first_row, lxw_col_t first_col,
-                               lxw_row_t last_row, lxw_col_t last_col);
+lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
+                          lxw_row_t first_row, lxw_col_t first_col,
+                          lxw_row_t last_row, lxw_col_t last_col);
 
 uint32_t lxw_name_to_row(const char *row_str);
 uint16_t lxw_name_to_col(const char *col_str);

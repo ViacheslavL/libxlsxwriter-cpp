@@ -219,12 +219,7 @@ public:
 
     workbook(const std::string& filename, const workbook_options &options = workbook_options());
 
-    /* Deprecated function name for backwards compatibility. */
-    lxw_workbook *new_workbook(const char *filename);
-
-    /* Deprecated function name for backwards compatibility. */
-    lxw_workbook *new_workbook_opt(const char *filename,
-                                   lxw_workbook_options *options);
+    ~workbook();
 
     /**
      * @brief get_worksheets
@@ -418,14 +413,13 @@ public:
      *     properties.status   = "Quo";
      *
      *     // Set the properties in the workbook.
-     *     workbook_set_properties(properties);
+     *     workbook->set_properties(properties);
      * @endcode
      *
      * @image html doc_properties.png
      *
      */
-    lxw_error workbook_set_properties(lxw_workbook *workbook,
-                                      lxw_doc_properties *properties);
+    lxw_error set_properties(const doc_properties& properties);
 
     /**
      * @brief Set a custom document text property.
@@ -571,9 +565,8 @@ public:
 
     worksheet_ptr get_worksheet_by_name(const std::string& name);
 
-    void lxw_workbook_free(lxw_workbook *workbook);
-    void lxw_workbook_assemble_xml_file(lxw_workbook *workbook);
-    void lxw_workbook_set_default_xf_indices(lxw_workbook *workbook);
+    void assemble_xml_file();
+    void set_default_xf_indices();
 
 private:
     FILE *file;

@@ -12,8 +12,8 @@
  * <!-- Copyright 2014-2016, John McNamara, jmcnamara@cpan.org -->
  *
  */
-#ifndef __LXW_COMMON_H__
-#define __LXW_COMMON_H__
+#ifndef __LXW_COMMON_HPP__
+#define __LXW_COMMON_HPP__
 
 #include <time.h>
 #include "xlsxwriter/third_party/queue.h"
@@ -100,7 +100,7 @@ typedef enum lxw_error {
  *
  * Struct to represent a date and time in Excel. See @ref working_with_dates.
  */
-typedef struct lxw_datetime {
+struct lxw_datetime {
 
     /** Year     : 1900 - 9999 */
     int year;
@@ -115,7 +115,7 @@ typedef struct lxw_datetime {
     /** Seconds  : 0 - 59.999 */
     double sec;
 
-} lxw_datetime;
+};
 
 enum lxw_custom_property_types {
     LXW_CUSTOM_NONE,

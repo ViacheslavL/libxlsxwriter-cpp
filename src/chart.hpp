@@ -196,9 +196,9 @@ enum lxw_marker_types {
     LXW_MARKER_PICTURE
 };
 
-typedef struct lxw_series_range {
-    char *formula;
-    char *sheetname;
+struct lxw_series_range {
+    std::string formula;
+    std::string sheetname;
     lxw_row_t first_row;
     lxw_row_t last_row;
     lxw_col_t first_col;
@@ -207,48 +207,48 @@ typedef struct lxw_series_range {
 
     uint8_t has_string_cache;
     uint16_t num_data_points;
-    struct lxw_series_data_points *data_cache;
+    lxw_series_data_points *data_cache;
 
-} lxw_series_range;
+};
 
-typedef struct lxw_series_data_point {
-    uint8_t is_string;
+struct lxw_series_data_point {
+    bool is_string;
     double number;
     char *string;
-    uint8_t no_data;
+    bool no_data;
 
     STAILQ_ENTRY (lxw_series_data_point) list_pointers;
 
-} lxw_series_data_point;
+};
 
-typedef struct lxw_chart_font {
+struct lxw_chart_font {
 
     uint8_t bold;
 
-} lxw_chart_font;
+};
 
-typedef struct lxw_chart_title {
+struct lxw_chart_title {
 
-    char *name;
+    std::string name;
     lxw_row_t row;
     lxw_col_t col;
     lxw_chart_font font;
     uint8_t off;
-    uint8_t is_horizontal;
-    uint8_t ignore_cache;
+    bool is_horizontal;
+    bool ignore_cache;
 
     /* We use a range to hold the title formula properties even though it
      * will only have 1 point in order to re-use similar functions.*/
     lxw_series_range *range;
 
-    struct lxw_series_data_point data_point;
+    lxw_series_data_point data_point;
 
-} lxw_chart_title;
+};
 
-typedef struct lxw_marker {
+struct lxw_marker {
     uint8_t marker_type;
     lxw_shape_properties properties;
-} lxw_marker;
+};
 
 /**
  * @brief Struct to represent an Excel chart data series.
@@ -258,6 +258,117 @@ typedef struct lxw_marker {
  * aren't modified directly.
  */
 struct chart_series {
+public:
+
+    chart_series();
+
+    /**
+     * @brief Set a series "categories" range using row and column values.
+     *
+     * @param sheetname The name of the worksheet that contains the data range.
+     * @param first_row The first row of the range. (All zero indexed.)
+     * @param first_col The first column of the range.
+     * @param last_row  The last row of the range.
+     * @param last_col  The last col of the range.
+     *
+     * The `categories` and `values` of a chart data series are generally set
+     * using the `chart_add_series()` function and Excel range formulas like
+     * `"=Sheet1!$A$2:$A$7"`.
+     *
+     * The `%chart_series_set_categories()` function is an alternative method that
+     * is easier to generate programmatically. It requires that you set the
+     * `categories` and `values` parameters in `chart_add_series()`to `NULL` and
+     * then set them using row and column values in
+     * `chart_series_set_categories()` and `chart_series_set_values()`:
+     *
+     * @code
+     *     chart_series_ptr series = chart->add_series->();
+     *
+     *     // Configure the series ranges programmatically.
+     *     series->set_categories("Sheet1", 1, 0, 6, 0); // "=Sheet1!$A$2:$A$7"
+     *     series->set_values("Sheet1", 1, 2, 6, 2); // "=Sheet1!$C$2:$C$7"
+     * @endcode
+     *
+     */
+    void set_categories(const std::string& sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
+
+    /**
+     * @brief Set a series "values" range using row and column values.
+     *
+     * @param series    A series object created via `chart_add_series()`.
+     * @param sheetname The name of the worksheet that contains the data range.
+     * @param first_row The first row of the range. (All zero indexed.)
+     * @param first_col The first column of the range.
+     * @param last_row  The last row of the range.
+     * @param last_col  The last col of the range.
+     *
+     * The `categories` and `values` of a chart data series are generally set
+     * using the `chart_add_series()` function and Excel range formulas like
+     * `"=Sheet1!$A$2:$A$7"`.
+     *
+     * The `%chart_series_set_values()` function is an alternative method that is
+     * easier to generate programmatically. See the documentation for
+     * `chart_series_set_categories()` above.
+     */
+    void set_values(const std::string& sheetname, lxw_row_t first_row, lxw_col_t first_col,
+                    lxw_row_t last_row, lxw_col_t last_col);
+
+    /**
+     * @brief Set the name of a chart series range.
+     *
+     * @param name   The series name.
+     *
+     * The `%set_name` function is used to set the name for a chart
+     * data series. The series name in Excel is displayed in the chart legend and
+     * in the formula bar. The name property is optional and if it isn't supplied
+     * it will default to `Series 1..n`.
+     *
+     * The function applies to a #chart_series object created using
+     * `add_series()`:
+     *
+     * @code
+     *     chart_series_ptr series = chart->add_series("", "=Sheet1!$B$2:$B$7");
+     *
+     *     series->set_name("Quarterly budget data");
+     * @endcode
+     *
+     * The name parameter can also be a formula such as `=Sheet1!$A$1` to point to
+     * a cell in the workbook that contains the name:
+     *
+     * @code
+     *     chart_series_ptr series = chart->add_series("", "=Sheet1!$B$2:$B$7");
+     *
+     *     series->set_name("=Sheet1!$B1$1");
+     * @endcode
+     *
+     * See also the `set_name_range()` function to see how to set the
+     * name formula programmatically.
+     */
+    void set_name(const std::string& name);
+
+    /**
+     * @brief Set a series name formula using row and column values.
+     *
+     * @param series    A series object created via `chart_add_series()`.
+     * @param sheetname The name of the worksheet that contains the cell range.
+     * @param row       The zero indexed row number of the range.
+     * @param col       The zero indexed column number of the range.
+     *
+     * The `%set_name_range()` function can be used to set a series
+     * name range and is an alternative to using `set_name()` and a
+     * string formula:
+     *
+     * @code
+     *     chart_series_ptr series = chart->add_series("", "=Sheet1!$B$2:$B$7");
+     *
+     *     series->set_name_range("Sheet1", 0, 2); // "=Sheet1!$C$1"
+     * @endcode
+     */
+    void set_name_range(lxw_chart_series *series,
+                                     const char *sheetname, lxw_row_t row,
+                                     lxw_col_t col);
+
+private:
 
     lxw_series_range *categories;
     lxw_series_range *values;
@@ -280,12 +391,77 @@ typedef std::shared_ptr<chart_series> chart_series_ptr;
  * directly.
  */
 struct chart_axis {
+public:
+
+    chart_axis();
+
+    /**
+     * @brief Set the name caption of the an axis.
+     *
+     * @param axis A pointer to a chart #lxw_chart_axis object.
+     * @param name The name caption of the axis.
+     *
+     * The `%chart_axis_set_name()` function sets the name (also known as title or
+     * caption) for an axis. It can be used for the X or Y axes. The name is
+     * displayed below an X axis and to the side of a Y axis.
+     *
+     * @code
+     *     chart->x1_axis()->set_name("Earnings per Quarter");
+     *     chart->y1_axis()->axis_set_name("US Dollars (Millions)");
+     * @endcode
+     *
+     * @image html chart_axis_set_name.png
+     *
+     * The name parameter can also be a formula such as `=Sheet1!$A$1` to point to
+     * a cell in the workbook that contains the name:
+     *
+     * @code
+     *     chart->x1_axis()->set_name("=Sheet1!$B1$1");
+     * @endcode
+     *
+     * See also the `chart_axis_set_name_range()` function to see how to set the
+     * name formula programmatically.
+     *
+     * This function is applicable to category, date and value axes.
+     */
+    void set_name(const std::string& name);
+
+    /**
+     * @brief Set a chart axis name formula using row and column values.
+     *
+     * @param axis      A pointer to a chart #lxw_chart_axis object.
+     * @param sheetname The name of the worksheet that contains the cell range.
+     * @param row       The zero indexed row number of the range.
+     * @param col       The zero indexed column number of the range.
+     *
+     * The `%chart_axis_set_name_range()` function can be used to set an axis name
+     * range and is an alternative to using `chart_axis_set_name()` and a string
+     * formula:
+     *
+     * @code
+     *     chart->x1_axis()->set_name_range("Sheet1", 1, 0);
+     *     chart->y1_axis()->set_name_range("Sheet1", 2, 0);
+     * @endcode
+     */
+    void set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col);
+
+    /**
+     * @brief Set a chart axis values format
+     *
+     * @param axis     A pointer to a chart #lxw_chart_axis object.
+     * @param format   Format for axis's values
+     */
+    void set_format(const std::string& format);
+
+    void set_crossing(const std::string& crossing);
+
+private:
 
     lxw_chart_title title;
 
-    char num_format[LXW_CHART_NUM_FORMAT_LEN];    
-    char default_num_format[LXW_CHART_NUM_FORMAT_LEN];
-    char crossing[LXW_CHART_NUM_FORMAT_LEN];
+    std::string num_format;
+    std::string default_num_format;
+    std::string crossing;
 
     uint8_t default_major_gridlines;
     uint8_t major_tick_mark;
@@ -294,7 +470,7 @@ struct chart_axis {
     double max_value;
 
     uint8_t position;
-    uint8_t visible;
+    bool visible;
 
 };
 
@@ -317,7 +493,7 @@ public:
 
     ~chart();
 
-    void lxw_chart_assemble_xml_file();
+    void assemble_xml_file();
 
 
     /**
@@ -405,189 +581,15 @@ public:
     void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
     /**
-     * @brief Set a series "categories" range using row and column values.
-     *
-     * @param series    A series object created via `chart_add_series()`.
-     * @param sheetname The name of the worksheet that contains the data range.
-     * @param first_row The first row of the range. (All zero indexed.)
-     * @param first_col The first column of the range.
-     * @param last_row  The last row of the range.
-     * @param last_col  The last col of the range.
-     *
-     * The `categories` and `values` of a chart data series are generally set
-     * using the `chart_add_series()` function and Excel range formulas like
-     * `"=Sheet1!$A$2:$A$7"`.
-     *
-     * The `%chart_series_set_categories()` function is an alternative method that
-     * is easier to generate programmatically. It requires that you set the
-     * `categories` and `values` parameters in `chart_add_series()`to `NULL` and
-     * then set them using row and column values in
-     * `chart_series_set_categories()` and `chart_series_set_values()`:
-     *
-     * @code
-     *     lxw_chart_series *series = chart_add_series(chart, NULL, NULL);
-     *
-     *     // Configure the series ranges programmatically.
-     *     chart_series_set_categories(series, "Sheet1", 1, 0, 6, 0); // "=Sheet1!$A$2:$A$7"
-     *     chart_series_set_values(    series, "Sheet1", 1, 2, 6, 2); // "=Sheet1!$C$2:$C$7"
-     * @endcode
-     *
-     */
-    void chart_series_set_categories(lxw_chart_series *series,
-                                     const char *sheetname, lxw_row_t first_row,
-                                     lxw_col_t first_col, lxw_row_t last_row,
-                                     lxw_col_t last_col);
-
-    /**
-     * @brief Set a series "values" range using row and column values.
-     *
-     * @param series    A series object created via `chart_add_series()`.
-     * @param sheetname The name of the worksheet that contains the data range.
-     * @param first_row The first row of the range. (All zero indexed.)
-     * @param first_col The first column of the range.
-     * @param last_row  The last row of the range.
-     * @param last_col  The last col of the range.
-     *
-     * The `categories` and `values` of a chart data series are generally set
-     * using the `chart_add_series()` function and Excel range formulas like
-     * `"=Sheet1!$A$2:$A$7"`.
-     *
-     * The `%chart_series_set_values()` function is an alternative method that is
-     * easier to generate programmatically. See the documentation for
-     * `chart_series_set_categories()` above.
-     */
-    void chart_series_set_values(lxw_chart_series *series, const char *sheetname,
-                                 lxw_row_t first_row, lxw_col_t first_col,
-                                 lxw_row_t last_row, lxw_col_t last_col);
-
-    /**
-     * @brief Set the name of a chart series range.
-     *
-     * @param series A series object created via `chart_add_series()`.
-     * @param name   The series name.
-     *
-     * The `%chart_series_set_name` function is used to set the name for a chart
-     * data series. The series name in Excel is displayed in the chart legend and
-     * in the formula bar. The name property is optional and if it isn't supplied
-     * it will default to `Series 1..n`.
-     *
-     * The function applies to a #lxw_chart_series object created using
-     * `chart_add_series()`:
-     *
-     * @code
-     *     lxw_chart_series *series = chart_add_series(chart, NULL, "=Sheet1!$B$2:$B$7");
-     *
-     *     chart_series_set_name(series, "Quarterly budget data");
-     * @endcode
-     *
-     * The name parameter can also be a formula such as `=Sheet1!$A$1` to point to
-     * a cell in the workbook that contains the name:
-     *
-     * @code
-     *     lxw_chart_series *series = chart_add_series(chart, NULL, "=Sheet1!$B$2:$B$7");
-     *
-     *     chart_series_set_name(series, "=Sheet1!$B1$1");
-     * @endcode
-     *
-     * See also the `chart_series_set_name_range()` function to see how to set the
-     * name formula programmatically.
-     */
-    void chart_series_set_name(lxw_chart_series *series, const char *name);
-
-    /**
-     * @brief Set a series name formula using row and column values.
-     *
-     * @param series    A series object created via `chart_add_series()`.
-     * @param sheetname The name of the worksheet that contains the cell range.
-     * @param row       The zero indexed row number of the range.
-     * @param col       The zero indexed column number of the range.
-     *
-     * The `%chart_series_set_name_range()` function can be used to set a series
-     * name range and is an alternative to using `chart_series_set_name()` and a
-     * string formula:
-     *
-     * @code
-     *     lxw_chart_series *series = chart_add_series(chart, NULL, "=Sheet1!$B$2:$B$7");
-     *
-     *     chart_series_set_name_range(series, "Sheet1", 0, 2); // "=Sheet1!$C$1"
-     * @endcode
-     */
-    void chart_series_set_name_range(lxw_chart_series *series,
-                                     const char *sheetname, lxw_row_t row,
-                                     lxw_col_t col);
-
-    /**
-     * @brief Set the name caption of the an axis.
-     *
-     * @param axis A pointer to a chart #lxw_chart_axis object.
-     * @param name The name caption of the axis.
-     *
-     * The `%chart_axis_set_name()` function sets the name (also known as title or
-     * caption) for an axis. It can be used for the X or Y axes. The name is
-     * displayed below an X axis and to the side of a Y axis.
-     *
-     * @code
-     *     chart_axis_set_name(chart->x_axis, "Earnings per Quarter");
-     *     chart_axis_set_name(chart->y_axis, "US Dollars (Millions)");
-     * @endcode
-     *
-     * @image html chart_axis_set_name.png
-     *
-     * The name parameter can also be a formula such as `=Sheet1!$A$1` to point to
-     * a cell in the workbook that contains the name:
-     *
-     * @code
-     *     chart_axis_set_name(chart->x_axis, "=Sheet1!$B1$1");
-     * @endcode
-     *
-     * See also the `chart_axis_set_name_range()` function to see how to set the
-     * name formula programmatically.
-     *
-     * This function is applicable to category, date and value axes.
-     */
-    void chart_axis_set_name(lxw_chart_axis *axis, const std::string& name);
-
-    /**
-     * @brief Set a chart axis name formula using row and column values.
-     *
-     * @param axis      A pointer to a chart #lxw_chart_axis object.
-     * @param sheetname The name of the worksheet that contains the cell range.
-     * @param row       The zero indexed row number of the range.
-     * @param col       The zero indexed column number of the range.
-     *
-     * The `%chart_axis_set_name_range()` function can be used to set an axis name
-     * range and is an alternative to using `chart_axis_set_name()` and a string
-     * formula:
-     *
-     * @code
-     *     chart_axis_set_name_range(chart->x_axis, "Sheet1", 1, 0);
-     *     chart_axis_set_name_range(chart->y_axis, "Sheet1", 2, 0);
-     * @endcode
-     */
-    void chart_axis_set_name_range(lxw_chart_axis *axis, const char *sheetname,
-                                   lxw_row_t row, lxw_col_t col);
-
-    /**
-     * @brief Set a chart axis values format
-     *
-     * @param axis     A pointer to a chart #lxw_chart_axis object.
-     * @param format   Format for axis's values
-     */
-    void chart_axis_set_format(lxw_chart_axis *axis, const char* format);
-
-    void chart_axis_set_crossing(lxw_chart_axis *axis, const char* crossing);
-
-    /**
      * @brief Set the title of the chart.
      *
-     * @param chart Pointer to a lxw_chart instance to be configured.
      * @param name  The chart title name.
      *
-     * The `%chart_title_set_name()` function sets the name (title) for the
+     * The `%title_set_name()` function sets the name (title) for the
      * chart. The name is displayed above the chart.
      *
      * @code
-     *     chart_title_set_name(chart, "Year End Results");
+     *     chart->title_set_name("Year End Results");
      * @endcode
      *
      * @image html chart_title_set_name.png
@@ -596,38 +598,35 @@ public:
      * a cell in the workbook that contains the name:
      *
      * @code
-     *     chart_title_set_name(chart, "=Sheet1!$B1$1");
+     *     chart->title_set_name("=Sheet1!$B1$1");
      * @endcode
      *
-     * See also the `chart_title_set_name_range()` function to see how to set the
+     * See also the `title_set_name_range()` function to see how to set the
      * name formula programmatically.
      *
      * The Excel default is to have no chart title.
      */
-    void chart_title_set_name(lxw_chart *chart, const char *name);
+    void title_set_name(const std::string& name);
 
     /**
      * @brief Set a chart title formula using row and column values.
      *
-     * @param chart     Pointer to a lxw_chart instance to be configured.
      * @param sheetname The name of the worksheet that contains the cell range.
      * @param row       The zero indexed row number of the range.
      * @param col       The zero indexed column number of the range.
      *
-     * The `%chart_title_set_name_range()` function can be used to set a chart
-     * title range and is an alternative to using `chart_title_set_name()` and a
+     * The `%title_set_name_range()` function can be used to set a chart
+     * title range and is an alternative to using `title_set_name()` and a
      * string formula:
      *
      * @code
-     *     chart_title_set_name_range(chart, "Sheet1", 1, 0);
+     *     chart->title_set_name_range("Sheet1", 1, 0);
      * @endcode
      */
-    void chart_title_set_name_range(lxw_chart *chart, const char *sheetname,
-                                    lxw_row_t row, lxw_col_t col);
+    void title_set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col);
+
     /**
      * @brief Turn off an automatic chart title.
-     *
-     * @param chart  Pointer to a lxw_chart instance to be configured.
      *
      * In general in Excel a chart title isn't displayed unless the user
      * explicitly adds one. However, Excel adds an automatic chart title to charts
@@ -636,10 +635,10 @@ public:
      * title:
      *
      * @code
-     *     chart_title_off(chart);
+     *     chart->title_off(chart);
      * @endcode
      */
-    void chart_title_off(lxw_chart *chart);
+    void title_off();
 
     /**
      * @brief Set the chart style type.
@@ -669,10 +668,10 @@ public:
      *
      *
      */
-    void chart_set_style(lxw_chart *chart, uint8_t style_id);
+    void set_style(uint8_t style_id);
 
-    void chart_set_rotation(lxw_chart *chart, uint16_t rotation);
-    void chart_set_hole_size(lxw_chart *chart, uint8_t size);
+    void set_rotation(uint16_t rotation);
+    void set_hole_size(uint8_t size);
 
 
 private:
@@ -739,19 +738,36 @@ private:
     STAILQ_ENTRY (lxw_chart) ordered_list_pointers;
     STAILQ_ENTRY (lxw_chart) list_pointers;
 
+    void _write_chart_space();
+    void _write_lang();
+    void _write_layout();
+    void _write_vary_colors();
+    void _write_radar_style();
+    void _write_grouping(uint8_t grouping);
+    void _write_first_slice_ang();
+    void _write_hole_size();
+    void _write_a_t(const std::string &name);
+    void _write_a_end_para_rpr();
+    void _write_a_def_rpr();
+    void _write_a_r_pr();
+    void _write_a_r(const std::string &name);
+    void _write_a_p_pr();
+    void _write_a_p_pr_pie();
+    void _add_axis_ids(bool primary);
+    void _set_range(lxw_series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
+    void _write_a_p_pr_rich();
+    void _chart_write_a_p();
+    void _write_a_p_pie();
+    void _write_a_p_rich(const std::string &name);
+    void _write_a_lst_style();
+    void _write_a_body_pr(lxw_chart_title *title);
+    void _write_pt_count(uint16_t num_data_points);
+    void _write_v_num(double number);
+    void _write_v_str(const std::string &str);
+    void _write_pt(uint16_t index, lxw_series_data_point *data_point);
 };
 
 typedef std::shared_ptr<chart> chart_ptr;
-
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-
-
 
 int lxw_chart_add_data_cache(lxw_series_range *range, uint8_t *data,
                              uint16_t rows, uint8_t cols, uint8_t col);
@@ -763,11 +779,6 @@ STATIC void _chart_xml_declaration(lxw_chart *chart);
 
 #endif /* TESTING */
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
 
 } // namespace xlsxwriter
 

@@ -11,8 +11,8 @@
 
 #include <stdint.h>
 
-#include "xlsxwriter/workbook.h"
-#include "common.h"
+#include "workbook.hpp"
+#include "common.hpp"
 
 /*
  * Struct to represent a core.
