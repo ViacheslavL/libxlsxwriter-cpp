@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#include "common.h"
+#include "common.hpp"
 
 /*
  * Struct to represent a theme.

@@ -336,7 +336,7 @@ lxw_theme_assemble_xml_file(lxw_theme *self)
     int i = 0;
 
     while (strlen(theme_strs[i])) {
-        fprintf("%s", theme_strs[i]);
+        fprintf(self->file, "%s", theme_strs[i]);
         i++;
     }
 }
