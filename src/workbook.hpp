@@ -626,6 +626,8 @@ private:
 
 };
 
+typedef std::shared_ptr<workbook> workbook_ptr;
+
 } // namespace xlsxwriter
 
 #endif /* __LXW_WORKBOOK_H__ */

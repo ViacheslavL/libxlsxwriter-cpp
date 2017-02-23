@@ -7,12 +7,14 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/packager.h"
-#include "xlsxwriter/hash_table.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "packager.hpp"
+#include "hash_table.hpp"
+#include "utility.hpp"
 
-STATIC uint8_t _add_file_to_zip(lxw_packager *self, FILE * file,
+namespace xlsxwriter {
+
+STATIC uint8_t _add_file_to_zip(FILE * file,
                                 const char *filename);
 
 /*
@@ -67,61 +69,33 @@ _open_zipfile_win32(const char *filename)
 /*
  * Create a new packager object.
  */
-lxw_packager *
-lxw_packager_new(const char *filename, char *tmpdir)
+packager::packager(const std::string& filename, const std::string& tmpdir)
 {
-    lxw_packager *packager = calloc(1, sizeof(lxw_packager));
-    GOTO_LABEL_ON_MEM_ERROR(packager, mem_error);
+    this->filename = filename;
+    this->tmpdir = tmpdir;
 
-    packager->buffer = calloc(1, LXW_ZIP_BUFFER_SIZE);
-    GOTO_LABEL_ON_MEM_ERROR(packager->buffer, mem_error);
-
-    packager->filename = lxw_strdup(filename);
-    packager->tmpdir = tmpdir;
-    GOTO_LABEL_ON_MEM_ERROR(packager->filename, mem_error);
-
-    packager->buffer_size = LXW_ZIP_BUFFER_SIZE;
+    buffer_size = LXW_ZIP_BUFFER_SIZE;
 
     /* Initialize the zip_fileinfo struct to Jan 1 1980 like Excel. */
-    packager->zipfile_info.tmz_date.tm_sec = 0;
-    packager->zipfile_info.tmz_date.tm_min = 0;
-    packager->zipfile_info.tmz_date.tm_hour = 0;
-    packager->zipfile_info.tmz_date.tm_mday = 1;
-    packager->zipfile_info.tmz_date.tm_mon = 0;
-    packager->zipfile_info.tmz_date.tm_year = 1980;
-    packager->zipfile_info.dosDate = 0;
-    packager->zipfile_info.internal_fa = 0;
-    packager->zipfile_info.external_fa = 0;
+    zipfile_info.tmz_date.tm_sec = 0;
+    zipfile_info.tmz_date.tm_min = 0;
+    zipfile_info.tmz_date.tm_hour = 0;
+    zipfile_info.tmz_date.tm_mday = 1;
+    zipfile_info.tmz_date.tm_mon = 0;
+    zipfile_info.tmz_date.tm_year = 1980;
+    zipfile_info.dosDate = 0;
+    zipfile_info.internal_fa = 0;
+    zipfile_info.external_fa = 0;
 
     /* Create a zip container for the xlsx file. */
 #ifdef _WIN32
-    packager->zipfile = _open_zipfile_win32(packager->filename);
+    zipfile = _open_zipfile_win32(this->filename);
 #else
-    packager->zipfile = zipOpen(packager->filename, 0);
+    zipfile = zipOpen(this->filename, 0);
 #endif
 
-    if (packager->zipfile == NULL)
-        goto mem_error;
-
-    return packager;
-
-mem_error:
-    lxw_packager_free(packager);
-    return NULL;
-}
-
-/*
- * Free a packager object.
- */
-void
-lxw_packager_free(lxw_packager *packager)
-{
-    if (!packager)
-        return;
-
-    free(packager->buffer);
-    free(packager->filename);
-    free(packager);
+    if (zipfile == NULL)
+        throw new no_zip_file_exception();
 }
 
 /*****************************************************************************
@@ -132,19 +106,15 @@ lxw_packager_free(lxw_packager *packager)
 /*
  * Write the workbook.xml file.
  */
-STATIC uint8_t
-_write_workbook_file(lxw_packager *self)
+uint8_t packager::_write_workbook_file()
 {
-    lxw_workbook *workbook = self->workbook;
-    int err;
-
-    workbook->file = lxw_tmpfile(self->tmpdir);
+    workbook->file = lxw_tmpfile(tmpdir);
     if (!workbook->file)
         return LXW_ERROR_CREATING_TMPFILE;
 
-    lxw_workbook_assemble_xml_file(workbook);
+    workbook->assemble_xml_file();
 
-    err = _add_file_to_zip(self, workbook->file, "xl/workbook.xml");
+    err = _add_file_to_zip( workbook->file, "xl/workbook.xml");
     RETURN_ON_ERROR(err);
 
     fclose(workbook->file);
@@ -155,29 +125,26 @@ _write_workbook_file(lxw_packager *self)
 /*
  * Write the worksheet files.
  */
-STATIC uint8_t
-_write_worksheet_files(lxw_packager *self)
+uint8_t packager::_write_worksheet_files()
 {
-    lxw_workbook *workbook = self->workbook;
-    lxw_worksheet *worksheet;
     char sheetname[LXW_FILENAME_LENGTH] = { 0 };
     uint16_t index = 1;
     int err;
 
-    STAILQ_FOREACH(worksheet, workbook->worksheets, list_pointers) {
+    for (const auto& worksheet : workbook->worksheets) {
         lxw_snprintf(sheetname, LXW_FILENAME_LENGTH,
                      "xl/worksheets/sheet%d.xml", index++);
 
         if (worksheet->optimize_row)
-            lxw_worksheet_write_single_row(worksheet);
+            worksheet->write_single_row();
 
-        worksheet->file = lxw_tmpfile(self->tmpdir);
+        worksheet->file = lxw_tmpfile(tmpdir);
         if (!worksheet->file)
             return LXW_ERROR_CREATING_TMPFILE;
 
-        lxw_worksheet_assemble_xml_file(worksheet);
+        worksheet->assemble_xml_file();
 
-        err = _add_file_to_zip(self, worksheet->file, sheetname);
+        err = _add_file_to_zip(worksheet->file, sheetname);
         RETURN_ON_ERROR(err);
 
         fclose(worksheet->file);
@@ -189,23 +156,20 @@ _write_worksheet_files(lxw_packager *self)
 /*
  * Write the /xl/media/image?.xml files.
  */
-STATIC uint8_t
-_write_image_files(lxw_packager *self)
+uint8_t packager::_write_image_files()
 {
-    lxw_workbook *workbook = self->workbook;
-    lxw_worksheet *worksheet;
     lxw_image_options *image;
     int err;
 
     char filename[LXW_FILENAME_LENGTH] = { 0 };
     uint16_t index = 1;
 
-    STAILQ_FOREACH(worksheet, workbook->worksheets, list_pointers) {
+    for(const auto& sheet : workbook->worksheets) {
 
-        if (STAILQ_EMPTY(worksheet->image_data))
+        if (STAILQ_EMPTY(sheet->image_data))
             continue;
 
-        STAILQ_FOREACH(image, worksheet->image_data, list_pointers) {
+        STAILQ_FOREACH(image, sheet->image_data, list_pointers) {
 
             lxw_snprintf(filename, LXW_FILENAME_LENGTH,
                          "xl/media/image%d.%s", index++, image->extension);
@@ -226,7 +190,7 @@ _write_image_files(lxw_packager *self)
  * Write the chart files.
  */
 STATIC uint8_t
-_write_chart_files(lxw_packager *self)
+_write_chart_files()
 {
     lxw_workbook *workbook = self->workbook;
     lxw_chart *chart;
@@ -260,7 +224,7 @@ _write_chart_files(lxw_packager *self)
  * Write the drawing files.
  */
 STATIC uint8_t
-_write_drawing_files(lxw_packager *self)
+_write_drawing_files()
 {
     lxw_workbook *workbook = self->workbook;
     lxw_worksheet *worksheet;
@@ -297,7 +261,7 @@ _write_drawing_files(lxw_packager *self)
  * Write the sharedStrings.xml file.
  */
 STATIC uint8_t
-_write_shared_strings_file(lxw_packager *self)
+_write_shared_strings_file()
 {
     lxw_sst *sst = self->workbook->sst;
     int err;
@@ -324,7 +288,7 @@ _write_shared_strings_file(lxw_packager *self)
  * Write the app.xml file.
  */
 STATIC uint8_t
-_write_app_file(lxw_packager *self)
+_write_app_file()
 {
     lxw_workbook *workbook = self->workbook;
     lxw_worksheet *worksheet;
@@ -386,7 +350,7 @@ _write_app_file(lxw_packager *self)
  * Write the core.xml file.
  */
 STATIC uint8_t
-_write_core_file(lxw_packager *self)
+_write_core_file()
 {
     lxw_core *core = lxw_core_new();
     int err;
@@ -413,7 +377,7 @@ _write_core_file(lxw_packager *self)
  * Write the custom.xml file.
  */
 STATIC uint8_t
-_write_custom_file(lxw_packager *self)
+_write_custom_file()
 {
     lxw_custom *custom;
     int err;
@@ -445,7 +409,7 @@ _write_custom_file(lxw_packager *self)
  * Write the theme.xml file.
  */
 STATIC uint8_t
-_write_theme_file(lxw_packager *self)
+_write_theme_file()
 {
     lxw_theme *theme = lxw_theme_new();
     int err;
@@ -470,7 +434,7 @@ _write_theme_file(lxw_packager *self)
  * Write the styles.xml file.
  */
 STATIC uint8_t
-_write_styles_file(lxw_packager *self)
+_write_styles_file()
 {
     lxw_styles *styles = lxw_styles_new();
     lxw_hash_element *hash_element;
@@ -511,7 +475,7 @@ _write_styles_file(lxw_packager *self)
  * Write the ContentTypes.xml file.
  */
 STATIC uint8_t
-_write_content_types_file(lxw_packager *self)
+_write_content_types_file()
 {
     lxw_content_types *content_types = lxw_content_types_new();
     lxw_workbook *workbook = self->workbook;
@@ -573,7 +537,7 @@ _write_content_types_file(lxw_packager *self)
  * Write the workbook .rels xml file.
  */
 STATIC uint8_t
-_write_workbook_rels_file(lxw_packager *self)
+_write_workbook_rels_file()
 {
     lxw_relationships *rels = lxw_relationships_new();
     lxw_workbook *workbook = self->workbook;
@@ -615,7 +579,7 @@ _write_workbook_rels_file(lxw_packager *self)
  * external data such as hyperlinks or drawings.
  */
 STATIC uint8_t
-_write_worksheet_rels_file(lxw_packager *self)
+_write_worksheet_rels_file()
 {
     lxw_relationships *rels;
     lxw_rel_tuple *rel;
@@ -668,7 +632,7 @@ _write_worksheet_rels_file(lxw_packager *self)
  * drawings.
  */
 STATIC uint8_t
-_write_drawing_rels_file(lxw_packager *self)
+_write_drawing_rels_file()
 {
     lxw_relationships *rels;
     lxw_rel_tuple *rel;
@@ -713,7 +677,7 @@ _write_drawing_rels_file(lxw_packager *self)
  * Write the _rels/.rels xml file.
  */
 STATIC uint8_t
-_write_root_rels_file(lxw_packager *self)
+_write_root_rels_file()
 {
     lxw_relationships *rels = lxw_relationships_new();
     int err;
@@ -754,8 +718,7 @@ _write_root_rels_file(lxw_packager *self)
  *
  ****************************************************************************/
 
-STATIC uint8_t
-_add_file_to_zip(lxw_packager *self, FILE * file, const char *filename)
+uint8_t packager::_add_file_to_zip(FILE * file, const char *filename)
 {
     int16_t error = ZIP_OK;
     size_t size_read;
@@ -815,8 +778,7 @@ _add_file_to_zip(lxw_packager *self, FILE * file, const char *filename)
 /*
  * Write the xml files that make up the XLXS OPC package.
  */
-uint8_t
-lxw_create_package(lxw_packager *self)
+uint8_t packager::create_package()
 {
     int8_t error;
 
@@ -875,3 +837,5 @@ lxw_create_package(lxw_packager *self)
 
     return 0;
 }
+
+} //namespace xlsxwriter

@@ -13,6 +13,9 @@
 #include "packager.hpp"
 #include "hash_table.hpp"
 
+
+namespace xlsxwriter {
+
 STATIC int _name_cmp(lxw_worksheet_name *name1, lxw_worksheet_name *name2);
 LXW_RB_GENERATE_NAMES(lxw_worksheet_names, lxw_worksheet_name, tree_pointers,
                       _name_cmp);
@@ -1506,28 +1509,25 @@ workbook_add_format(lxw_workbook *self)
 /*
  * Call finalization code and close file.
  */
-lxw_error
-workbook_close(lxw_workbook *self)
+lxw_error workbook::close()
 {
-    lxw_worksheet *worksheet = NULL;
-    lxw_packager *packager = NULL;
     uint8_t error = LXW_NO_ERROR;
 
     /* Add a default worksheet if non have been added. */
-    if (!self->num_sheets)
-        workbook_add_worksheet(self, NULL);
+    if (worksheets.empty())
+        add_worksheet();
 
     /* Ensure that at least one worksheet has been selected. */
-    if (self->active_sheet == 0) {
-        worksheet = STAILQ_FIRST(self->worksheets);
-        worksheet->selected = 1;
-        worksheet->hidden = 0;
+    if (active_sheet == 0) {
+        const auto& sheet = worksheets.front();
+        sheet->selected = 1;
+        sheet->hidden = 0;
     }
 
     /* Set the active sheet. */
-    STAILQ_FOREACH(worksheet, self->worksheets, list_pointers) {
-        if (worksheet->index == self->active_sheet)
-            worksheet->active = 1;
+    for (const auto& sheet : worksheets) {
+        if (sheet->index == self->active_sheet)
+            sheet->active = 1;
     }
 
     /* Set the defined names for the worksheets such as Print Titles. */
@@ -1540,20 +1540,10 @@ workbook_close(lxw_workbook *self)
     _add_chart_cache_data(self);
 
     /* Create a packager object to assemble sub-elements into a zip file. */
-    packager = lxw_packager_new(self->filename, self->options.tmpdir);
-
-    /* If the packager fails it is generally due to a zip permission error. */
-    if (packager == NULL) {
-        fprintf(stderr, "[ERROR] workbook_close(): "
-                "Error creating '%s'. "
-                "Error = %s\n", self->filename, strerror(errno));
-
-        error = LXW_ERROR_CREATING_XLSX_FILE;
-        goto mem_error;
-    }
+    std::shared_ptr<packager> pkger = std::make_shared<packager>(filename, options.tmpdir);
 
     /* Set the workbook object in the packager. */
-    packager->workbook = self;
+    pkger->workbook = this;
 
     /* Assemble all the sub-files in the xlsx package. */
     error = lxw_create_package(packager);
@@ -1887,3 +1877,5 @@ workbook_get_worksheet_by_name(lxw_workbook *self, const char *name)
     else
         return NULL;
 }
+
+} // namespace xlsxwriter

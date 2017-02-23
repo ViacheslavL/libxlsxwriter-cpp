@@ -11,6 +11,7 @@
 #include "chart.hpp"
 #include "utility.hpp"
 #include <math.h>
+#include <memory>
 
 namespace xlsxwriter {
 
@@ -58,39 +59,6 @@ void void_chart_free_range(series_range *range)
 }
 
 /*
- * Free a series object.
- */
-/*
-void chart_series::series_free(lxw_chart_series *series)
-{
-    if (!series)
-        return;
-
-    free(series->title.name);
-
-    _chart_free_range(series->categories);
-    _chart_free_range(series->values);
-    _chart_free_range(series->title.range);
-
-    free(series);
-}
-
-*/
-
-/*
- * Initialize the data cache in a range object.
- */
-int _char_init_data_cache(series_range *range)
-{
-    /* Initialize the series range data cache. */
-    range->data_cache = calloc(1, sizeof(struct lxw_series_data_points));
-    RETURN_ON_MEM_ERROR(range->data_cache, -1);
-    STAILQ_INIT(range->data_cache);
-
-    return 0;
-}
-
-/*
  * Create a new axis object
  */
 /*
@@ -123,26 +91,9 @@ chart::chart(uint8_t type)
 
     y2_axis = std::make_shared<chart_axis>();
 
-    title.range = calloc(1, sizeof(series_range));
-    GOTO_LABEL_ON_MEM_ERROR(title.range, mem_error);
+    title.range = new series_range{};
 
-    /* Initialize the ranges in the chart titles. */
-    if (_chart_init_data_cache(title.range) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(x_axis->title.range) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(y_axis->title.range) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(x2_axis->title.range) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(y2_axis->title.range) != LXW_NO_ERROR)
-        goto mem_error;
-
-    type = type;
+    this->type = type;
     style_id = 2;
     hole_size = 50;
 
@@ -213,7 +164,7 @@ void chart::_add_axis_ids(bool primary)
 /*
  * Utility function to set a chart range.
  */
-static void chart::set_range(series_range *range, const std::string& sheetname,
+void chart::set_range(series_range *range, const std::string& sheetname,
                  lxw_row_t first_row, lxw_col_t first_col,
                  lxw_row_t last_row, lxw_col_t last_col)
 {
@@ -639,7 +590,7 @@ void chart::_write_f(const std::string& formula)
 /*
  * Write the <c:pt> element.
  */
-void chart::_write_pt(uint16_t index, lxw_series_data_point *data_point)
+void chart::_write_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -653,7 +604,7 @@ void chart::_write_pt(uint16_t index, lxw_series_data_point *data_point)
 
     lxw_xml_start_tag("c:pt", &attributes);
 
-    if (data_point->is_string && data_point->string)
+    if (data_point->is_string && !data_point->string.empty())
         _write_v_str(data_point->string);
     else
         _write_v_num(data_point->number);
@@ -666,7 +617,7 @@ void chart::_write_pt(uint16_t index, lxw_series_data_point *data_point)
 /*
  * Write the <c:pt> element.
  */
-void chart::_write_num_pt(uint16_t index, lxw_series_data_point *data_point)
+void chart::_write_num_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -733,7 +684,7 @@ void chart::_write_str_cache(series_range *range)
     /* Write the c:ptCount element. */
     _write_pt_count(range->num_data_points);
 
-    STAILQ_FOREACH(data_point, range->data_cache, list_pointers) {
+    for (const auto& data_point : range->data_cache) {
         /* Write the c:pt element. */
         _write_pt(index, data_point);
         index++;
@@ -2654,31 +2605,31 @@ void chart::_initialize(uint8_t type)
         case LXW_CHART_AREA:
         case LXW_CHART_AREA_STACKED:
         case LXW_CHART_AREA_STACKED_PERCENT:
-            _chart_initialize_area_chart(type);
+            _initialize_area_chart(type);
             break;
 
         case LXW_CHART_BAR:
         case LXW_CHART_BAR_STACKED:
         case LXW_CHART_BAR_STACKED_PERCENT:
-            _chart_initialize_bar_chart(type);
+            _initialize_bar_chart(type);
             break;
 
         case LXW_CHART_COLUMN:
         case LXW_CHART_COLUMN_STACKED:
         case LXW_CHART_COLUMN_STACKED_PERCENT:
-            _chart_initialize_column_chart(type);
+            _initialize_column_chart(type);
             break;
 
         case LXW_CHART_DOUGHNUT:
-            _chart_initialize_doughnut_chart();
+            _initialize_doughnut_chart();
             break;
 
         case LXW_CHART_LINE:
-            _chart_initialize_line_chart();
+            _initialize_line_chart();
             break;
 
         case LXW_CHART_PIE:
-            _chart_initialize_pie_chart();
+            _initialize_pie_chart();
             break;
 
         case LXW_CHART_SCATTER:
@@ -2686,13 +2637,13 @@ void chart::_initialize(uint8_t type)
         case LXW_CHART_SCATTER_STRAIGHT_WITH_MARKERS:
         case LXW_CHART_SCATTER_SMOOTH:
         case LXW_CHART_SCATTER_SMOOTH_WITH_MARKERS:
-            _chart_initialize_scatter_chart();
+            _initialize_scatter_chart();
             break;
 
         case LXW_CHART_RADAR:
         case LXW_CHART_RADAR_WITH_MARKERS:
         case LXW_CHART_RADAR_FILLED:
-            _chart_initialize_radar_chart(type);
+            _initialize_radar_chart(type);
             break;
 
         default:
@@ -2742,7 +2693,6 @@ void chart::assemble_xml_file()
 int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
                          uint16_t rows, uint8_t cols, uint8_t col)
 {
-    struct lxw_series_data_point *data_point;
     uint16_t i;
 
     range->ignore_cache = true;
@@ -2750,8 +2700,8 @@ int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
 
     /* Initialize the series range data cache. */
     for (i = 0; i < rows; i++) {
-        data_point = calloc(1, sizeof(struct lxw_series_data_point));
-        STAILQ_INSERT_TAIL(range->data_cache, data_point, list_pointers);
+        std::shared_ptr<series_data_point> data_point = std::make_shared<series_data_point>();
+        range->data_cache.push_back(data_point);
         data_point->number = data[i * cols + col];
     }
 
@@ -2766,56 +2716,26 @@ void chart::set_y2_axis(const std::shared_ptr<chart_axis>& axis)
 /*
  * Insert an image into the worksheet.
  */
-lxw_chart_series *
-chart_add_series(const char *categories, const char *values)
-{
-
-mem_error:
-    _chart_series_free(series);
-    return NULL;
-}
-
 std::shared_ptr<chart_series> chart::add_series(const std::string& categories, const std::string&  values, const series_options& options)
 {
-    std::shared_ptr<chart_series> series = new std::make_shared<chart_series>();
-
-    /* Create a new object to hold the series. */
-    series = calloc(1, sizeof(lxw_chart_series));
-    GOTO_LABEL_ON_MEM_ERROR(series, mem_error);
-
-    series->categories = calloc(1, sizeof(lxw_series_range));
-    GOTO_LABEL_ON_MEM_ERROR(series->categories, mem_error);
-
-    series->values = calloc(1, sizeof(lxw_series_range));
-    GOTO_LABEL_ON_MEM_ERROR(series->values, mem_error);
-
-    series->title.range = calloc(1, sizeof(lxw_series_range));
-    GOTO_LABEL_ON_MEM_ERROR(series->title.range, mem_error);
+    std::shared_ptr<chart_series> series = std::make_shared<chart_series>();
+    series->title.range = new series_range{};
 
     series->marker.marker_type = LXW_MARKER_NONE;
 
     if (!categories.empty()) {
         if (categories[0] == '=')
-            series->categories->formula = lxw_strdup(categories + 1);
+            series->categories->formula = categories.substr(1);
         else
-            series->categories->formula = lxw_strdup(categories);
+            series->categories->formula = categories;
     }
 
     if (!values.empty()) {
         if (values[0] == '=')
-            series->values->formula = lxw_strdup(values + 1);
+            series->values->formula = values.substr(1);
         else
-            series->values->formula = lxw_strdup(values);
+            series->values->formula = values;
     }
-
-    if (_chart_init_data_cache(series->categories) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(series->values) != LXW_NO_ERROR)
-        goto mem_error;
-
-    if (_chart_init_data_cache(series->title.range) != LXW_NO_ERROR)
-        goto mem_error;
 
     series_list.push_back(series);
 
@@ -2844,68 +2764,62 @@ chart_set_style(uint8_t style_id)
 /*
  * Set a user defined name for a series.
  */
-void
-chart_series_set_name(lxw_chart_series *series, const char *name)
+void chart_series::set_name(const std::string& name)
 {
-    if (!name)
+    if (name.empty())
         return;
 
     if (name[0] == '=')
-        series->title.range->formula = lxw_strdup(name + 1);
+        title.range->formula = name.substr(1);
     else
-        series->title.name = lxw_strdup(name);
+        title.name = name;
 }
 
 /*
  * Set an axis caption, with a range instead or a formula..
  */
-void
-chart_series_set_name_range(lxw_chart_series *series, const char *sheetname,
+void chart_series::set_name_range(const std::string& sheetname,
                             lxw_row_t row, lxw_col_t col)
 {
-    if (!sheetname) {
+    if (sheetname.empty()) {
         LXW_WARN("chart_series_set_name_range(): "
                  "sheetname must be specified");
         return;
     }
 
     /* Start and end row, col are the same for single cell range. */
-    _chart_set_range(series->title.range, sheetname, row, col, row, col);
+    chart::set_range(title.range, sheetname, row, col, row, col);
 }
 
 /*
  * Set the categories range for a series.
  */
-void
-chart_series_set_categories(lxw_chart_series *series, const char *sheetname,
+void chart_series::set_categories(const std::string& sheetname,
                             lxw_row_t first_row, lxw_col_t first_col,
                             lxw_row_t last_row, lxw_col_t last_col)
 {
-    if (!sheetname) {
+    if (sheetname.empty()) {
         LXW_WARN("chart_series_set_categories(): "
                  "sheetname must be specified");
         return;
     }
 
-    _chart_set_range(series->categories, sheetname,
-                     first_row, first_col, last_row, last_col);
+    chart::set_range(categories, sheetname, first_row, first_col, last_row, last_col);
 }
 
 /*
  * Set the values range for a series.
  */
-void
-chart_series_set_values(lxw_chart_series *series, const char *sheetname,
+void chart_series::set_values(const std::string& sheetname,
                         lxw_row_t first_row, lxw_col_t first_col,
                         lxw_row_t last_row, lxw_col_t last_col)
 {
-    if (!sheetname) {
+    if (sheetname.empty()) {
         LXW_WARN("chart_series_set_values(): sheetname must be specified");
         return;
     }
 
-    _chart_set_range(series->values, sheetname,
-                     first_row, first_col, last_row, last_col);
+    chart::set_range(values, sheetname, first_row, first_col, last_row, last_col);
 }
 
 /*
@@ -2917,7 +2831,7 @@ void chart_axis::set_name(const std::string& name)
         return;
 
     if (name[0] == '=')
-        title.range->formula = lxw_strdup(name + 1);
+        title.range->formula = name.substr(1);
     else
         title.name = name;
 }

@@ -6,24 +6,26 @@
  * packager - A libxlsxwriter library for creating Excel XLSX packager files.
  *
  */
-#ifndef __LXW_PACKAGER_H__
-#define __LXW_PACKAGER_H__
+#ifndef __LXW_PACKAGER_HPP__
+#define __LXW_PACKAGER_HPP__
 
 #include <stdint.h>
 #include "xlsxwriter/third_party/zip.h"
 
-#include "common.h"
-#include "workbook.h"
-#include "worksheet.h"
-#include "shared_strings.h"
-#include "app.h"
-#include "core.h"
-#include "custom.h"
-#include "theme.h"
-#include "styles.h"
-#include "format.h"
-#include "content_types.h"
-#include "relationships.h"
+#include <string>
+
+#include "common.hpp"
+#include "workbook.hpp"
+#include "worksheet.hpp"
+#include "shared_strings.hpp"
+#include "app.hpp"
+#include "core.hpp"
+#include "custom.hpp"
+#include "theme.hpp"
+#include "styles.hpp"
+#include "format.hpp"
+#include "content_types.hpp"
+#include "relationships.hpp"
 
 #define LXW_ZIP_BUFFER_SIZE (16384)
 
@@ -35,13 +37,26 @@
     else                                        \
         return default_err;
 
+
+namespace xlsxwriter {
+
+class no_zip_file_exception : public std::exception {
+};
+
 /*
  * Struct to represent a packager.
  */
-typedef struct lxw_packager {
+class packager {
+    friend class xlsxwriter::workbook;
+public:
+    packager(const std::string& filename, const std::string& tmpdir = std::string());
+
+    uint8_t create_package();
+
+private:
 
     FILE *file;
-    lxw_workbook *workbook;
+    workbook_ptr workbook;
 
     size_t buffer_size;
     zipFile zipfile;
@@ -53,28 +68,11 @@ typedef struct lxw_packager {
     uint16_t chart_count;
     uint16_t drawing_count;
 
-} lxw_packager;
+    uint8_t _write_workbook_file();
+    uint8_t _write_worksheet_files();
+    uint8_t _write_image_files();
+};
 
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-lxw_packager *lxw_packager_new(const char *filename, char *tmpdir);
-void lxw_packager_free(lxw_packager *packager);
-uint8_t lxw_create_package(lxw_packager *self);
-
-/* Declarations required for unit testing. */
-#ifdef TESTING
-
-#endif /* TESTING */
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
 #endif /* __LXW_PACKAGER_H__ */

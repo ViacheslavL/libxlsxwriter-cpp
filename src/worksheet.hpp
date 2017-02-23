@@ -2387,13 +2387,13 @@ public:
 private:
     FILE *file_;
     FILE *optimize_tmpfile;
-    struct lxw_table_rows *table;
-    struct lxw_table_rows *hyperlinks;
-    struct lxw_cell **array;
-    struct lxw_merged_ranges *merged_ranges;
-    struct lxw_selections *selections;
-    struct lxw_image_data *image_data;
-    struct lxw_chart_data *chart_data;
+    lxw_table_rows *table;
+    lxw_table_rows *hyperlinks;
+    lxw_cell **array;
+    lxw_merged_ranges *merged_ranges;
+    lxw_selections *selections;
+    lxw_image_data *image_data;
+    lxw_chart_data *chart_data;
 
     lxw_row_t dim_rowmin;
     lxw_row_t dim_rowmax;
@@ -2401,9 +2401,9 @@ private:
     lxw_col_t dim_colmax;
 
     lxw_sst *sst;
-    char *name;
-    char *quoted_name;
-    char *tmpdir;
+    std::string name;
+    std::string quoted_name;
+    std::string tmpdir;
 
     uint32_t index;
     uint8_t active;
@@ -2424,7 +2424,7 @@ private:
     uint8_t col_size_changed;
     uint8_t row_size_changed;
     uint8_t optimize;
-    struct lxw_row *optimize_row;
+    lxw_row *optimize_row;
 
     uint16_t fit_height;
     uint16_t fit_width;

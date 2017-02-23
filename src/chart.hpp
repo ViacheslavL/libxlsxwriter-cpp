@@ -199,6 +199,13 @@ enum lxw_marker_types {
     LXW_MARKER_PICTURE
 };
 
+struct series_data_point {
+    bool is_string;
+    double number;
+    std::string string;
+    bool no_data;
+};
+
 struct series_range {
     std::string formula;
     std::string sheetname;
@@ -210,18 +217,7 @@ struct series_range {
 
     bool has_string_cache;
     uint16_t num_data_points;
-    lxw_series_data_points *data_cache;
-
-};
-
-struct lxw_series_data_point {
-    bool is_string;
-    double number;
-    char *string;
-    bool no_data;
-
-    STAILQ_ENTRY (lxw_series_data_point) list_pointers;
-
+    std::vector<std::shared_ptr<series_data_point>> data_cache;
 };
 
 struct lxw_chart_font {
@@ -244,7 +240,7 @@ struct lxw_chart_title {
      * will only have 1 point in order to re-use similar functions.*/
     series_range *range;
 
-    lxw_series_data_point data_point;
+    series_data_point data_point;
 
 };
 
@@ -353,7 +349,6 @@ public:
     /**
      * @brief Set a series name formula using row and column values.
      *
-     * @param series    A series object created via `chart_add_series()`.
      * @param sheetname The name of the worksheet that contains the cell range.
      * @param row       The zero indexed row number of the range.
      * @param col       The zero indexed column number of the range.
@@ -368,9 +363,7 @@ public:
      *     series->set_name_range("Sheet1", 0, 2); // "=Sheet1!$C$1"
      * @endcode
      */
-    void set_name_range(lxw_chart_series *series,
-                                     const char *sheetname, lxw_row_t row,
-                                     lxw_col_t col);
+    void set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col);
 private:
 
     series_range *categories;
@@ -675,6 +668,7 @@ public:
 
     static void set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
 
+    void set_y2_axis(const std::shared_ptr<chart_axis> &axis);
 protected:
 
     FILE *file;
@@ -764,9 +758,9 @@ protected:
     void _write_pt_count(uint16_t num_data_points);
     void _write_v_num(double number);
     void _write_v_str(const std::string &str);
-    void _write_pt(uint16_t index, lxw_series_data_point *data_point);
+    void _write_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point);
     void _write_f(const std::string &formula);
-    void _write_num_pt(uint16_t index, lxw_series_data_point *data_point);
+    void _write_num_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point);
     void _write_format_code();
     void _write_num_cache(series_range *range);
     void _write_str_cache(series_range *range);
@@ -858,6 +852,7 @@ protected:
     void _initialize_scatter_chart();
     void _initialize_radar_chart(uint8_t type);
     void _initialize(uint8_t type);
+    void _initialize_doughnut_chart();
 };
 
 typedef std::shared_ptr<chart> chart_ptr;
