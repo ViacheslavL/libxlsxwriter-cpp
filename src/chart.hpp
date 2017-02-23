@@ -371,7 +371,6 @@ public:
     void set_name_range(lxw_chart_series *series,
                                      const char *sheetname, lxw_row_t row,
                                      lxw_col_t col);
-
 private:
 
     series_range *categories;
@@ -577,7 +576,7 @@ public:
      * @endcode
      *
      */
-    std::shared_ptr<chart_series> add_series_opt(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
+    std::shared_ptr<chart_series> add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
 
     void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
@@ -674,6 +673,7 @@ public:
     void set_rotation(uint16_t rotation);
     void set_hole_size(uint8_t size);
 
+    static void set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
 
 protected:
 
@@ -755,7 +755,6 @@ protected:
     void _write_a_p_pr();
     void _write_a_p_pr_pie();
     void _add_axis_ids(bool primary);
-    void _set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
     void _write_a_p_pr_rich();
     void _write_a_p();
     void _write_a_p_pie();
@@ -854,6 +853,11 @@ protected:
     void _initialize_area_chart(uint8_t type);
     void _initialize_bar_chart(uint8_t type);
     void _initialize_column_chart(uint8_t type);
+    void _initialize_line_chart();
+    void _initialize_pie_chart();
+    void _initialize_scatter_chart();
+    void _initialize_radar_chart(uint8_t type);
+    void _initialize(uint8_t type);
 };
 
 typedef std::shared_ptr<chart> chart_ptr;

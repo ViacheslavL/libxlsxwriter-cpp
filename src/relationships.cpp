@@ -78,7 +78,7 @@ lxw_free_relationships(lxw_relationships *rels)
 STATIC void
 _relationships_xml_declaration(lxw_relationships *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -103,7 +103,7 @@ _write_relationship(lxw_relationships *self, const char *type,
     if (target_mode)
         LXW_PUSH_ATTRIBUTES_STR("TargetMode", target_mode);
 
-    lxw_xml_empty_tag(self->file, "Relationship", &attributes);
+    lxw_xml_empty_tag("Relationship", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -121,7 +121,7 @@ _write_relationships(lxw_relationships *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("xmlns", LXW_SCHEMA_PACKAGE);
 
-    lxw_xml_start_tag(self->file, "Relationships", &attributes);
+    lxw_xml_start_tag("Relationships", &attributes);
 
     STAILQ_FOREACH(rel, self->relationships, list_pointers) {
         _write_relationship(self, rel->type, rel->target, rel->target_mode);
@@ -148,7 +148,7 @@ lxw_relationships_assemble_xml_file(lxw_relationships *self)
     _write_relationships(self);
 
     /* Close the relationships tag. */
-    lxw_xml_end_tag(self->file, "Relationships");
+    lxw_xml_end_tag("Relationships");
 }
 
 /*

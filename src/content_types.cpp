@@ -7,9 +7,9 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/content_types.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "content_types.hpp"
+#include "utility.hpp"
 
 /*
  * Forward declarations.
@@ -105,7 +105,7 @@ lxw_content_types_free(lxw_content_types *content_types)
 STATIC void
 _content_types_xml_declaration(lxw_content_types *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -120,7 +120,7 @@ _write_types(lxw_content_types *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("xmlns", LXW_SCHEMA_CONTENT);
 
-    lxw_xml_start_tag(self->file, "Types", &attributes);
+    lxw_xml_start_tag("Types", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -138,7 +138,7 @@ _write_default(lxw_content_types *self, const char *ext, const char *type)
     LXW_PUSH_ATTRIBUTES_STR("Extension", ext);
     LXW_PUSH_ATTRIBUTES_STR("ContentType", type);
 
-    lxw_xml_empty_tag(self->file, "Default", &attributes);
+    lxw_xml_empty_tag("Default", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -157,7 +157,7 @@ _write_override(lxw_content_types *self, const char *part_name,
     LXW_PUSH_ATTRIBUTES_STR("PartName", part_name);
     LXW_PUSH_ATTRIBUTES_STR("ContentType", type);
 
-    lxw_xml_empty_tag(self->file, "Override", &attributes);
+    lxw_xml_empty_tag("Override", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -208,7 +208,7 @@ lxw_content_types_assemble_xml_file(lxw_content_types *self)
     _write_overrides(self);
 
     /* Close the content_types tag. */
-    lxw_xml_end_tag(self->file, "Types");
+    lxw_xml_end_tag("Types");
 }
 
 /*****************************************************************************

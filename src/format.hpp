@@ -402,11 +402,11 @@ struct lxw_fill {
 class lxw_format {
 public:
     lxw_format *lxw_format_new();
-    void lxw_format_free(lxw_format *format);
-    int32_t lxw_format_get_xf_index(lxw_format *format);
-    lxw_font *lxw_format_get_font_key(lxw_format *format);
-    lxw_border *lxw_format_get_border_key(lxw_format *format);
-    lxw_fill *lxw_format_get_fill_key(lxw_format *format);
+    void lxw_format_free();
+    int32_t lxw_format_get_xf_index();
+    lxw_font *lxw_format_get_font_key();
+    lxw_border *lxw_format_get_border_key();
+    lxw_fill *lxw_format_get_fill_key();
 
     /**
      * @brief Set the font used in the cell.
@@ -428,7 +428,7 @@ public:
      *
      * The default font in Excel 2007, and later, is Calibri.
      */
-    void format_set_font_name(lxw_format *format, const char *font_name);
+    void set_font_name(const char *font_name);
 
     /**
      * @brief Set the size of the font used in the cell.
@@ -448,7 +448,7 @@ public:
      * size in the row. You can also explicitly specify the height of a
      * row using the worksheet_set_row() function.
      */
-    void format_set_font_size(lxw_format *format, uint16_t size);
+    void set_font_size(uint16_t size);
 
     /**
      * @brief Set the color of the font used in the cell.
@@ -460,10 +460,10 @@ public:
      * Set the font color:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_font_color(format, LXW_COLOR_RED);
+     *     format = workbook->add_format();
+     *     format->set_font_color(LXW_COLOR_RED);
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Wheelbarrow", format);
+     *     worksheet->write_string(0, 0, "Wheelbarrow", format);
      * @endcode
      *
      * @image html format_font_color.png
@@ -475,12 +475,10 @@ public:
      * cell. To set the color of a cell background use the format_set_bg_color()
      * and format_set_pattern() methods.
      */
-    void format_set_font_color(lxw_format *format, lxw_color_t color);
+    void set_font_color(lxw_color_t color);
 
     /**
      * @brief Turn on bold for the format font.
-     *
-     * @param format Pointer to a Format instance.
      *
      * Set the bold property of the font:
      *
@@ -493,36 +491,33 @@ public:
      *
      * @image html format_font_bold.png
      */
-    void format_set_bold(lxw_format *format);
+    void set_bold();
 
     /**
      * @brief Turn on italic for the format font.
      *
-     * @param format Pointer to a Format instance.
-     *
      * Set the italic property of the font:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_italic(format);
+     *     format = workbook->add_format();
+     *     format->set_italic();
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Italic Text", format);
+     *     worksheet->write_string(0, 0, "Italic Text", format);
      * @endcode
      *
      * @image html format_font_italic.png
      */
-    void format_set_italic(lxw_format *format);
+    void set_italic();
 
     /**
      * @brief Turn on underline for the format:
      *
-     * @param format Pointer to a Format instance.
      * @param style Underline style.
      *
      * Set the underline property of the format:
      *
      * @code
-     *     format_set_underline(format, LXW_UNDERLINE_SINGLE);
+     *     format->set_underline(LXW_UNDERLINE_SINGLE);
      * @endcode
      *
      * @image html format_font_underlined.png
@@ -535,7 +530,7 @@ public:
      * - #LXW_UNDERLINE_DOUBLE_ACCOUNTING
      *
      */
-    void format_set_underline(lxw_format *format, uint8_t style);
+    void set_underline(uint8_t style);
 
     /**
      * @brief Set the strikeout property of the font.
@@ -545,7 +540,7 @@ public:
      * @image html format_font_strikeout.png
      *
      */
-    void format_set_font_strikeout(lxw_format *format);
+    void set_font_strikeout();
 
     /**
      * @brief Set the superscript/subscript property of the font.
@@ -562,12 +557,11 @@ public:
      * - #LXW_FONT_SUPERSCRIPT
      * - #LXW_FONT_SUBSCRIPT
      */
-    void format_set_font_script(lxw_format *format, uint8_t style);
+    void set_font_script(uint8_t style);
 
     /**
      * @brief Set the number format for a cell.
      *
-     * @param format      Pointer to a Format instance.
      * @param num_format The cell number format string.
      *
      * This method is used to define the numerical format of a number in
@@ -579,8 +573,8 @@ public:
      * string:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_num_format(format, "d mmm yyyy");
+     *     format = workbook->add_format();
+     *     format->set_num_format("d mmm yyyy");
      * @endcode
      *
      * Format strings can control any aspect of number formatting allowed by Excel:
@@ -596,7 +590,7 @@ public:
      * For more information on number formats in Excel refer to the
      * [Microsoft documentation on cell formats](http://office.microsoft.com/en-gb/assistance/HP051995001033.aspx).
      */
-    void format_set_num_format(lxw_format *format, const char *num_format);
+    void set_num_format(const std::string& num_format);
 
     /**
      * @brief Set the Excel built-in number format for a cell.
@@ -609,8 +603,8 @@ public:
      * user defined format string:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_num_format(format, 0x0F);     // d-mmm-yy
+     *     format = workbook->add_format();
+     *     format->set_num_format(0x0F);     // d-mmm-yy
      * @endcode
      *
      * @note
@@ -669,12 +663,10 @@ public:
      *    symbol.
      *  - These formats can also be set via format_set_num_format().
      */
-    void format_set_num_format_index(lxw_format *format, uint8_t index);
+    void set_num_format_index(uint8_t index);
 
     /**
      * @brief Set the cell unlocked state.
-     *
-     * @param format Pointer to a Format instance.
      *
      * This property can be used to allow modification of a cell in a protected
      * worksheet. In Excel, cell locking is turned on by default for all
@@ -682,25 +674,23 @@ public:
      * using the worksheet worksheet_protect() function:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_unlocked(format);
+     *     format = workbook->add_format();
+     *     format->set_unlocked();
      *
      *     // Enable worksheet protection, without password or options.
-     *     worksheet_protect(worksheet, NULL, NULL);
+     *     worksheet->protect(NULL, NULL);
      *
      *     // This cell cannot be edited.
-     *     worksheet_write_formula(worksheet, 0, 0, "=1+2", NULL);
+     *     worksheet->write_formula(0, 0, "=1+2", NULL);
      *
      *     // This cell can be edited.
-     *     worksheet_write_formula(worksheet, 1, 0, "=1+2", format);
+     *     worksheet->write_formula(1, 0, "=1+2", format);
      * @endcode
      */
-    void format_set_unlocked(lxw_format *format);
+    void set_unlocked();
 
     /**
      * @brief Hide formulas in a cell.
-     *
-     * @param format Pointer to a Format instance.
      *
      * This property is used to hide a formula while still displaying its
      * result. This is generally used to hide complex calculations from end users
@@ -709,22 +699,21 @@ public:
      * function:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_hidden(format);
+     *     format = workbook->add_format();
+     *     format->set_hidden();
      *
      *     // Enable worksheet protection, without password or options.
-     *     worksheet_protect(worksheet, NULL, NULL);
+     *     worksheet->protect(NULL, NULL);
      *
      *     // The formula in this cell isn't visible.
-     *     worksheet_write_formula(worksheet, 0, 0, "=1+2", format);
+     *     worksheet->write_formula(0, 0, "=1+2", format);
      * @endcode
      */
-    void format_set_hidden(lxw_format *format);
+    void set_hidden();
 
     /**
      * @brief Set the alignment for data in the cell.
      *
-     * @param format    Pointer to a Format instance.
      * @param alignment The horizontal and or vertical alignment direction.
      *
      * This method is used to set the horizontal and vertical text alignment within a
@@ -769,7 +758,7 @@ public:
      * wrapped text. To specify where the text wraps use the
      * format_set_text_wrap() method.
      */
-    void format_set_align(lxw_format *format, uint8_t alignment);
+    void set_align(uint8_t alignment);
 
     /**
      * @brief Wrap text in a cell.
@@ -777,20 +766,20 @@ public:
      * Turn text wrapping on for text in a cell.
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_text_wrap(format);
+     *     format = workbook->add_format();
+     *     format->set_text_wrap();
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Some long text to wrap in a cell", format);
+     *     worksheet->write_string(0, 0, "Some long text to wrap in a cell", format);
      * @endcode
      *
      * If you wish to control where the text is wrapped you can add newline characters
      * to the string:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_text_wrap(format);
+     *     format = workbook->add_format();
+     *     format->set_text_wrap();
      *
-     *     worksheet_write_string(worksheet, 0, 0, "It's\na bum\nwrap", format);
+     *     worksheet->write_string(0, 0, "It's\na bum\nwrap", format);
      * @endcode
      *
      * @image html format_font_text_wrap.png
@@ -799,22 +788,21 @@ public:
      * similar effect can be obtained without newlines using the
      * format_set_align() function with #LXW_ALIGN_VERTICAL_JUSTIFY.
      */
-    void format_set_text_wrap(lxw_format *format);
+    void set_text_wrap();
 
     /**
      * @brief Set the rotation of the text in a cell.
      *
-     * @param format Pointer to a Format instance.
      * @param angle  Rotation angle in the range -90 to 90 and 270.
      *
      * Set the rotation of the text in a cell. The rotation can be any angle in the
      * range -90 to 90 degrees:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_rotation(format, 30);
+     *     format = workbook->add_format();
+     *     format->set_rotation(30);
      *
-     *     worksheet_write_string(worksheet, 0, 0, "This text is rotated", format);
+     *     worksheet->write_string(0, 0, "This text is rotated", format);
      * @endcode
      *
      * @image html format_font_text_rotated.png
@@ -822,26 +810,25 @@ public:
      * The angle 270 is also supported. This indicates text where the letters run from
      * top to bottom.
      */
-    void format_set_rotation(lxw_format *format, int16_t angle);
+    void set_rotation(int16_t angle);
 
     /**
      * @brief Set the cell text indentation level.
      *
-     * @param format Pointer to a Format instance.
      * @param level  Indentation level.
      *
      * This method can be used to indent text in a cell. The argument, which should be
      * an integer, is taken as the level of indentation:
      *
      * @code
-     *     format1 = workbook_add_format(workbook);
-     *     format2 = workbook_add_format(workbook);
+     *     format1 = workbook->add_format();
+     *     format2 = workbook->add_format();
      *
-     *     format_set_indent(format1, 1);
-     *     format_set_indent(format2, 2);
+     *     format1->set_indent(1);
+     *     format2->set_indent(2);
      *
-     *     worksheet_write_string(worksheet, 0, 0, "This text is indented 1 level",  format1);
-     *     worksheet_write_string(worksheet, 1, 0, "This text is indented 2 levels", format2);
+     *     worksheet->write_string(0, 0, "This text is indented 1 level",  format1);
+     *     worksheet->write_string(1, 0, "This text is indented 2 levels", format2);
      * @endcode
      *
      * @image html text_indent.png
@@ -851,28 +838,25 @@ public:
      * horizontal properties but it can be used in conjunction with vertical
      * properties.
      */
-    void format_set_indent(lxw_format *format, uint8_t level);
+    void set_indent(uint8_t level);
 
     /**
      * @brief Turn on the text "shrink to fit" for a cell.
      *
-     * @param format Pointer to a Format instance.
-     *
      * This method can be used to shrink text so that it fits in a cell:
      *
      * @code
-     *     format = workbook_add_format(workbook);
-     *     format_set_shrink(format);
+     *     format = workbook->add_format();
+     *     format->set_shrink();
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Honey, I shrunk the text!", format);
+     *     worksheet->write_string(0, 0, "Honey, I shrunk the text!", format);
      * @endcode
      */
-    void format_set_shrink(lxw_format *format);
+    void set_shrink();
 
     /**
      * @brief Set the background fill pattern for a cell
      *
-     * @param format Pointer to a Format instance.
      * @param index  Pattern index.
      *
      * Set the background pattern for a cell.
@@ -880,10 +864,10 @@ public:
      * The most common pattern is a solid fill of the background color:
      *
      * @code
-     *     format = workbook_add_format(workbook);
+     *     format = workbook->add_format();
      *
-     *     format_set_pattern (format, LXW_PATTERN_SOLID);
-     *     format_set_bg_color(format, LXW_COLOR_YELLOW);
+     *     format->set_pattern (LXW_PATTERN_SOLID);
+     *     format->set_bg_color(LXW_COLOR_YELLOW);
      * @endcode
      *
      * The available fill patterns are:
@@ -910,12 +894,11 @@ public:
      *    6.25% gray                    | #LXW_PATTERN_GRAY_0625
      *
      */
-    void format_set_pattern(lxw_format *format, uint8_t index);
+    void set_pattern(uint8_t index);
 
     /**
      * @brief Set the pattern background color for a cell.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell pattern background color.
      *
      * The format_set_bg_color() method can be used to set the background color of
@@ -926,12 +909,12 @@ public:
      * Here is an example of how to set up a solid fill in a cell:
      *
      * @code
-     *     format = workbook_add_format(workbook);
+     *     format = workbook->add_format();
      *
-     *     format_set_pattern (format, LXW_PATTERN_SOLID);
-     *     format_set_bg_color(format, LXW_COLOR_GREEN);
+     *     format->set_pattern (LXW_PATTERN_SOLID);
+     *     format->set_bg_color(LXW_COLOR_GREEN);
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Ray", format);
+     *     worksheet->write_string(0, 0, "Ray", format);
      * @endcode
      *
      * @image html formats_set_bg_color.png
@@ -939,12 +922,11 @@ public:
      * The color should be an RGB integer value, see @ref working_with_colors.
      *
      */
-    void format_set_bg_color(lxw_format *format, lxw_color_t color);
+    void set_bg_color(lxw_color_t color);
 
     /**
      * @brief Set the pattern foreground color for a cell.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell pattern foreground  color.
      *
      * The format_set_fg_color() method can be used to set the foreground color of
@@ -953,27 +935,26 @@ public:
      * The color should be an RGB integer value, see @ref working_with_colors.
      *
      */
-    void format_set_fg_color(lxw_format *format, lxw_color_t color);
+    void set_fg_color(lxw_color_t color);
 
     /**
      * @brief Set the cell border style.
      *
-     * @param format Pointer to a Format instance.
      * @param style  Border style index.
      *
      * Set the cell border style:
      *
      * @code
-     *     format_set_border(format, LXW_BORDER_THIN);
+     *     format->set_border(LXW_BORDER_THIN);
      * @endcode
      *
      * Individual border elements can be configured using the following functions with
      * the same parameters:
      *
-     * - format_set_bottom()
-     * - format_set_top()
-     * - format_set_left()
-     * - format_set_right()
+     * - set_bottom()
+     * - set_top()
+     * - set_left()
+     * - set_right()
      *
      * A cell border is comprised of a border on the bottom, top, left and right.
      * These can be set to the same value using format_set_border() or
@@ -997,65 +978,60 @@ public:
      *
      *  The most commonly used style is the `thin` style.
      */
-    void format_set_border(lxw_format *format, uint8_t style);
+    void set_border(uint8_t style);
 
     /**
      * @brief Set the cell bottom border style.
      *
-     * @param format Pointer to a Format instance.
      * @param style  Border style index.
      *
-     * Set the cell bottom border style. See format_set_border() for details on the
+     * Set the cell bottom border style. See set_border() for details on the
      * border styles.
      */
-    void format_set_bottom(lxw_format *format, uint8_t style);
+    void set_bottom(uint8_t style);
 
     /**
      * @brief Set the cell top border style.
      *
-     * @param format Pointer to a Format instance.
      * @param style  Border style index.
      *
-     * Set the cell top border style. See format_set_border() for details on the border
+     * Set the cell top border style. See set_border() for details on the border
      * styles.
      */
-    void format_set_top(lxw_format *format, uint8_t style);
+    void set_top(uint8_t style);
 
     /**
      * @brief Set the cell left border style.
      *
-     * @param format Pointer to a Format instance.
      * @param style  Border style index.
      *
-     * Set the cell left border style. See format_set_border() for details on the
+     * Set the cell left border style. See set_border() for details on the
      * border styles.
      */
-    void format_set_left(lxw_format *format, uint8_t style);
+    void set_left(uint8_t style);
 
     /**
      * @brief Set the cell right border style.
      *
-     * @param format Pointer to a Format instance.
      * @param style  Border style index.
      *
-     * Set the cell right border style. See format_set_border() for details on the
+     * Set the cell right border style. See set_border() for details on the
      * border styles.
      */
-    void format_set_right(lxw_format *format, uint8_t style);
+    void set_right(uint8_t style);
 
     /**
      * @brief Set the color of the cell border.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell border color.
      *
      * Individual border elements can be configured using the following methods with
      * the same parameters:
      *
-     * - format_set_bottom_color()
-     * - format_set_top_color()
-     * - format_set_left_color()
-     * - format_set_right_color()
+     * - set_bottom_color()
+     * - set_top_color()
+     * - set_left_color()
+     * - set_right_color()
      *
      * Set the color of the cell borders. A cell border is comprised of a border
      * on the bottom, top, left and right. These can be set to the same color
@@ -1064,60 +1040,56 @@ public:
      *
      * The color should be an RGB integer value, see @ref working_with_colors.
      */
-    void format_set_border_color(lxw_format *format, lxw_color_t color);
+    void set_border_color(lxw_color_t color);
 
     /**
      * @brief Set the color of the bottom cell border.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell border color.
      *
-     * See format_set_border_color() for details on the border colors.
+     * See set_border_color() for details on the border colors.
      */
-    void format_set_bottom_color(lxw_format *format, lxw_color_t color);
+    void set_bottom_color(lxw_color_t color);
 
     /**
      * @brief Set the color of the top cell border.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell border color.
      *
-     * See format_set_border_color() for details on the border colors.
+     * See set_border_color() for details on the border colors.
      */
-    void format_set_top_color(lxw_format *format, lxw_color_t color);
+    void set_top_color(lxw_color_t color);
 
     /**
      * @brief Set the color of the left cell border.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell border color.
      *
-     * See format_set_border_color() for details on the border colors.
+     * See set_border_color() for details on the border colors.
      */
-    void format_set_left_color(lxw_format *format, lxw_color_t color);
+    void set_left_color(lxw_color_t color);
 
     /**
      * @brief Set the color of the right cell border.
      *
-     * @param format Pointer to a Format instance.
      * @param color  The cell border color.
      *
-     * See format_set_border_color() for details on the border colors.
+     * See set_border_color() for details on the border colors.
      */
-    void format_set_right_color(lxw_format *format, lxw_color_t color);
+    void set_right_color(lxw_color_t color);
 
-    void format_set_diag_type(lxw_format *format, uint8_t value);
-    void format_set_diag_color(lxw_format *format, lxw_color_t color);
-    void format_set_diag_border(lxw_format *format, uint8_t value);
-    void format_set_font_outline(lxw_format *format);
-    void format_set_font_shadow(lxw_format *format);
-    void format_set_font_family(lxw_format *format, uint8_t value);
-    void format_set_font_charset(lxw_format *format, uint8_t value);
-    void format_set_font_scheme(lxw_format *format, const char *font_scheme);
-    void format_set_font_condense(lxw_format *format);
-    void format_set_font_extend(lxw_format *format);
-    void format_set_reading_order(lxw_format *format, uint8_t value);
-    void format_set_theme(lxw_format *format, uint8_t value);
+    void set_diag_type(uint8_t value);
+    void set_diag_color(lxw_color_t color);
+    void set_diag_border(uint8_t value);
+    void set_font_outline();
+    void set_font_shadow();
+    void set_font_family(uint8_t value);
+    void set_font_charset(uint8_t value);
+    void set_font_scheme(const char *font_scheme);
+    void set_font_condense();
+    void set_font_extend();
+    void set_reading_order(uint8_t value);
+    void set_theme(uint8_t value);
 
     /* Declarations required for unit testing. */
     #ifdef TESTING
@@ -1135,9 +1107,9 @@ private:
     int32_t xf_index;
     int32_t dxf_index;
 
-    char num_format[LXW_FORMAT_FIELD_LEN];
-    char font_name[LXW_FORMAT_FIELD_LEN];
-    char font_scheme[LXW_FORMAT_FIELD_LEN];
+    std::string num_format;
+    std::string font_name;
+    std::string font_scheme;
     uint16_t num_format_index;
     uint16_t font_index;
     uint8_t has_font;

@@ -7,11 +7,11 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/workbook.h"
-#include "xlsxwriter/utility.h"
-#include "xlsxwriter/packager.h"
-#include "xlsxwriter/hash_table.h"
+#include "xmlwriter.hpp"
+#include "workbook.hpp"
+#include "utility.hpp"
+#include "packager.hpp"
+#include "hash_table.hpp"
 
 STATIC int _name_cmp(lxw_worksheet_name *name1, lxw_worksheet_name *name2);
 LXW_RB_GENERATE_NAMES(lxw_worksheet_names, lxw_worksheet_name, tree_pointers,
@@ -1033,7 +1033,7 @@ _prepare_defined_names(lxw_workbook *self)
 STATIC void
 _workbook_xml_declaration(lxw_workbook *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -1053,7 +1053,7 @@ _write_workbook(lxw_workbook *self)
     LXW_PUSH_ATTRIBUTES_STR("xmlns", xmlns);
     LXW_PUSH_ATTRIBUTES_STR("xmlns:r", xmlns_r);
 
-    lxw_xml_start_tag(self->file, "workbook", &attributes);
+    lxw_xml_start_tag("workbook", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1073,7 +1073,7 @@ _write_file_version(lxw_workbook *self)
     LXW_PUSH_ATTRIBUTES_STR("lowestEdited", "4");
     LXW_PUSH_ATTRIBUTES_STR("rupBuild", "4505");
 
-    lxw_xml_empty_tag(self->file, "fileVersion", &attributes);
+    lxw_xml_empty_tag("fileVersion", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1090,7 +1090,7 @@ _write_workbook_pr(lxw_workbook *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("defaultThemeVersion", "124226");
 
-    lxw_xml_empty_tag(self->file, "workbookPr", &attributes);
+    lxw_xml_empty_tag("workbookPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1116,7 +1116,7 @@ _write_workbook_view(lxw_workbook *self)
     if (self->active_sheet)
         LXW_PUSH_ATTRIBUTES_INT("activeTab", self->active_sheet);
 
-    lxw_xml_empty_tag(self->file, "workbookView", &attributes);
+    lxw_xml_empty_tag("workbookView", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1127,11 +1127,11 @@ _write_workbook_view(lxw_workbook *self)
 STATIC void
 _write_book_views(lxw_workbook *self)
 {
-    lxw_xml_start_tag(self->file, "bookViews", NULL);
+    lxw_xml_start_tag("bookViews", NULL);
 
     _write_workbook_view(self);
 
-    lxw_xml_end_tag(self->file, "bookViews");
+    lxw_xml_end_tag("bookViews");
 }
 
 /*
@@ -1156,7 +1156,7 @@ _write_sheet(lxw_workbook *self, const char *name, uint32_t sheet_id,
 
     LXW_PUSH_ATTRIBUTES_STR("r:id", r_id);
 
-    lxw_xml_empty_tag(self->file, "sheet", &attributes);
+    lxw_xml_empty_tag("sheet", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1169,14 +1169,14 @@ _write_sheets(lxw_workbook *self)
 {
     lxw_worksheet *worksheet;
 
-    lxw_xml_start_tag(self->file, "sheets", NULL);
+    lxw_xml_start_tag("sheets", NULL);
 
     STAILQ_FOREACH(worksheet, self->worksheets, list_pointers) {
         _write_sheet(self, worksheet->name, worksheet->index + 1,
                      worksheet->hidden);
     }
 
-    lxw_xml_end_tag(self->file, "sheets");
+    lxw_xml_end_tag("sheets");
 }
 
 /*
@@ -1192,7 +1192,7 @@ _write_calc_pr(lxw_workbook *self)
     LXW_PUSH_ATTRIBUTES_STR("calcId", "124519");
     LXW_PUSH_ATTRIBUTES_STR("fullCalcOnLoad", "1");
 
-    lxw_xml_empty_tag(self->file, "calcPr", &attributes);
+    lxw_xml_empty_tag("calcPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -1215,7 +1215,7 @@ _write_defined_name(lxw_workbook *self, lxw_defined_name *defined_name)
     if (defined_name->hidden)
         LXW_PUSH_ATTRIBUTES_INT("hidden", 1);
 
-    lxw_xml_data_element(self->file, "definedName", defined_name->formula,
+    lxw_xml_data_element("definedName", defined_name->formula,
                          &attributes);
 
     LXW_FREE_ATTRIBUTES();
@@ -1232,13 +1232,13 @@ _write_defined_names(lxw_workbook *self)
     if (TAILQ_EMPTY(self->defined_names))
         return;
 
-    lxw_xml_start_tag(self->file, "definedNames", NULL);
+    lxw_xml_start_tag("definedNames", NULL);
 
     TAILQ_FOREACH(defined_name, self->defined_names, list_pointers) {
         _write_defined_name(self, defined_name);
     }
 
-    lxw_xml_end_tag(self->file, "definedNames");
+    lxw_xml_end_tag("definedNames");
 }
 
 /*****************************************************************************
@@ -1281,7 +1281,7 @@ lxw_workbook_assemble_xml_file(lxw_workbook *self)
     _write_calc_pr(self);
 
     /* Close the workbook tag. */
-    lxw_xml_end_tag(self->file, "workbook");
+    lxw_xml_end_tag("workbook");
 }
 
 /*****************************************************************************

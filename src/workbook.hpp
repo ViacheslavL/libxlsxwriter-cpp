@@ -178,7 +178,7 @@ struct workbook_options {
  * the workbook properties are set by calling the functions shown in
  * workbook.h.
  */
-class workbook {
+class workbook : public xmlwriter {
 
 public:
     /**

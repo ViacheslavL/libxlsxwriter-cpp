@@ -108,7 +108,7 @@ _element_cmp(struct sst_element *element1, struct sst_element *element2)
 STATIC void
 _sst_xml_declaration(lxw_sst *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -127,7 +127,7 @@ _write_t(lxw_sst *self, char *string)
         || isspace((unsigned char) string[strlen(string) - 1]))
         LXW_PUSH_ATTRIBUTES_STR("xml:space", "preserve");
 
-    lxw_xml_data_element(self->file, "t", string, &attributes);
+    lxw_xml_data_element("t", string, &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -140,7 +140,7 @@ _write_si(lxw_sst *self, char *string)
 {
     uint8_t escaped_string = false;
 
-    lxw_xml_start_tag(self->file, "si", NULL);
+    lxw_xml_start_tag("si", NULL);
 
     /* Look for and escape control chars in the string. */
     if (strpbrk(string, "\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C"
@@ -153,7 +153,7 @@ _write_si(lxw_sst *self, char *string)
     /* Write the t element. */
     _write_t(self, string);
 
-    lxw_xml_end_tag(self->file, "si");
+    lxw_xml_end_tag("si");
 
     if (escaped_string)
         free(string);
@@ -175,7 +175,7 @@ _write_sst(lxw_sst *self)
     LXW_PUSH_ATTRIBUTES_INT("count", self->string_count);
     LXW_PUSH_ATTRIBUTES_INT("uniqueCount", self->unique_count);
 
-    lxw_xml_start_tag(self->file, "sst", &attributes);
+    lxw_xml_start_tag("sst", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -216,7 +216,7 @@ lxw_sst_assemble_xml_file(lxw_sst *self)
     _write_sst_strings(self);
 
     /* Close the sst tag. */
-    lxw_xml_end_tag(self->file, "sst");
+    lxw_xml_end_tag("sst");
 }
 
 /*****************************************************************************

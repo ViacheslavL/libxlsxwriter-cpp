@@ -6,17 +6,19 @@
  * styles - A libxlsxwriter library for creating Excel XLSX styles files.
  *
  */
-#ifndef __LXW_STYLES_H__
-#define __LXW_STYLES_H__
+#ifndef __LXW_STYLES_HPP__
+#define __LXW_STYLES_HPP__
 
 #include <stdint.h>
 
-#include "format.h"
+#include "format.hpp"
+
+namespace xlsxwriter {
 
 /*
  * Struct to represent a styles.
  */
-typedef struct lxw_styles {
+struct lxw_styles {
 
     FILE *file;
     uint32_t font_count;
@@ -25,17 +27,10 @@ typedef struct lxw_styles {
     uint32_t num_format_count;
     uint32_t border_count;
     uint32_t fill_count;
-    struct lxw_formats *xf_formats;
-    struct lxw_formats *dxf_formats;
+    lxw_formats *xf_formats;
+    lxw_formats *dxf_formats;
 
-} lxw_styles;
-
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
+};
 
 lxw_styles *lxw_styles_new();
 void lxw_styles_free(lxw_styles *styles);
@@ -68,10 +63,6 @@ STATIC void _write_table_styles(lxw_styles *self);
 
 #endif /* TESTING */
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
-#endif /* __LXW_STYLES_H__ */
+#endif /* __LXW_STYLES_HPP__ */

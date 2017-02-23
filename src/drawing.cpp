@@ -107,7 +107,7 @@ lxw_add_drawing_object(lxw_drawing *drawing,
 STATIC void
 _drawing_xml_declaration(lxw_drawing *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -126,7 +126,7 @@ _write_drawing_workspace(lxw_drawing *self)
     LXW_PUSH_ATTRIBUTES_STR("xmlns:xdr", xmlns_xdr);
     LXW_PUSH_ATTRIBUTES_STR("xmlns:a", xmlns_a);
 
-    lxw_xml_start_tag(self->file, "xdr:wsDr", &attributes);
+    lxw_xml_start_tag("xdr:wsDr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -137,7 +137,7 @@ _write_drawing_workspace(lxw_drawing *self)
 STATIC void
 _drawing_write_col(lxw_drawing *self, char *data)
 {
-    lxw_xml_data_element(self->file, "xdr:col", data, NULL);
+    lxw_xml_data_element("xdr:col", data, NULL);
 }
 
 /*
@@ -146,7 +146,7 @@ _drawing_write_col(lxw_drawing *self, char *data)
 STATIC void
 _drawing_write_col_off(lxw_drawing *self, char *data)
 {
-    lxw_xml_data_element(self->file, "xdr:colOff", data, NULL);
+    lxw_xml_data_element("xdr:colOff", data, NULL);
 }
 
 /*
@@ -155,7 +155,7 @@ _drawing_write_col_off(lxw_drawing *self, char *data)
 STATIC void
 _drawing_write_row(lxw_drawing *self, char *data)
 {
-    lxw_xml_data_element(self->file, "xdr:row", data, NULL);
+    lxw_xml_data_element("xdr:row", data, NULL);
 }
 
 /*
@@ -164,7 +164,7 @@ _drawing_write_row(lxw_drawing *self, char *data)
 STATIC void
 _drawing_write_row_off(lxw_drawing *self, char *data)
 {
-    lxw_xml_data_element(self->file, "xdr:rowOff", data, NULL);
+    lxw_xml_data_element("xdr:rowOff", data, NULL);
 }
 
 /*
@@ -175,7 +175,7 @@ _drawing_write_from(lxw_drawing *self, lxw_drawing_coords *coords)
 {
     char data[LXW_UINT32_T_LENGTH];
 
-    lxw_xml_start_tag(self->file, "xdr:from", NULL);
+    lxw_xml_start_tag("xdr:from", NULL);
 
     lxw_snprintf(data, LXW_UINT32_T_LENGTH, "%u", coords->col);
     _drawing_write_col(self, data);
@@ -191,7 +191,7 @@ _drawing_write_from(lxw_drawing *self, lxw_drawing_coords *coords)
                  (uint32_t) coords->row_offset);
     _drawing_write_row_off(self, data);
 
-    lxw_xml_end_tag(self->file, "xdr:from");
+    lxw_xml_end_tag("xdr:from");
 }
 
 /*
@@ -202,7 +202,7 @@ _drawing_write_to(lxw_drawing *self, lxw_drawing_coords *coords)
 {
     char data[LXW_UINT32_T_LENGTH];
 
-    lxw_xml_start_tag(self->file, "xdr:to", NULL);
+    lxw_xml_start_tag("xdr:to", NULL);
 
     lxw_snprintf(data, LXW_UINT32_T_LENGTH, "%u", coords->col);
     _drawing_write_col(self, data);
@@ -218,7 +218,7 @@ _drawing_write_to(lxw_drawing *self, lxw_drawing_coords *coords)
                  (uint32_t) coords->row_offset);
     _drawing_write_row_off(self, data);
 
-    lxw_xml_end_tag(self->file, "xdr:to");
+    lxw_xml_end_tag("xdr:to");
 }
 
 /*
@@ -242,7 +242,7 @@ _drawing_write_c_nv_pr(lxw_drawing *self, char *object_name, uint16_t index,
     if (drawing_object)
         LXW_PUSH_ATTRIBUTES_STR("descr", drawing_object->description);
 
-    lxw_xml_empty_tag(self->file, "xdr:cNvPr", &attributes);
+    lxw_xml_empty_tag("xdr:cNvPr", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -259,7 +259,7 @@ _drawing_write_a_pic_locks(lxw_drawing *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("noChangeAspect", "1");
 
-    lxw_xml_empty_tag(self->file, "a:picLocks", &attributes);
+    lxw_xml_empty_tag("a:picLocks", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -270,12 +270,12 @@ _drawing_write_a_pic_locks(lxw_drawing *self)
 STATIC void
 _drawing_write_c_nv_pic_pr(lxw_drawing *self)
 {
-    lxw_xml_start_tag(self->file, "xdr:cNvPicPr", NULL);
+    lxw_xml_start_tag("xdr:cNvPicPr", NULL);
 
     /* Write the a:picLocks element. */
     _drawing_write_a_pic_locks(self);
 
-    lxw_xml_end_tag(self->file, "xdr:cNvPicPr");
+    lxw_xml_end_tag("xdr:cNvPicPr");
 }
 
 /*
@@ -285,7 +285,7 @@ STATIC void
 _drawing_write_nv_pic_pr(lxw_drawing *self, uint16_t index,
                          lxw_drawing_object *drawing_object)
 {
-    lxw_xml_start_tag(self->file, "xdr:nvPicPr", NULL);
+    lxw_xml_start_tag("xdr:nvPicPr", NULL);
 
     /* Write the xdr:cNvPr element. */
     _drawing_write_c_nv_pr(self, "Picture", index, drawing_object);
@@ -293,7 +293,7 @@ _drawing_write_nv_pic_pr(lxw_drawing *self, uint16_t index,
     /* Write the xdr:cNvPicPr element. */
     _drawing_write_c_nv_pic_pr(self);
 
-    lxw_xml_end_tag(self->file, "xdr:nvPicPr");
+    lxw_xml_end_tag("xdr:nvPicPr");
 }
 
 /*
@@ -313,7 +313,7 @@ _drawing_write_a_blip(lxw_drawing *self, uint16_t index)
     LXW_PUSH_ATTRIBUTES_STR("xmlns:r", xmlns_r);
     LXW_PUSH_ATTRIBUTES_STR("r:embed", r_id);
 
-    lxw_xml_empty_tag(self->file, "a:blip", &attributes);
+    lxw_xml_empty_tag("a:blip", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -324,7 +324,7 @@ _drawing_write_a_blip(lxw_drawing *self, uint16_t index)
 STATIC void
 _drawing_write_a_fill_rect(lxw_drawing *self)
 {
-    lxw_xml_empty_tag(self->file, "a:fillRect", NULL);
+    lxw_xml_empty_tag("a:fillRect", NULL);
 }
 
 /*
@@ -333,12 +333,12 @@ _drawing_write_a_fill_rect(lxw_drawing *self)
 STATIC void
 _drawing_write_a_stretch(lxw_drawing *self)
 {
-    lxw_xml_start_tag(self->file, "a:stretch", NULL);
+    lxw_xml_start_tag("a:stretch", NULL);
 
     /* Write the a:fillRect element. */
     _drawing_write_a_fill_rect(self);
 
-    lxw_xml_end_tag(self->file, "a:stretch");
+    lxw_xml_end_tag("a:stretch");
 }
 
 /*
@@ -347,7 +347,7 @@ _drawing_write_a_stretch(lxw_drawing *self)
 STATIC void
 _drawing_write_blip_fill(lxw_drawing *self, uint16_t index)
 {
-    lxw_xml_start_tag(self->file, "xdr:blipFill", NULL);
+    lxw_xml_start_tag("xdr:blipFill", NULL);
 
     /* Write the a:blip element. */
     _drawing_write_a_blip(self, index);
@@ -355,7 +355,7 @@ _drawing_write_blip_fill(lxw_drawing *self, uint16_t index)
     /* Write the a:stretch element. */
     _drawing_write_a_stretch(self);
 
-    lxw_xml_end_tag(self->file, "xdr:blipFill");
+    lxw_xml_end_tag("xdr:blipFill");
 }
 
 /*
@@ -371,7 +371,7 @@ _drawing_write_a_ext(lxw_drawing *self, lxw_drawing_object *drawing_object)
     LXW_PUSH_ATTRIBUTES_INT("cx", drawing_object->width);
     LXW_PUSH_ATTRIBUTES_INT("cy", drawing_object->height);
 
-    lxw_xml_empty_tag(self->file, "a:ext", &attributes);
+    lxw_xml_empty_tag("a:ext", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -389,7 +389,7 @@ _drawing_write_a_off(lxw_drawing *self, lxw_drawing_object *drawing_object)
     LXW_PUSH_ATTRIBUTES_INT("x", drawing_object->col_absolute);
     LXW_PUSH_ATTRIBUTES_INT("y", drawing_object->row_absolute);
 
-    lxw_xml_empty_tag(self->file, "a:off", &attributes);
+    lxw_xml_empty_tag("a:off", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -400,7 +400,7 @@ _drawing_write_a_off(lxw_drawing *self, lxw_drawing_object *drawing_object)
 STATIC void
 _drawing_write_a_xfrm(lxw_drawing *self, lxw_drawing_object *drawing_object)
 {
-    lxw_xml_start_tag(self->file, "a:xfrm", NULL);
+    lxw_xml_start_tag("a:xfrm", NULL);
 
     /* Write the a:off element. */
     _drawing_write_a_off(self, drawing_object);
@@ -408,7 +408,7 @@ _drawing_write_a_xfrm(lxw_drawing *self, lxw_drawing_object *drawing_object)
     /* Write the a:ext element. */
     _drawing_write_a_ext(self, drawing_object);
 
-    lxw_xml_end_tag(self->file, "a:xfrm");
+    lxw_xml_end_tag("a:xfrm");
 }
 
 /*
@@ -417,7 +417,7 @@ _drawing_write_a_xfrm(lxw_drawing *self, lxw_drawing_object *drawing_object)
 STATIC void
 _drawing_write_a_av_lst(lxw_drawing *self)
 {
-    lxw_xml_empty_tag(self->file, "a:avLst", NULL);
+    lxw_xml_empty_tag("a:avLst", NULL);
 }
 
 /*
@@ -432,12 +432,12 @@ _drawing_write_a_prst_geom(lxw_drawing *self)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("prst", "rect");
 
-    lxw_xml_start_tag(self->file, "a:prstGeom", &attributes);
+    lxw_xml_start_tag("a:prstGeom", &attributes);
 
     /* Write the a:avLst element. */
     _drawing_write_a_av_lst(self);
 
-    lxw_xml_end_tag(self->file, "a:prstGeom");
+    lxw_xml_end_tag("a:prstGeom");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -448,7 +448,7 @@ _drawing_write_a_prst_geom(lxw_drawing *self)
 STATIC void
 _drawing_write_sp_pr(lxw_drawing *self, lxw_drawing_object *drawing_object)
 {
-    lxw_xml_start_tag(self->file, "xdr:spPr", NULL);
+    lxw_xml_start_tag("xdr:spPr", NULL);
 
     /* Write the a:xfrm element. */
     _drawing_write_a_xfrm(self, drawing_object);
@@ -456,7 +456,7 @@ _drawing_write_sp_pr(lxw_drawing *self, lxw_drawing_object *drawing_object)
     /* Write the a:prstGeom element. */
     _drawing_write_a_prst_geom(self);
 
-    lxw_xml_end_tag(self->file, "xdr:spPr");
+    lxw_xml_end_tag("xdr:spPr");
 }
 
 /*
@@ -466,7 +466,7 @@ STATIC void
 _drawing_write_pic(lxw_drawing *self, uint16_t index,
                    lxw_drawing_object *drawing_object)
 {
-    lxw_xml_start_tag(self->file, "xdr:pic", NULL);
+    lxw_xml_start_tag("xdr:pic", NULL);
 
     /* Write the xdr:nvPicPr element. */
     _drawing_write_nv_pic_pr(self, index, drawing_object);
@@ -477,7 +477,7 @@ _drawing_write_pic(lxw_drawing *self, uint16_t index,
     /* Write the xdr:spPr element. */
     _drawing_write_sp_pr(self, drawing_object);
 
-    lxw_xml_end_tag(self->file, "xdr:pic");
+    lxw_xml_end_tag("xdr:pic");
 }
 
 /*
@@ -486,7 +486,7 @@ _drawing_write_pic(lxw_drawing *self, uint16_t index,
 STATIC void
 _drawing_write_client_data(lxw_drawing *self)
 {
-    lxw_xml_empty_tag(self->file, "xdr:clientData", NULL);
+    lxw_xml_empty_tag("xdr:clientData", NULL);
 }
 
 /*
@@ -495,7 +495,7 @@ _drawing_write_client_data(lxw_drawing *self)
 STATIC void
 _drawing_write_c_nv_graphic_frame_pr(lxw_drawing *self)
 {
-    lxw_xml_empty_tag(self->file, "xdr:cNvGraphicFramePr", NULL);
+    lxw_xml_empty_tag("xdr:cNvGraphicFramePr", NULL);
 }
 
 /*
@@ -504,7 +504,7 @@ _drawing_write_c_nv_graphic_frame_pr(lxw_drawing *self)
 STATIC void
 _drawing_write_nv_graphic_frame_pr(lxw_drawing *self, uint16_t index)
 {
-    lxw_xml_start_tag(self->file, "xdr:nvGraphicFramePr", NULL);
+    lxw_xml_start_tag("xdr:nvGraphicFramePr", NULL);
 
     /* Write the xdr:cNvPr element. */
     _drawing_write_c_nv_pr(self, "Chart", index, NULL);
@@ -512,7 +512,7 @@ _drawing_write_nv_graphic_frame_pr(lxw_drawing *self, uint16_t index)
     /* Write the xdr:cNvGraphicFramePr element. */
     _drawing_write_c_nv_graphic_frame_pr(self);
 
-    lxw_xml_end_tag(self->file, "xdr:nvGraphicFramePr");
+    lxw_xml_end_tag("xdr:nvGraphicFramePr");
 }
 
 /*
@@ -528,7 +528,7 @@ _drawing_write_xfrm_offset(lxw_drawing *self)
     LXW_PUSH_ATTRIBUTES_STR("x", "0");
     LXW_PUSH_ATTRIBUTES_STR("y", "0");
 
-    lxw_xml_empty_tag(self->file, "a:off", &attributes);
+    lxw_xml_empty_tag("a:off", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -546,7 +546,7 @@ _drawing_write_xfrm_extension(lxw_drawing *self)
     LXW_PUSH_ATTRIBUTES_STR("cx", "0");
     LXW_PUSH_ATTRIBUTES_STR("cy", "0");
 
-    lxw_xml_empty_tag(self->file, "a:ext", &attributes);
+    lxw_xml_empty_tag("a:ext", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -557,7 +557,7 @@ _drawing_write_xfrm_extension(lxw_drawing *self)
 STATIC void
 _drawing_write_xfrm(lxw_drawing *self)
 {
-    lxw_xml_start_tag(self->file, "xdr:xfrm", NULL);
+    lxw_xml_start_tag("xdr:xfrm", NULL);
 
     /* Write the a:off element. */
     _drawing_write_xfrm_offset(self);
@@ -565,7 +565,7 @@ _drawing_write_xfrm(lxw_drawing *self)
     /* Write the a:ext element. */
     _drawing_write_xfrm_extension(self);
 
-    lxw_xml_end_tag(self->file, "xdr:xfrm");
+    lxw_xml_end_tag("xdr:xfrm");
 }
 
 /*
@@ -587,7 +587,7 @@ _drawing_write_chart(lxw_drawing *self, uint16_t index)
     LXW_PUSH_ATTRIBUTES_STR("xmlns:r", xmlns_r);
     LXW_PUSH_ATTRIBUTES_STR("r:id", r_id);
 
-    lxw_xml_empty_tag(self->file, "c:chart", &attributes);
+    lxw_xml_empty_tag("c:chart", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -605,12 +605,12 @@ _drawing_write_a_graphic_data(lxw_drawing *self, uint16_t index)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("uri", uri);
 
-    lxw_xml_start_tag(self->file, "a:graphicData", &attributes);
+    lxw_xml_start_tag("a:graphicData", &attributes);
 
     /* Write the c:chart element. */
     _drawing_write_chart(self, index);
 
-    lxw_xml_end_tag(self->file, "a:graphicData");
+    lxw_xml_end_tag("a:graphicData");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -622,12 +622,12 @@ STATIC void
 _drawing_write_a_graphic(lxw_drawing *self, uint16_t index)
 {
 
-    lxw_xml_start_tag(self->file, "a:graphic", NULL);
+    lxw_xml_start_tag("a:graphic", NULL);
 
     /* Write the a:graphicData element. */
     _drawing_write_a_graphic_data(self, index);
 
-    lxw_xml_end_tag(self->file, "a:graphic");
+    lxw_xml_end_tag("a:graphic");
 }
 
 /*
@@ -642,7 +642,7 @@ _drawing_write_graphic_frame(lxw_drawing *self, uint16_t index)
     LXW_INIT_ATTRIBUTES();
     LXW_PUSH_ATTRIBUTES_STR("macro", "");
 
-    lxw_xml_start_tag(self->file, "xdr:graphicFrame", &attributes);
+    lxw_xml_start_tag("xdr:graphicFrame", &attributes);
 
     /* Write the xdr:nvGraphicFramePr element. */
     _drawing_write_nv_graphic_frame_pr(self, index);
@@ -653,7 +653,7 @@ _drawing_write_graphic_frame(lxw_drawing *self, uint16_t index)
     /* Write the a:graphic element. */
     _drawing_write_a_graphic(self, index);
 
-    lxw_xml_end_tag(self->file, "xdr:graphicFrame");
+    lxw_xml_end_tag("xdr:graphicFrame");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -683,7 +683,7 @@ _drawing_write_two_cell_anchor(lxw_drawing *self, uint16_t index,
 			LXW_PUSH_ATTRIBUTES_STR("editAs", "absolute");
 	}
 
-    lxw_xml_start_tag(self->file, "xdr:twoCellAnchor", &attributes);
+    lxw_xml_start_tag("xdr:twoCellAnchor", &attributes);
 
     _drawing_write_from(self, &drawing_object->from);
     _drawing_write_to(self, &drawing_object->to);
@@ -705,7 +705,7 @@ _drawing_write_two_cell_anchor(lxw_drawing *self, uint16_t index,
     /* Write the xdr:clientData element. */
     _drawing_write_client_data(self);
 
-    lxw_xml_end_tag(self->file, "xdr:twoCellAnchor");
+    lxw_xml_end_tag("xdr:twoCellAnchor");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -741,7 +741,7 @@ lxw_drawing_assemble_xml_file(lxw_drawing *self)
 
     }
 
-    lxw_xml_end_tag(self->file, "xdr:wsDr");
+    lxw_xml_end_tag("xdr:wsDr");
 }
 
 /*****************************************************************************

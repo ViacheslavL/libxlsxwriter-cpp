@@ -213,7 +213,7 @@ void chart::_add_axis_ids(bool primary)
 /*
  * Utility function to set a chart range.
  */
-void chart::_set_range(series_range *range, const std::string& sheetname,
+static void chart::set_range(series_range *range, const std::string& sheetname,
                  lxw_row_t first_row, lxw_col_t first_col,
                  lxw_row_t last_row, lxw_col_t last_col)
 {
@@ -2446,7 +2446,7 @@ void chart::_write_plot_area()
     args.id_2 = axis_id_4;
 
     /* Write the c:valAx element. */
-    _chart_write_val_axis(&args);
+    _write_val_axis(&args);
 
     if (second_chart && second_chart->is_secondary)
     {
@@ -2579,8 +2579,7 @@ void chart::_initialize_column_chart(uint8_t type)
 /*
  * Initialize a doughnut chart.
  */
-STATIC void
-chart::_initialize_doughnut_chart()
+void chart::_initialize_doughnut_chart()
 {
     has_markers = false;
 
@@ -2592,8 +2591,7 @@ chart::_initialize_doughnut_chart()
 /*
  * Initialize a line chart.
  */
-STATIC void
-chart::_initialize_line_chart()
+void chart::_initialize_line_chart()
 {
     has_markers = true;
     grouping = LXW_GROUPING_STANDARD;
@@ -2606,8 +2604,7 @@ chart::_initialize_line_chart()
 /*
  * Initialize a pie chart.
  */
-STATIC void
-chart::_initialize_pie_chart()
+void chart::_initialize_pie_chart()
 {
     has_markers = false;
 
@@ -2619,8 +2616,7 @@ chart::_initialize_pie_chart()
 /*
  * Initialize a scatter chart.
  */
-STATIC void
-chart::_initialize_scatter_chart()
+void chart::_initialize_scatter_chart()
 {
     has_horiz_val_axis = false;
     cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
@@ -2635,8 +2631,7 @@ chart::_initialize_scatter_chart()
 /*
  * Initialize a radar chart.
  */
-STATIC void
-chart::_initialize_radar_chart(uint8_t type)
+void chart::_initialize_radar_chart(uint8_t type)
 {
     if (type == LXW_CHART_RADAR)
         has_markers = true;
@@ -2652,8 +2647,7 @@ chart::_initialize_radar_chart(uint8_t type)
 /*
  * Initialize the chart specific properties.
  */
-STATIC void
-chart::_initialize(uint8_t type)
+void chart::_initialize(uint8_t type)
 {
     switch (type) {
 
@@ -2764,9 +2758,9 @@ int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
     return 0;
 }
 
-void chart_set_y2_axis(lxw_chart *chart, lxw_chart_axis *axis)
+void chart::set_y2_axis(const std::shared_ptr<chart_axis>& axis)
 {
-    chart->y2_axis = axis;
+    y2_axis = axis;
 }
 
 /*
@@ -2939,7 +2933,7 @@ void chart_axis::set_name_range(const std::string& sheetname, lxw_row_t row, lxw
     }
 
     /* Start and end row, col are the same for single cell range. */
-    _chart_set_range(axis->title.range, sheetname, row, col, row, col);
+    chart::set_range(title.range, sheetname, row, col, row, col);
 }
 
 void  chart_axis::set_format(const std::string& format)
@@ -2965,9 +2959,9 @@ void chart::title_set_name(const std::string& name)
         return;
 
     if (name[0] == '=')
-        title.range->formula = lxw_strdup(name + 1);
+        title.range->formula = name.substr(1);
     else
-        title.name = lxw_strdup(name);
+        title.name = name;
 }
 
 /*
@@ -2976,13 +2970,13 @@ void chart::title_set_name(const std::string& name)
 void chart::title_set_name_range(const std::string& sheetname,
                            lxw_row_t row, lxw_col_t col)
 {
-    if (!sheetname) {
+    if (sheetname.empty()) {
         LXW_WARN("chart_title_set_name_range(): sheetname must be specified");
         return;
     }
 
     /* Start and end row, col are the same for single cell range. */
-    _chart_set_range(title.range, sheetname, row, col, row, col);
+    set_range(title.range, sheetname, row, col, row, col);
 }
 
 /*

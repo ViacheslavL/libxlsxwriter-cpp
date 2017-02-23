@@ -61,7 +61,7 @@ lxw_custom_free(lxw_custom *custom)
 STATIC void
 _custom_xml_declaration(lxw_custom *self)
 {
-    lxw_xml_declaration(self->file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -70,7 +70,7 @@ _custom_xml_declaration(lxw_custom *self)
 STATIC void
 _chart_write_vt_lpwstr(lxw_custom *self, char *value)
 {
-    lxw_xml_data_element(self->file, "vt:lpwstr", value, NULL);
+    lxw_xml_data_element("vt:lpwstr", value, NULL);
 }
 
 /*
@@ -83,7 +83,7 @@ _chart_write_vt_r_8(lxw_custom *self, double value)
 
     lxw_snprintf(data, LXW_ATTR_32, "%.16g", value);
 
-    lxw_xml_data_element(self->file, "vt:r8", data, NULL);
+    lxw_xml_data_element("vt:r8", data, NULL);
 }
 
 /*
@@ -96,7 +96,7 @@ _custom_write_vt_i_4(lxw_custom *self, int32_t value)
 
     lxw_snprintf(data, LXW_ATTR_32, "%d", value);
 
-    lxw_xml_data_element(self->file, "vt:i4", data, NULL);
+    lxw_xml_data_element("vt:i4", data, NULL);
 }
 
 /*
@@ -106,9 +106,9 @@ STATIC void
 _custom_write_vt_bool(lxw_custom *self, uint8_t value)
 {
     if (value)
-        lxw_xml_data_element(self->file, "vt:bool", "true", NULL);
+        lxw_xml_data_element("vt:bool", "true", NULL);
     else
-        lxw_xml_data_element(self->file, "vt:bool", "false", NULL);
+        lxw_xml_data_element("vt:bool", "false", NULL);
 }
 
 /*
@@ -123,7 +123,7 @@ _custom_write_vt_filetime(lxw_custom *self, lxw_datetime *datetime)
                  datetime->year, datetime->month, datetime->day,
                  datetime->hour, datetime->min, (int) datetime->sec);
 
-    lxw_xml_data_element(self->file, "vt:filetime", data, NULL);
+    lxw_xml_data_element("vt:filetime", data, NULL);
 }
 
 /*
@@ -144,7 +144,7 @@ _chart_write_custom_property(lxw_custom *self,
     LXW_PUSH_ATTRIBUTES_INT("pid", self->pid + 1);
     LXW_PUSH_ATTRIBUTES_STR("name", custom_property->name);
 
-    lxw_xml_start_tag(self->file, "property", &attributes);
+    lxw_xml_start_tag("property", &attributes);
 
     if (custom_property->type == LXW_CUSTOM_STRING) {
         /* Write the vt:lpwstr element. */
@@ -167,7 +167,7 @@ _chart_write_custom_property(lxw_custom *self,
         _custom_write_vt_filetime(self, &custom_property->u.datetime);
     }
 
-    lxw_xml_end_tag(self->file, "property");
+    lxw_xml_end_tag("property");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -188,7 +188,7 @@ _write_custom_properties(lxw_custom *self)
     LXW_PUSH_ATTRIBUTES_STR("xmlns", xmlns);
     LXW_PUSH_ATTRIBUTES_STR("xmlns:vt", xmlns_vt);
 
-    lxw_xml_start_tag(self->file, "Properties", &attributes);
+    lxw_xml_start_tag("Properties", &attributes);
 
     STAILQ_FOREACH(custom_property, self->custom_properties, list_pointers) {
         _chart_write_custom_property(self, custom_property);
@@ -214,7 +214,7 @@ lxw_custom_assemble_xml_file(lxw_custom *self)
 
     _write_custom_properties(self);
 
-    lxw_xml_end_tag(self->file, "Properties");
+    lxw_xml_end_tag("Properties");
 }
 
 /*****************************************************************************
