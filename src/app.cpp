@@ -48,7 +48,7 @@ app::~app()
 
 void app::_xml_declaration()
 {
-    lxw_xml_declaration(file);
+    lxw_xml_declaration();
 }
 
 /*
@@ -65,7 +65,7 @@ void app::_write_properties()
     LXW_PUSH_ATTRIBUTES_STR("xmlns", xmlns);
     LXW_PUSH_ATTRIBUTES_STR("xmlns:vt", xmlns_vt);
 
-    lxw_xml_start_tag(file, "Properties", &attributes);
+    lxw_xml_start_tag("Properties", &attributes);
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -75,7 +75,7 @@ void app::_write_properties()
  */
 void app::_write_application()
 {
-    lxw_xml_data_element(file, "Application", "Microsoft Excel", NULL);
+    lxw_xml_data_element("Application", "Microsoft Excel", NULL);
 }
 
 /*
@@ -83,7 +83,7 @@ void app::_write_application()
  */
 void app::_write_doc_security()
 {
-    lxw_xml_data_element(file, "DocSecurity", "0", NULL);
+    lxw_xml_data_element("DocSecurity", "0", NULL);
 }
 
 /*
@@ -91,7 +91,7 @@ void app::_write_doc_security()
  */
 void app::_write_scale_crop()
 {
-    lxw_xml_data_element(file, "ScaleCrop", "false", NULL);
+    lxw_xml_data_element("ScaleCrop", "false", NULL);
 }
 
 /*
@@ -99,7 +99,7 @@ void app::_write_scale_crop()
  */
 void app::_write_vt_lpstr(const std::string& str)
 {
-    lxw_xml_data_element(file, "vt:lpstr", str, NULL);
+    lxw_xml_data_element("vt:lpstr", str, NULL);
 }
 
 /*
@@ -107,7 +107,7 @@ void app::_write_vt_lpstr(const std::string& str)
  */
 void app::_write_vt_i4(const std::string& value)
 {
-    lxw_xml_data_element(file, "vt:i4", value, NULL);
+    lxw_xml_data_element("vt:i4", value, NULL);
 }
 
 /*
@@ -116,14 +116,14 @@ void app::_write_vt_i4(const std::string& value)
 void app::_write_vt_variant(const std::string& key, const std::string& value)
 {
     /* Write the vt:lpstr element. */
-    lxw_xml_start_tag(file, "vt:variant", NULL);
+    lxw_xml_start_tag("vt:variant", NULL);
     _write_vt_lpstr(key);
-    lxw_xml_end_tag(file, "vt:variant");
+    lxw_xml_end_tag("vt:variant");
 
     /* Write the vt:i4 element. */
-    lxw_xml_start_tag(file, "vt:variant", NULL);
+    lxw_xml_start_tag("vt:variant", NULL);
     _write_vt_i4(value);
-    lxw_xml_end_tag(file, "vt:variant");
+    lxw_xml_end_tag("vt:variant");
 }
 
 /*
@@ -138,13 +138,13 @@ void app::_write_vt_vector_heading_pairs()
     LXW_PUSH_ATTRIBUTES_INT("size", num_heading_pairs * 2);
     LXW_PUSH_ATTRIBUTES_STR("baseType", "variant");
 
-    lxw_xml_start_tag(file, "vt:vector", &attributes);
+    lxw_xml_start_tag("vt:vector", &attributes);
 
     for(const auto& heading_pair : heading_pairs) {
         _write_vt_variant(heading_pair.first, heading_pair.second);
     }
 
-    lxw_xml_end_tag(file, "vt:vector");
+    lxw_xml_end_tag("vt:vector");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -161,13 +161,13 @@ void app::_write_vt_vector_lpstr_named_parts()
     LXW_PUSH_ATTRIBUTES_INT("size", num_part_names);
     LXW_PUSH_ATTRIBUTES_STR("baseType", "lpstr");
 
-    lxw_xml_start_tag(file, "vt:vector", &attributes);
+    lxw_xml_start_tag("vt:vector", &attributes);
 
     for (const auto& part_name : part_names) {
         _write_vt_lpstr(part_name);
     }
 
-    lxw_xml_end_tag(file, "vt:vector");
+    lxw_xml_end_tag("vt:vector");
 
     LXW_FREE_ATTRIBUTES();
 }
@@ -177,12 +177,12 @@ void app::_write_vt_vector_lpstr_named_parts()
  */
 void app::_write_heading_pairs()
 {
-    lxw_xml_start_tag(file, "HeadingPairs", NULL);
+    lxw_xml_start_tag("HeadingPairs", NULL);
 
     /* Write the vt:vector element. */
     _write_vt_vector_heading_pairs();
 
-    lxw_xml_end_tag(file, "HeadingPairs");
+    lxw_xml_end_tag("HeadingPairs");
 }
 
 /*
@@ -190,12 +190,12 @@ void app::_write_heading_pairs()
  */
 void app::_write_titles_of_parts()
 {
-    lxw_xml_start_tag(file, "TitlesOfParts", NULL);
+    lxw_xml_start_tag("TitlesOfParts", NULL);
 
     /* Write the vt:vector element. */
     _write_vt_vector_lpstr_named_parts();
 
-    lxw_xml_end_tag(file, "TitlesOfParts");
+    lxw_xml_end_tag("TitlesOfParts");
 }
 
 /*
@@ -204,7 +204,7 @@ void app::_write_titles_of_parts()
 void app::_write_manager()
 {
     if (!properties.manager.empty())
-        lxw_xml_data_element(file, "Manager", properties.manager, NULL);
+        lxw_xml_data_element("Manager", properties.manager, NULL);
 }
 
 /*
@@ -214,9 +214,9 @@ void app::_write_company()
 {
 
     if (!properties.company.empty())
-        lxw_xml_data_element(file, "Company", properties.company, NULL);
+        lxw_xml_data_element("Company", properties.company, NULL);
     else
-        lxw_xml_data_element(file, "Company", "", NULL);
+        lxw_xml_data_element("Company", "", NULL);
 }
 
 /*
@@ -224,7 +224,7 @@ void app::_write_company()
  */
 void app::_write_links_up_to_date()
 {
-    lxw_xml_data_element(file, "LinksUpToDate", "false", NULL);
+    lxw_xml_data_element("LinksUpToDate", "false", NULL);
 }
 
 /*
@@ -232,7 +232,7 @@ void app::_write_links_up_to_date()
  */
 void app::_write_shared_doc()
 {
-    lxw_xml_data_element(file, "SharedDoc", "false", NULL);
+    lxw_xml_data_element("SharedDoc", "false", NULL);
 }
 
 /*
@@ -241,8 +241,7 @@ void app::_write_shared_doc()
 void app::_write_hyperlink_base()
 {
     if (!properties.hyperlink_base.empty())
-        lxw_xml_data_element(file, "HyperlinkBase",
-                             properties.hyperlink_base, NULL);
+        lxw_xml_data_element("HyperlinkBase", properties.hyperlink_base, NULL);
 }
 
 /*
@@ -250,7 +249,7 @@ void app::_write_hyperlink_base()
  */
 void app::_write_hyperlinks_changed()
 {
-    lxw_xml_data_element(file, "HyperlinksChanged", "false", NULL);
+    lxw_xml_data_element("HyperlinksChanged", "false", NULL);
 }
 
 /*
@@ -258,7 +257,7 @@ void app::_write_hyperlinks_changed()
  */
 void app::_write_app_version()
 {
-    lxw_xml_data_element(file, "AppVersion", "12.0000", NULL);
+    lxw_xml_data_element("AppVersion", "12.0000", NULL);
 }
 
 /*****************************************************************************
@@ -290,7 +289,7 @@ void app::_assemble_xml_file()
     _write_hyperlinks_changed();
     _write_app_version();
 
-    lxw_xml_end_tag(file, "Properties");
+    lxw_xml_end_tag("Properties");
 }
 
 /*****************************************************************************

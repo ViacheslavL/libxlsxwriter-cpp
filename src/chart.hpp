@@ -76,6 +76,7 @@
 
 #include <memory>
 #include <vector>
+#include "xmlwriter.hpp"
 #include "common.hpp"
 #include "shape.hpp"
 
@@ -83,6 +84,8 @@ STAILQ_HEAD(lxw_chart_series_list, lxw_chart_series);
 STAILQ_HEAD(lxw_series_data_points, lxw_series_data_point);
 
 namespace xlsxwriter {
+
+struct val_axis_args;
 
 #define LXW_CHART_NUM_FORMAT_LEN 128
 
@@ -196,7 +199,7 @@ enum lxw_marker_types {
     LXW_MARKER_PICTURE
 };
 
-struct lxw_series_range {
+struct series_range {
     std::string formula;
     std::string sheetname;
     lxw_row_t first_row;
@@ -205,7 +208,7 @@ struct lxw_series_range {
     lxw_col_t last_col;
     uint8_t ignore_cache;
 
-    uint8_t has_string_cache;
+    bool has_string_cache;
     uint16_t num_data_points;
     lxw_series_data_points *data_cache;
 
@@ -239,7 +242,7 @@ struct lxw_chart_title {
 
     /* We use a range to hold the title formula properties even though it
      * will only have 1 point in order to re-use similar functions.*/
-    lxw_series_range *range;
+    series_range *range;
 
     lxw_series_data_point data_point;
 
@@ -258,6 +261,7 @@ struct lxw_marker {
  * aren't modified directly.
  */
 struct chart_series {
+    friend class chart;
 public:
 
     chart_series();
@@ -282,7 +286,7 @@ public:
      * `chart_series_set_categories()` and `chart_series_set_values()`:
      *
      * @code
-     *     chart_series_ptr series = chart->add_series->();
+     *     chart_series_ptr series = chart->add_series();
      *
      *     // Configure the series ranges programmatically.
      *     series->set_categories("Sheet1", 1, 0, 6, 0); // "=Sheet1!$A$2:$A$7"
@@ -370,8 +374,8 @@ public:
 
 private:
 
-    lxw_series_range *categories;
-    lxw_series_range *values;
+    series_range *categories;
+    series_range *values;
     lxw_chart_title title;
     lxw_shape_properties properties;
     lxw_marker marker;
@@ -390,7 +394,8 @@ typedef std::shared_ptr<chart_series> chart_series_ptr;
  * that modify a chart axis but the members of the struct aren't modified
  * directly.
  */
-struct chart_axis {
+struct chart_axis{
+    friend class chart;
 public:
 
     chart_axis();
@@ -485,7 +490,7 @@ struct series_options {
  * The members of the chart class aren't modified directly. Instead
  * the chart properties are set by calling the functions shown in chart.h.
  */
-class chart {
+class chart : public xmlwriter {
 
 public:
 
@@ -499,21 +504,20 @@ public:
     /**
      * @brief Add a data series to a chart.
      *
-     * @param chart      Pointer to a lxw_chart instance to be configured.
      * @param categories The range of categories in the data series.
      * @param values     The range of values in the data series.
      *
-     * @return A lxw_chart_series object pointer.
+     * @return A chart_series object pointer.
      *
      * In Excel a chart **series** is a collection of information that defines
      * which data is plotted such as the categories and values. It is also used to
      * define the formatting for the data.
      *
-     * For an libxlsxwriter chart object the `%chart_add_series()` function is
+     * For an libxlsxwriter chart object the `%add_series()` function is
      * used to set the categories and values of the series:
      *
      * @code
-     *     chart_add_series(chart, "=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
+     *     chart->add_series("=Sheet1!$A$2:$A$7", "=Sheet1!$C$2:$C$7");
      * @endcode
      *
      *
@@ -526,7 +530,7 @@ public:
      *
      * @code
      *     // The NULL category will default to 1 to 5 like in Excel.
-     *     chart_add_series(chart, NULL, "Sheet1!$A$1:$A$5");
+     *     add_series(NULL, "Sheet1!$A$1:$A$5");
      * @endcode
      *
      *  - `values`: This is the most important property of a series and is the
@@ -541,15 +545,15 @@ public:
      * `chart_series_set_categories()` and `chart_series_set_values()` functions:
      *
      * @code
-     *     lxw_chart_series *series = chart_add_series(chart, NULL, NULL);
+     *     chart_series_ptr series = chart->add_series(chart);
      *
      *     // Configure the series using a syntax that is easier to define programmatically.
-     *     chart_series_set_categories(series, "Sheet1", 1, 0, 6, 0); // "=Sheet1!$A$2:$A$7"
-     *     chart_series_set_values(    series, "Sheet1", 1, 2, 6, 2); // "=Sheet1!$C$2:$C$7"
+     *     chart_series_ptr->set_categories("Sheet1", 1, 0, 6, 0); // "=Sheet1!$A$2:$A$7"
+     *     chart_series_ptr->set_values("Sheet1", 1, 2, 6, 2); // "=Sheet1!$C$2:$C$7"
      * @endcode
      *
      * As shown in the previous example the return value from
-     * `%chart_add_series()` is a lxw_chart_series pointer. This can be used in
+     * `%add_series()` is a lxw_chart_series pointer. This can be used in
      * other functions that configure a series.
      *
      *
@@ -558,25 +562,22 @@ public:
      * added in libxlsxwriter:
      *
      * @code
-     *    chart_add_series(chart, NULL, "Sheet1!$A$1:$A$5");
-     *    chart_add_series(chart, NULL, "Sheet1!$B$1:$B$5");
-     *    chart_add_series(chart, NULL, "Sheet1!$C$1:$C$5");
+     *    chart->add_series("", "Sheet1!$A$1:$A$5");
+     *    chart->add_series("", "Sheet1!$B$1:$B$5");
+     *    chart->add_series("", "Sheet1!$C$1:$C$5");
      * @endcode
      *
      * It is also possible to specify non-contiguous ranges:
      *
      * @code
-     *    chart_add_series(
-     *        chart,
+     *    chart->add_series(
      *        "=(Sheet1!$A$1:$A$9,Sheet1!$A$14:$A$25)",
      *        "=(Sheet1!$B$1:$B$9,Sheet1!$B$14:$B$25)"
      *    );
      * @endcode
      *
      */
-    std::shared_ptr<chart_series> chart_add_series(const std::string& categories, const std::string& values);
-
-    std::shared_ptr<chart_series> chart_add_series_opt(const std::string& categories, const std::string&values, const series_options& options);
+    std::shared_ptr<chart_series> add_series_opt(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
 
     void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
@@ -674,7 +675,7 @@ public:
     void set_hole_size(uint8_t size);
 
 
-private:
+protected:
 
     FILE *file;
 
@@ -682,8 +683,8 @@ private:
     uint8_t subtype;
     uint16_t series_index;
 
-    void(*write_chart_type) (struct lxw_chart *, uint8_t primary_axes);
-    void (*write_plot_area) (struct lxw_chart *);
+    void(chart::*write_chart_type) (chart *, bool primary_axes);
+    void (chart::*write_plot_area) (chart *);
 
     /**
      * A pointer to the chart x_axis object which can be used in functions
@@ -754,9 +755,9 @@ private:
     void _write_a_p_pr();
     void _write_a_p_pr_pie();
     void _add_axis_ids(bool primary);
-    void _set_range(lxw_series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
+    void _set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
     void _write_a_p_pr_rich();
-    void _chart_write_a_p();
+    void _write_a_p();
     void _write_a_p_pie();
     void _write_a_p_rich(const std::string &name);
     void _write_a_lst_style();
@@ -765,11 +766,99 @@ private:
     void _write_v_num(double number);
     void _write_v_str(const std::string &str);
     void _write_pt(uint16_t index, lxw_series_data_point *data_point);
+    void _write_f(const std::string &formula);
+    void _write_num_pt(uint16_t index, lxw_series_data_point *data_point);
+    void _write_format_code();
+    void _write_num_cache(series_range *range);
+    void _write_str_cache(series_range *range);
+    void _write_num_ref(series_range *range);
+    void _write_data_cache(series_range *range, bool has_string_cache);
+    void _write_str_ref(series_range *range);
+    void _write_tx_value(const std::string &name);
+    void _write_tx_formula(lxw_chart_title *title);
+    void _write_tx_pr(lxw_chart_title *title);
+    void _write_rich(lxw_chart_title *title);
+    void _write_tx_pr_pie(lxw_chart_title *title);
+    void _write_tx_rich(lxw_chart_title *title);
+    void _write_title_rich(lxw_chart_title *title);
+    void _write_title_formula(lxw_chart_title *title);
+    void _write_auto_title_deleted();
+    void _write_idx(uint16_t index);
+    void _write_a_alpha(double transparency);
+    void _write_a_no_fill();
+    void _write_a_solid_fill(lxw_color_t color, double transparency);
+    void _write_a_ln(lxw_line *line);
+    void _write_sp_pr(lxw_shape_properties *properties);
+    void _write_order(uint16_t index);
+    void _write_axis_id(uint32_t axis_id);
+    void _write_axis_ids(uint8_t primary);
+    void _write_series_name(const std::shared_ptr<chart_series> &series);
+    void _write_major_tick_mark(const std::shared_ptr<chart_axis> &axis);
+    void _write_symbol();
+    void _write_marker_data(lxw_marker *marker);
+    void _write_marker(lxw_marker *marker);
+    void _write_marker_value();
+    void _write_smooth();
+    void _write_scatter_style();
+    void _write_cat(const std::shared_ptr<chart_series> &series);
+    void _write_x_val(const std::shared_ptr<chart_series> &series);
+    void _write_y_val(const std::shared_ptr<chart_series> &series);
+    void _write_val(const std::shared_ptr<chart_series> &series);
+    void _write_style();
+    void _write_a_srgb(lxw_color_t color, double transparency);
+    void _write_radar_chart(uint8_t primary_axes);
+    void _write_orientation();
+    void _write_tick_lbl_pos();
+    void _write_axis_pos(uint8_t position);
+    void _write_ser(const std::shared_ptr<chart_series> &series);
+    void _write_lbl_offset();
+    void _write_lbl_algn();
+    void _write_scaling(const std::shared_ptr<chart_axis> &axis);
+    void _write_cross_axis(uint32_t axis_id);
+    void _write_crosses(const std::string &value);
+    void _write_auto();
+    void _write_major_gridlines(const std::shared_ptr<chart_axis> &axis);
+    void _write_number_format(const std::shared_ptr<chart_axis> &axis);
+    void _write_cross_between();
+    void _write_legend_pos();
+    void _write_legend();
+    void _write_plot_vis_only();
+    void _write_header_footer();
+    void _write_page_margins();
+    void _write_page_setup();
+    void _write_overlap(int overlap);
+    void _write_delete();
+    void _write_cat_val_axis();
+    void _write_val_axis(val_axis_args *args);
+    void _write_cat_axis(val_axis_args *args);
+    void _write_chart_title();
+    void _write_title(lxw_chart_title *title);
+    void _write_scatter_plot_area();
+    void _write_radar_chart(bool primary_axes);
+    std::vector<std::shared_ptr<chart_series> > _get_primary_axes_series();
+    std::vector<std::shared_ptr<chart_series> > _get_secondary_axes_series();
+    void _write_xval_ser(const std::shared_ptr<chart_series> &series);
+    void _xml_declaration();
+    void _write_area_chart(bool primary_axes);
+    void _write_bar_chart(bool primary_axes);
+    void _write_column_chart(bool primary_axes);
+    void _write_doughnut_chart(bool primary_axes);
+    void _write_line_chart(bool primary_axes);
+    void _write_print_settings();
+    void _write_pie_plot_area();
+    void _write_plot_area();
+    void _write_pie_chart(uint8_t primary_axes);
+    void _write_scatter_chart(bool primary_axes);
+    void _write_chart();
+    void _write_bar_dir(const std::string &type);
+    void _initialize_area_chart(uint8_t type);
+    void _initialize_bar_chart(uint8_t type);
+    void _initialize_column_chart(uint8_t type);
 };
 
 typedef std::shared_ptr<chart> chart_ptr;
 
-int lxw_chart_add_data_cache(lxw_series_range *range, uint8_t *data,
+int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
                              uint16_t rows, uint8_t cols, uint8_t col);
 
 /* Declarations required for unit testing. */

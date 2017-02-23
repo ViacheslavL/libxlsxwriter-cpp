@@ -16,8 +16,8 @@
  * called directly by the end user.
  *
  */
-#ifndef __XMLWRITER_H__
-#define __XMLWRITER_H__
+#ifndef __XMLWRITER_HPP__
+#define __XMLWRITER_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,12 +35,6 @@
         dst[LXW_MAX_ATTRIBUTE_LENGTH - 1] = '\0';       \
     } while (0)
 
-
- /* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
 
 /* Attribute used in XML elements. */
 struct xml_attribute {
@@ -93,88 +87,83 @@ struct xml_attribute *lxw_new_attribute_dbl(const char *key, double value);
         free(attribute);                                      \
     }
 
-/**
- * Create the XML declaration in an XML file.
- *
- * @param xmlfile A FILE pointer to the output XML file.
- */
-void lxw_xml_declaration(FILE * xmlfile);
+namespace xlsxwriter {
 
-/**
- * Write an XML start tag with optional attributes.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- * @param attributes An optional list of attributes to add to the tag.
- */
-void lxw_xml_start_tag(FILE * xmlfile,
-                       const char *tag,
-                       struct xml_attribute_list *attributes);
+class xmlwriter {
+protected:
 
-/**
- * Write an XML start tag with optional un-encoded attributes.
- * This is a minor optimization for attributes that don't need encoding.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- * @param attributes An optional list of attributes to add to the tag.
- */
-void lxw_xml_start_tag_unencoded(FILE * xmlfile,
-                                 const char *tag,
-                                 struct xml_attribute_list *attributes);
+    /**
+     * Create the XML declaration in an XML file.
+     *
+     * @param xmlfile A FILE pointer to the output XML file.
+     */
+    void lxw_xml_declaration();
 
-/**
- * Write an XML end tag.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- */
-void lxw_xml_end_tag(FILE * xmlfile, const char *tag);
+    /**
+     * Write an XML start tag with optional attributes.
+     *
+     * @param tag        The XML tag to write.
+     * @param attributes An optional list of attributes to add to the tag.
+     */
+    void lxw_xml_start_tag(const char *tag,
+                           struct xml_attribute_list *attributes);
 
-/**
- * Write an XML empty tag with optional attributes.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- * @param attributes An optional list of attributes to add to the tag.
- */
-void lxw_xml_empty_tag(FILE * xmlfile,
-                       const char *tag,
-                       struct xml_attribute_list *attributes);
+    /**
+     * Write an XML start tag with optional un-encoded attributes.
+     * This is a minor optimization for attributes that don't need encoding.
+     *
+     * @param tag        The XML tag to write.
+     * @param attributes An optional list of attributes to add to the tag.
+     */
+    void lxw_xml_start_tag_unencoded(const char *tag,
+                                     struct xml_attribute_list *attributes);
 
-/**
- * Write an XML empty tag with optional un-encoded attributes.
- * This is a minor optimization for attributes that don't need encoding.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- * @param attributes An optional list of attributes to add to the tag.
- */
-void lxw_xml_empty_tag_unencoded(FILE * xmlfile,
-                                 const char *tag,
-                                 struct xml_attribute_list *attributes);
+    /**
+     * Write an XML end tag.
+     *
+     * @param xmlfile    A FILE pointer to the output XML file.
+     * @param tag        The XML tag to write.
+     */
+    void lxw_xml_end_tag(const char *tag);
 
-/**
- * Write an XML element containing data and optional attributes.
- *
- * @param xmlfile    A FILE pointer to the output XML file.
- * @param tag        The XML tag to write.
- * @param data       The data section of the XML element.
- * @param attributes An optional list of attributes to add to the tag.
- */
-void lxw_xml_data_element(FILE * xmlfile,
-                          const std::string& tag,
-                          const std::string& data,
-                          struct xml_attribute_list *attributes);
+    /**
+     * Write an XML empty tag with optional attributes.
+     *
+     * @param tag        The XML tag to write.
+     * @param attributes An optional list of attributes to add to the tag.
+     */
+    void lxw_xml_empty_tag(const char *tag,
+                           struct xml_attribute_list *attributes);
 
-char *lxw_escape_control_characters(const char *string);
+    /**
+     * Write an XML empty tag with optional un-encoded attributes.
+     * This is a minor optimization for attributes that don't need encoding.
+     *
+     * @param tag        The XML tag to write.
+     * @param attributes An optional list of attributes to add to the tag.
+     */
+    void lxw_xml_empty_tag_unencoded(const char *tag,
+                                     struct xml_attribute_list *attributes);
 
-char *lxw_escape_data(const char *data);
+    /**
+     * Write an XML element containing data and optional attributes.
+     *
+     * @param tag        The XML tag to write.
+     * @param data       The data section of the XML element.
+     * @param attributes An optional list of attributes to add to the tag.
+     */
+    void lxw_xml_data_element(const std::string& tag,
+                              const std::string& data,
+                              struct xml_attribute_list *attributes);
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+    char *lxw_escape_control_characters(const char *string);
 
-#endif /* __XMLWRITER_H__ */
+    char *lxw_escape_data(const char *data);
+
+    FILE* file;
+};
+
+} // namespace xlsxwriter
+
+
+#endif /* __XMLWRITER_HPP__ */

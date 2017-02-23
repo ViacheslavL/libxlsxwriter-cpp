@@ -17,6 +17,7 @@
 #include <list>
 #include <memory>
 
+#include "xmlwriter.hpp"
 #include "shared_strings.hpp"
 #include "chart.hpp"
 #include "relationships.hpp"

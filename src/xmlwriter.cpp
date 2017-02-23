@@ -20,131 +20,107 @@
 /* Defines. */
 #define LXW_MAX_ENCODED_ATTRIBUTE_LENGTH (LXW_MAX_ATTRIBUTE_LENGTH*6)
 
-/* Forward declarations. */
-STATIC char *_escape_attributes(struct xml_attribute *attribute);
 
-char *lxw_escape_data(const char *data);
-
-STATIC void _fprint_escaped_attributes(FILE * xmlfile,
-                                       struct xml_attribute_list *attributes);
-
-STATIC void _fprint_escaped_data(FILE * xmlfile, const char *data);
-
+namespace xlsxwriter {
 /*
  * Write the XML declaration.
  */
-void
-lxw_xml_declaration(FILE * xmlfile)
+void xlsxwriter::lxw_xml_declaration()
 {
-    fprintf(xmlfile, "<?xml version=\"1.0\" "
+    fprintf(file, "<?xml version=\"1.0\" "
             "encoding=\"UTF-8\" standalone=\"yes\"?>\n");
 }
 
 /*
  * Write an XML start tag with optional attributes.
  */
-void
-lxw_xml_start_tag(FILE * xmlfile,
-                  const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_start_tag(const char *tag, struct xml_attribute_list *attributes)
 {
-    fprintf(xmlfile, "<%s", tag);
+    fprintf(file, "<%s", tag);
 
-    _fprint_escaped_attributes(xmlfile, attributes);
+    _fprint_escaped_attributes(file, attributes);
 
-    fprintf(xmlfile, ">");
+    fprintf(file, ">");
 }
 
 /*
  * Write an XML start tag with optional, unencoded, attributes.
  * This is a minor speed optimization for elements that don't need encoding.
  */
-void
-lxw_xml_start_tag_unencoded(FILE * xmlfile,
-                            const char *tag,
-                            struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_start_tag_unencoded(const char *tag, struct xml_attribute_list *attributes)
 {
     struct xml_attribute *attribute;
 
-    fprintf(xmlfile, "<%s", tag);
+    fprintf(file, "<%s", tag);
 
     if (attributes) {
         STAILQ_FOREACH(attribute, attributes, list_entries) {
-            fprintf(xmlfile, " %s=\"%s\"", attribute->key, attribute->value);
+            fprintf(file, " %s=\"%s\"", attribute->key, attribute->value);
         }
     }
 
-    fprintf(xmlfile, ">");
+    fprintf(file, ">");
 }
 
 /*
  * Write an XML end tag.
  */
-void
-lxw_xml_end_tag(FILE * xmlfile, const char *tag)
+void xlsxwriter::lxw_xml_end_tag(const char *tag)
 {
-    fprintf(xmlfile, "</%s>", tag);
+    fprintf(file, "</%s>", tag);
 }
 
 /*
  * Write an empty XML tag with optional attributes.
  */
-void
-lxw_xml_empty_tag(FILE * xmlfile,
-                  const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_empty_tag(const char *tag, struct xml_attribute_list *attributes)
 {
-    fprintf(xmlfile, "<%s", tag);
+    fprintf(file, "<%s", tag);
 
-    _fprint_escaped_attributes(xmlfile, attributes);
+    _fprint_escaped_attributes(file, attributes);
 
-    fprintf(xmlfile, "/>");
+    fprintf(file, "/>");
 }
 
 /*
  * Write an XML start tag with optional, unencoded, attributes.
  * This is a minor speed optimization for elements that don't need encoding.
  */
-void
-lxw_xml_empty_tag_unencoded(FILE * xmlfile,
-                            const char *tag,
-                            struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_empty_tag_unencoded(const char *tag, struct xml_attribute_list *attributes)
 {
     struct xml_attribute *attribute;
 
-    fprintf(xmlfile, "<%s", tag);
+    fprintf(file, "<%s", tag);
 
     if (attributes) {
         STAILQ_FOREACH(attribute, attributes, list_entries) {
-            fprintf(xmlfile, " %s=\"%s\"", attribute->key, attribute->value);
+            fprintf(file, " %s=\"%s\"", attribute->key, attribute->value);
         }
     }
 
-    fprintf(xmlfile, "/>");
+    fprintf(file, "/>");
 }
 
 /*
  * Write an XML element containing data with optional attributes.
  */
-void
-lxw_xml_data_element(FILE * xmlfile,
-                     const std::string& tag,
-                     const std::string& data, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_data_element(const std::string& tag, const std::string& data, struct xml_attribute_list *attributes)
 {
-    fprintf(xmlfile, "<%s", tag);
+    fprintf(file, "<%s", tag);
 
-    _fprint_escaped_attributes(xmlfile, attributes);
+    _fprint_escaped_attributes(file, attributes);
 
-    fprintf(xmlfile, ">");
+    fprintf(file, ">");
 
-    _fprint_escaped_data(xmlfile, data);
+    _fprint_escaped_data(file, data);
 
-    fprintf(xmlfile, "</%s>", tag);
+    fprintf(file, "</%s>", tag);
 }
 
 /*
  * Escape XML characters in attributes.
  */
-STATIC char *
-_escape_attributes(struct xml_attribute *attribute)
+char * xlsxwriter::_escape_attributes(struct xml_attribute *attribute)
 {
     char *encoded = (char *) calloc(LXW_MAX_ENCODED_ATTRIBUTE_LENGTH, 1);
     char *p_encoded = encoded;
@@ -184,8 +160,7 @@ _escape_attributes(struct xml_attribute *attribute)
  * Note, this is different from _escape_attributes()
  * in that double quotes are not escaped by Excel.
  */
-char *
-lxw_escape_data(const char *data)
+char * xlsxwriter::lxw_escape_data(const char *data)
 {
     size_t encoded_len = (strlen(data) * 5 + 1);
 
@@ -220,8 +195,7 @@ lxw_escape_data(const char *data)
 /*
  * Escape control characters in strings with with _xHHHH_.
  */
-char *
-lxw_escape_control_characters(const char *string)
+char * xlsxwriter::lxw_escape_control_characters(const char *string)
 {
     size_t escape_len = sizeof("_xHHHH_") - 1;
     size_t encoded_len = (strlen(string) * escape_len + 1);
@@ -275,24 +249,22 @@ lxw_escape_control_characters(const char *string)
 }
 
 /* Write out escaped attributes. */
-STATIC void
-_fprint_escaped_attributes(FILE * xmlfile,
-                           struct xml_attribute_list *attributes)
+void xlsxwriter::_fprint_escaped_attributes(struct xml_attribute_list *attributes)
 {
     struct xml_attribute *attribute;
 
     if (attributes) {
         STAILQ_FOREACH(attribute, attributes, list_entries) {
-            fprintf(xmlfile, " %s=", attribute->key);
+            fprintf(file, " %s=", attribute->key);
 
             if (!strpbrk(attribute->value, "&<>\"")) {
-                fprintf(xmlfile, "\"%s\"", attribute->value);
+                fprintf(file, "\"%s\"", attribute->value);
             }
             else {
                 char *encoded = _escape_attributes(attribute);
 
                 if (encoded) {
-                    fprintf(xmlfile, "\"%s\"", encoded);
+                    fprintf(file, "\"%s\"", encoded);
 
                     free(encoded);
                 }
@@ -302,25 +274,23 @@ _fprint_escaped_attributes(FILE * xmlfile,
 }
 
 /* Write out escaped XML data. */
-STATIC void
-_fprint_escaped_data(FILE * xmlfile, const char *data)
+void xlsxwriter::_fprint_escaped_data(const char *data)
 {
     /* Escape the data section of the XML element. */
     if (!strpbrk(data, "&<>")) {
-        fprintf(xmlfile, "%s", data);
+        fprintf(file, "%s", data);
     }
     else {
         char *encoded = lxw_escape_data(data);
         if (encoded) {
-            fprintf(xmlfile, "%s", encoded);
+            fprintf(file, "%s", encoded);
             free(encoded);
         }
     }
 }
 
 /* Create a new string XML attribute. */
-struct xml_attribute *
-lxw_new_attribute_str(const char *key, const char *value)
+xml_attribute * xlsxwriter::lxw_new_attribute_str(const char *key, const char *value)
 {
     struct xml_attribute *attribute = malloc(sizeof(struct xml_attribute));
 
@@ -331,8 +301,7 @@ lxw_new_attribute_str(const char *key, const char *value)
 }
 
 /* Create a new integer XML attribute. */
-struct xml_attribute *
-lxw_new_attribute_int(const char *key, uint32_t value)
+xml_attribute * xlsxwriter::lxw_new_attribute_int(const char *key, uint32_t value)
 {
     struct xml_attribute *attribute = malloc(sizeof(struct xml_attribute));
 
@@ -343,8 +312,7 @@ lxw_new_attribute_int(const char *key, uint32_t value)
 }
 
 /* Create a new double XML attribute. */
-struct xml_attribute *
-lxw_new_attribute_dbl(const char *key, double value)
+xml_attribute * xlsxwriter::lxw_new_attribute_dbl(const char *key, double value)
 {
     struct xml_attribute *attribute = malloc(sizeof(struct xml_attribute));
 
@@ -353,3 +321,5 @@ lxw_new_attribute_dbl(const char *key, double value)
 
     return attribute;
 }
+
+} // namespace xlsxwriter

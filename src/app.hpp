@@ -9,6 +9,7 @@
 #ifndef __LXW_APP_HPP__
 #define __LXW_APP_HPP__
 
+
 #include "workbook.hpp"
 #include "common.hpp"
 
@@ -18,7 +19,7 @@
 namespace xlsxwriter {
 
 /* Class to represent an App object. */
-class app {
+class app : public xmlwriter {
 public:
 
     app();
