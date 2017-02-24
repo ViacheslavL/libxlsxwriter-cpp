@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "common.h"
+#include "common.hpp"
 
 #define LXW_APP_PACKAGE  "application/vnd.openxmlformats-package."
 #define LXW_APP_DOCUMENT "application/vnd.openxmlformats-officedocument."

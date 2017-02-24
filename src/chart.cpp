@@ -203,20 +203,16 @@ void chart::_xml_declaration()
  */
 void chart::_write_chart_space()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char xmlns_c[] = LXW_SCHEMA_DRAWING "/chart";
     char xmlns_a[] = LXW_SCHEMA_DRAWING "/main";
     char xmlns_r[] = LXW_SCHEMA_OFFICEDOC "/relationships";
+    xml_attribute_list attributes = {
+        {"xmlns:c", xmlns_c},
+        {"xmlns:a", xmlns_a},
+        {"xmlns:r", xmlns_r}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("xmlns:c", xmlns_c);
-    LXW_PUSH_ATTRIBUTES_STR("xmlns:a", xmlns_a);
-    LXW_PUSH_ATTRIBUTES_STR("xmlns:r", xmlns_r);
-
-    lxw_xml_start_tag("c:chartSpace", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_start_tag("c:chartSpace", attributes);
 }
 
 /*
@@ -224,15 +220,11 @@ void chart::_write_chart_space()
  */
 void chart::_write_lang()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", "en-US"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", "en-US");
-
-    lxw_xml_empty_tag("c:lang", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:lang", attributes);
 }
 
 /*
@@ -240,19 +232,15 @@ void chart::_write_lang()
  */
 void chart::_write_style()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
     /* Don"t write an element for the default style, 2. */
     if (style_id == 2)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", style_id);
+    xml_attribute_list attributes = {
+        {"val", std::to_string(style_id)}
+    };
 
-    lxw_xml_empty_tag("c:style", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:style", attributes);
 }
 
 /*
@@ -260,7 +248,7 @@ void chart::_write_style()
  */
 void chart::_write_layout()
 {
-    lxw_xml_empty_tag("c:layout", NULL);
+    lxw_xml_empty_tag("c:layout");
 }
 
 /*
@@ -268,23 +256,18 @@ void chart::_write_layout()
  */
 void chart::_write_grouping(uint8_t grouping)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (grouping == LXW_GROUPING_STANDARD)
-        LXW_PUSH_ATTRIBUTES_STR("val", "standard");
+        attributes.push_back(std::make_pair("val", "standard"));
     else if (grouping == LXW_GROUPING_PERCENTSTACKED)
-        LXW_PUSH_ATTRIBUTES_STR("val", "percentStacked");
+        attributes.push_back(std::make_pair("val", "percentStacked"));
     else if (grouping == LXW_GROUPING_STACKED)
-        LXW_PUSH_ATTRIBUTES_STR("val", "stacked");
+        attributes.push_back(std::make_pair("val", "stacked"));
     else
-        LXW_PUSH_ATTRIBUTES_STR("val", "clustered");
+        attributes.push_back(std::make_pair("val", "clustered"));
 
-    lxw_xml_empty_tag("c:grouping", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:grouping", attributes);
 }
 
 /*
@@ -292,19 +275,14 @@ void chart::_write_grouping(uint8_t grouping)
  */
 void chart::_write_radar_style()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (type == LXW_CHART_RADAR_FILLED)
-        LXW_PUSH_ATTRIBUTES_STR("val", "filled");
+        attributes.push_back(std::make_pair("val", "filled"));
     else
-        LXW_PUSH_ATTRIBUTES_STR("val", "marker");
+        attributes.push_back(std::make_pair("val", "marker"));
 
-    lxw_xml_empty_tag("c:radarStyle", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:radarStyle", attributes);
 }
 
 /*
@@ -312,15 +290,9 @@ void chart::_write_radar_style()
  */
 void chart::_write_vary_colors()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {{"val", "1"}};
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", "1");
-
-    lxw_xml_empty_tag("c:varyColors", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:varyColors", attributes);
 }
 
 /*
@@ -328,15 +300,9 @@ void chart::_write_vary_colors()
  */
 void chart::_write_first_slice_ang()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {{"val", std::to_string(rotation)}};
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", rotation);
-
-    lxw_xml_empty_tag("c:firstSliceAng", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:firstSliceAng", attributes);
 }
 
 /*
@@ -344,15 +310,11 @@ void chart::_write_first_slice_ang()
  */
 void chart::_write_hole_size()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(hole_size)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", hole_size);
-
-    lxw_xml_empty_tag("c:holeSize", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:holeSize", attributes);
 }
 
 /*
@@ -360,7 +322,7 @@ void chart::_write_hole_size()
  */
 void chart::_write_a_t(const std::string& name)
 {
-    lxw_xml_data_element("a:t", name, NULL);
+    lxw_xml_data_element("a:t", name);
 }
 
 /*
@@ -368,15 +330,11 @@ void chart::_write_a_t(const std::string& name)
  */
 void chart::_write_a_end_para_rpr()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"lang", "en-US"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("lang", "en-US");
-
-    lxw_xml_empty_tag("a:endParaRPr", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("a:endParaRPr", attributes);
 }
 
 /*
@@ -384,7 +342,7 @@ void chart::_write_a_end_para_rpr()
  */
 void chart::_write_a_def_rpr()
 {
-    lxw_xml_empty_tag("a:defRPr", NULL);
+    lxw_xml_empty_tag("a:defRPr");
 }
 
 /*
@@ -392,16 +350,13 @@ void chart::_write_a_def_rpr()
  */
 void chart::_write_a_r_pr()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char lang[] = "en-US";
+    xml_attribute_list attributes = {
+        {"lang", lang}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("lang", lang);
+    lxw_xml_empty_tag("a:rPr", attributes);
 
-    lxw_xml_empty_tag("a:rPr", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -409,7 +364,7 @@ void chart::_write_a_r_pr()
  */
 void chart::_write_a_r(const std::string& name)
 {
-    lxw_xml_start_tag("a:r", NULL);
+    lxw_xml_start_tag("a:r");
 
     /* Write the a:rPr element. */
     _write_a_r_pr();
@@ -425,7 +380,7 @@ void chart::_write_a_r(const std::string& name)
  */
 void chart::_write_a_p_pr()
 {
-    lxw_xml_start_tag("a:pPr", NULL);
+    lxw_xml_start_tag("a:pPr");
 
     /* Write the a:defRPr element. */
     _write_a_def_rpr();
@@ -438,20 +393,16 @@ void chart::_write_a_p_pr()
  */
 void chart::_write_a_p_pr_pie()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"rtl", "0"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("rtl", "0");
-
-    lxw_xml_start_tag("a:pPr", &attributes);
+    lxw_xml_start_tag("a:pPr", attributes);
 
     /* Write the a:defRPr element. */
     _write_a_def_rpr();
 
     lxw_xml_end_tag("a:pPr");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -459,7 +410,7 @@ void chart::_write_a_p_pr_pie()
  */
 void chart::_write_a_p_pr_rich()
 {
-    lxw_xml_start_tag("a:pPr", NULL);
+    lxw_xml_start_tag("a:pPr");
 
     /* Write the a:defRPr element. */
     _write_a_def_rpr();
@@ -472,7 +423,7 @@ void chart::_write_a_p_pr_rich()
  */
 void chart::_write_a_p()
 {
-    lxw_xml_start_tag("a:p", NULL);
+    lxw_xml_start_tag("a:p");
 
     /* Write the a:pPr element. */
     _write_a_p_pr();
@@ -488,7 +439,7 @@ void chart::_write_a_p()
  */
 void chart::_write_a_p_pie()
 {
-    lxw_xml_start_tag("a:p", NULL);
+    lxw_xml_start_tag("a:p");
 
     /* Write the a:pPr element. */
     _write_a_p_pr_pie();
@@ -504,7 +455,7 @@ void chart::_write_a_p_pie()
  */
 void chart::_write_a_p_rich(const std::string& name)
 {
-    lxw_xml_start_tag("a:p", NULL);
+    lxw_xml_start_tag("a:p");
 
     /* Write the a:pPr element. */
     _write_a_p_pr_rich();
@@ -520,7 +471,7 @@ void chart::_write_a_p_rich(const std::string& name)
  */
 void chart::_write_a_lst_style()
 {
-    lxw_xml_empty_tag("a:lstStyle", NULL);
+    lxw_xml_empty_tag("a:lstStyle");
 }
 
 /*
@@ -528,19 +479,14 @@ void chart::_write_a_lst_style()
  */
 void chart::_write_a_body_pr(lxw_chart_title *title)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (title && title->is_horizontal) {
-        LXW_PUSH_ATTRIBUTES_STR("rot", "-5400000");
-        LXW_PUSH_ATTRIBUTES_STR("vert", "horz");
+        attributes.push_back(std::make_pair("rot", "-5400000"));
+        attributes.push_back(std::make_pair("vert", "horz"));
     }
 
-    lxw_xml_empty_tag("a:bodyPr", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("a:bodyPr", attributes);
 }
 
 /*
@@ -548,15 +494,11 @@ void chart::_write_a_body_pr(lxw_chart_title *title)
  */
 void chart::_write_pt_count(uint16_t num_data_points)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(num_data_points)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", num_data_points);
-
-    lxw_xml_empty_tag("c:ptCount", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:ptCount", attributes);
 }
 
 /*
@@ -568,7 +510,7 @@ void chart::_write_v_num(double number)
 
     lxw_snprintf(data, LXW_ATTR_32, "%.16g", number);
 
-    lxw_xml_data_element("c:v", data, NULL);
+    lxw_xml_data_element("c:v", data);
 }
 
 /*
@@ -576,7 +518,7 @@ void chart::_write_v_num(double number)
  */
 void chart::_write_v_str(const std::string& str)
 {
-    lxw_xml_data_element("c:v", str, NULL);
+    lxw_xml_data_element("c:v", str);
 }
 
 /*
@@ -584,7 +526,7 @@ void chart::_write_v_str(const std::string& str)
  */
 void chart::_write_f(const std::string& formula)
 {
-    lxw_xml_data_element("c:f", formula, NULL);
+    lxw_xml_data_element("c:f", formula);
 }
 
 /*
@@ -592,17 +534,15 @@ void chart::_write_f(const std::string& formula)
  */
 void chart::_write_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
     /* Ignore chart points that have no data. */
     if (data_point->no_data)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("idx", index);
+    xml_attribute_list attributes = {
+        {"idx", std::to_string(index)}
+    };
 
-    lxw_xml_start_tag("c:pt", &attributes);
+    lxw_xml_start_tag("c:pt", attributes);
 
     if (data_point->is_string && !data_point->string.empty())
         _write_v_str(data_point->string);
@@ -610,8 +550,6 @@ void chart::_write_pt(uint16_t index, const std::shared_ptr<series_data_point>& 
         _write_v_num(data_point->number);
 
     lxw_xml_end_tag("c:pt");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -619,23 +557,19 @@ void chart::_write_pt(uint16_t index, const std::shared_ptr<series_data_point>& 
  */
 void chart::_write_num_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
     /* Ignore chart points that have no data. */
     if (data_point->no_data)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("idx", index);
+    xml_attribute_list attributes = {
+        {"idx", std::to_string(index)}
+    };
 
-    lxw_xml_start_tag("c:pt", &attributes);
+    lxw_xml_start_tag("c:pt", attributes);
 
     _write_v_num(data_point->number);
 
     lxw_xml_end_tag("c:pt");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -643,7 +577,7 @@ void chart::_write_num_pt(uint16_t index, const std::shared_ptr<series_data_poin
  */
  void chart::_write_format_code()
 {
-    lxw_xml_data_element("c:formatCode", "General", NULL);
+    lxw_xml_data_element("c:formatCode", "General");
 }
 
 /*
@@ -653,7 +587,7 @@ void chart::_write_num_cache(series_range *range)
 {
     uint16_t index = 0;
 
-    lxw_xml_start_tag("c:numCache", NULL);
+    lxw_xml_start_tag("c:numCache");
 
     /* Write the c:formatCode element. */
     _write_format_code();
@@ -678,7 +612,7 @@ void chart::_write_str_cache(series_range *range)
     lxw_series_data_point *data_point;
     uint16_t index = 0;
 
-    lxw_xml_start_tag("c:strCache", NULL);
+    lxw_xml_start_tag("c:strCache");
 
     /* Write the c:ptCount element. */
     _write_pt_count(range->num_data_points);
@@ -697,7 +631,7 @@ void chart::_write_str_cache(series_range *range)
  */
 void chart::_write_num_ref(series_range *range)
 {
-    lxw_xml_start_tag("c:numRef", NULL);
+    lxw_xml_start_tag("c:numRef");
 
     /* Write the c:f element. */
     _write_f(range->formula);
@@ -715,7 +649,7 @@ void chart::_write_num_ref(series_range *range)
  */
 void chart::_write_str_ref(series_range *range)
 {
-    lxw_xml_start_tag("c:strRef", NULL);
+    lxw_xml_start_tag("c:strRef");
 
     /* Write the c:f element. */
     _write_f(range->formula);
@@ -748,7 +682,7 @@ void chart::_write_data_cache(series_range *range, bool has_string_cache)
  */
 void chart::_write_tx_value(const std::string& name)
 {
-    lxw_xml_start_tag("c:tx", NULL);
+    lxw_xml_start_tag("c:tx");
 
     /* Write the c:v element. */
     _write_v_str(name);
@@ -761,7 +695,7 @@ void chart::_write_tx_value(const std::string& name)
  */
 void chart::_write_tx_formula(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:tx", NULL);
+    lxw_xml_start_tag("c:tx");
 
     _write_str_ref(title->range);
 
@@ -773,7 +707,7 @@ void chart::_write_tx_formula(lxw_chart_title *title)
  */
 void chart::_write_tx_pr(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:txPr", NULL);
+    lxw_xml_start_tag("c:txPr");
 
     /* Write the a:bodyPr element. */
     _write_a_body_pr(title);
@@ -792,7 +726,7 @@ void chart::_write_tx_pr(lxw_chart_title *title)
  */
 void chart::_write_tx_pr_pie(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:txPr", NULL);
+    lxw_xml_start_tag("c:txPr");
 
     /* Write the a:bodyPr element. */
     _write_a_body_pr(title);
@@ -811,7 +745,7 @@ void chart::_write_tx_pr_pie(lxw_chart_title *title)
  */
 void chart::_write_rich(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:rich", NULL);
+    lxw_xml_start_tag("c:rich");
 
     /* Write the a:bodyPr element. */
     _write_a_body_pr(title);
@@ -830,7 +764,7 @@ void chart::_write_rich(lxw_chart_title *title)
  */
 void chart::_write_tx_rich(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:tx", NULL);
+    lxw_xml_start_tag("c:tx");
 
     /* Write the c:rich element. */
     _write_rich(title);
@@ -843,7 +777,7 @@ void chart::_write_tx_rich(lxw_chart_title *title)
  */
 void chart::_write_title_rich(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:title", NULL);
+    lxw_xml_start_tag("c:title");
 
     /* Write the c:tx element. */
     _write_tx_rich(title);
@@ -859,7 +793,7 @@ void chart::_write_title_rich(lxw_chart_title *title)
  */
 void chart::_write_title_formula(lxw_chart_title *title)
 {
-    lxw_xml_start_tag("c:title", NULL);
+    lxw_xml_start_tag("c:title");
 
     /* Write the c:tx element. */
     _write_tx_formula(title);
@@ -878,15 +812,11 @@ void chart::_write_title_formula(lxw_chart_title *title)
  */
 void chart::_write_auto_title_deleted()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", "1"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", "1");
-
-    lxw_xml_empty_tag("c:autoTitleDeleted", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:autoTitleDeleted", attributes);
 }
 
 /*
@@ -894,52 +824,41 @@ void chart::_write_auto_title_deleted()
  */
 void chart::_write_idx(uint16_t index)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(index) }
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", index);
-
-    lxw_xml_empty_tag("c:idx", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:idx", attributes);
 }
 
 void chart::_write_a_alpha(double transparency)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char str[10];
-
-    sprintf(str, "%d", (int)((100 - transparency)*1000));
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", str);
-    lxw_xml_empty_tag("a:alpha", &attributes);
-    LXW_FREE_ATTRIBUTES();
+    xml_attribute_list attributes = {
+        {"val", std::to_string((int)((100 - transparency)*1000))}
+    };
+    lxw_xml_empty_tag("a:alpha", attributes);
 }
 
 void chart::_write_a_srgb(lxw_color_t color, double transparency)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char rgb_str[LXW_ATTR_32];
 
     lxw_snprintf(rgb_str, LXW_ATTR_32, "%06X",
         color & 0xFFFFFF);
-    LXW_INIT_ATTRIBUTES();
 
-    LXW_PUSH_ATTRIBUTES_STR("val", rgb_str);
+    xml_attribute_list attributes = {
+        {"val", rgb_str}
+    };
     if (transparency)
     {
-        lxw_xml_start_tag("a:srgbClr", &attributes);
+        lxw_xml_start_tag("a:srgbClr", attributes);
         _write_a_alpha(transparency);
         lxw_xml_end_tag("a:srgbClr");
     }
     else
     {
-        lxw_xml_empty_tag("a:srgbClr", &attributes);
+        lxw_xml_empty_tag("a:srgbClr", attributes);
     }
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -947,12 +866,12 @@ void chart::_write_a_srgb(lxw_color_t color, double transparency)
  */
 void chart::_write_a_no_fill()
 {
-    lxw_xml_empty_tag("a:noFill", NULL);
+    lxw_xml_empty_tag("a:noFill");
 }
 
 void chart::_write_a_solid_fill(lxw_color_t color, double transparency)
 {    
-    lxw_xml_start_tag("a:solidFill", NULL);
+    lxw_xml_start_tag("a:solidFill");
     _write_a_srgb(color, transparency);
     lxw_xml_end_tag("a:solidFill");
 }
@@ -962,27 +881,23 @@ void chart::_write_a_solid_fill(lxw_color_t color, double transparency)
  */
 void chart::_write_a_ln(lxw_line *line)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char w[] = "28575";
-
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("w", w);
+    xml_attribute_list attributes = {
+       {"w", w}
+    };
 
     if (line->none)
     {
-        lxw_xml_start_tag("a:ln", &attributes);
+        lxw_xml_start_tag("a:ln", attributes);
         /* Write the a:noFill element. */
         _write_a_no_fill();
     }
     else
     {
-        lxw_xml_start_tag("a:ln", NULL);
+        lxw_xml_start_tag("a:ln");
         _write_a_solid_fill(line->color, line->transparency);
     }  
     lxw_xml_end_tag("a:ln");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
@@ -994,7 +909,7 @@ void chart::_write_sp_pr(lxw_shape_properties* properties)
     if (!properties->fill.defined && !properties->line.defined && !properties->pattern.defined)
         return;
 
-    lxw_xml_start_tag("c:spPr", NULL);
+    lxw_xml_start_tag("c:spPr");
     
     if (properties->fill.defined)
     {
@@ -1020,15 +935,11 @@ void chart::_write_sp_pr(lxw_shape_properties* properties)
  */
 void chart::_write_order(uint16_t index)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(index)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", index);
-
-    lxw_xml_empty_tag("c:order", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:order", attributes);
 }
 
 /*
@@ -1036,15 +947,10 @@ void chart::_write_order(uint16_t index)
  */
 void chart::_write_axis_id(uint32_t axis_id)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", axis_id);
-
-    lxw_xml_empty_tag("c:axId", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    xml_attribute_list attributes = {
+        {"val", std::to_string(axis_id)}
+    };
+    lxw_xml_empty_tag("c:axId", attributes);
 }
 
 /*
@@ -1087,18 +993,14 @@ void chart::_write_series_name(const std::shared_ptr<chart_series>& series)
  */
 void chart::_write_major_tick_mark(const std::shared_ptr<chart_axis>& axis)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
     if (!axis->major_tick_mark)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", "cross");
+    xml_attribute_list attributes = {
+        {"val", "cross"}
+    };
 
-    lxw_xml_empty_tag("c:majorTickMark", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:majorTickMark", attributes);
 }
 
 /*
@@ -1106,48 +1008,38 @@ void chart::_write_major_tick_mark(const std::shared_ptr<chart_axis>& axis)
  */
 void chart::_write_symbol()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "none";
+    xml_attribute_list attributes = {
+        {"val", "none"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:symbol", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:symbol", attributes);
 }
 
 void chart::_write_marker_data(lxw_marker *marker)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
     char val[] = "none";
-
-    LXW_INIT_ATTRIBUTES();
 
     switch (marker->marker_type)
     {
     case LXW_MARKER_NONE:
-        LXW_PUSH_ATTRIBUTES_STR("val", "none");
+        attributes.push_back(std::make_pair("val", "none"));
         break;
     case LXW_MARKER_TRIANGLE:
-        LXW_PUSH_ATTRIBUTES_STR("val", "triangle");
+        attributes.push_back(std::make_pair("val", "triangle"));
         break;
     case LXW_MARKER_DIAMOND:
-        LXW_PUSH_ATTRIBUTES_STR("val", "diamond");
+        attributes.push_back(std::make_pair("val", "diamond"));
         break;
     case LXW_MARKER_SQUARE:
-        LXW_PUSH_ATTRIBUTES_STR("val", "square");
+        attributes.push_back(std::make_pair("val", "square"));
         break;
     default:
-        LXW_PUSH_ATTRIBUTES_STR("val", val);
+        attributes.push_back(std::make_pair("val", val));
         break;
     }
 
-    lxw_xml_empty_tag("c:symbol", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:symbol", attributes);
 }
 
 /*
@@ -1162,7 +1054,7 @@ void chart::_write_marker(lxw_marker* marker)
         return;
         */
 
-    lxw_xml_start_tag("c:marker", NULL);
+    lxw_xml_start_tag("c:marker");
 
     _write_marker_data(marker);
 
@@ -1182,16 +1074,11 @@ void chart::_write_marker(lxw_marker* marker)
  */
 void chart::_write_marker_value()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "1";
+    xml_attribute_list attributes = {
+        {"val", "1"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:marker", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:marker", attributes);
 }
 
 /*
@@ -1199,16 +1086,11 @@ void chart::_write_marker_value()
  */
 void chart::_write_smooth()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "1";
+     xml_attribute_list attributes = {
+         {"val", "1"}
+     };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:smooth", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:smooth", attributes);
 }
 
 /*
@@ -1216,20 +1098,15 @@ void chart::_write_smooth()
  */
 void chart::_write_scatter_style()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (type == LXW_CHART_SCATTER_SMOOTH
         || type == LXW_CHART_SCATTER_SMOOTH_WITH_MARKERS)
-        LXW_PUSH_ATTRIBUTES_STR("val", "smoothMarker");
+        attributes.push_back(std::make_pair("val", "smoothMarker"));
     else
-        LXW_PUSH_ATTRIBUTES_STR("val", "lineMarker");
+        attributes.push_back(std::make_pair("val", "lineMarker"));
 
-    lxw_xml_empty_tag("c:scatterStyle", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:scatterStyle", attributes);
 }
 
 /*
@@ -1245,7 +1122,7 @@ void chart::_write_cat(const std::shared_ptr<chart_series>& series)
 
     cat_has_num_fmt = !has_string_cache;
 
-    lxw_xml_start_tag("c:cat", NULL);
+    lxw_xml_start_tag("c:cat");
 
     /* Write the c:numRef element. */
     _write_data_cache(series->categories, has_string_cache);
@@ -1260,7 +1137,7 @@ void chart::_write_x_val(const std::shared_ptr<chart_series>& series)
 {
     bool has_string_cache = series->categories->has_string_cache;
 
-    lxw_xml_start_tag("c:xVal", NULL);
+    lxw_xml_start_tag("c:xVal");
 
     /* Write the data cache elements. */
     _write_data_cache(series->categories, has_string_cache);
@@ -1273,7 +1150,7 @@ void chart::_write_x_val(const std::shared_ptr<chart_series>& series)
  */
 void chart::_write_val(const std::shared_ptr<chart_series>& series)
 {
-    lxw_xml_start_tag("c:val", NULL);
+    lxw_xml_start_tag("c:val");
 
     /* Write the data cache elements. The string_cache is set to false since
      * this should always be a number series. */
@@ -1287,7 +1164,7 @@ void chart::_write_val(const std::shared_ptr<chart_series>& series)
  */
 void chart::_write_y_val(const std::shared_ptr<chart_series>& series)
 {
-    lxw_xml_start_tag("c:yVal", NULL);
+    lxw_xml_start_tag("c:yVal");
 
     /* Write the data cache elements. The string_cache is set to false since
      * this should always be a number series. */
@@ -1303,7 +1180,7 @@ void chart::_write_ser(const std::shared_ptr<chart_series>& series)
 {
     uint16_t index = series_index++;
 
-    lxw_xml_start_tag("c:ser", NULL);
+    lxw_xml_start_tag("c:ser");
 
     /* Write the c:idx element. */
     _write_idx(index);
@@ -1337,7 +1214,7 @@ void chart::_write_xval_ser(const std::shared_ptr<chart_series>& series)
 {
     uint16_t index = series_index++;
 
-    lxw_xml_start_tag("c:ser", NULL);
+    lxw_xml_start_tag("c:ser");
 
     /* Write the c:idx element. */
     _write_idx(index);
@@ -1379,16 +1256,11 @@ void chart::_write_xval_ser(const std::shared_ptr<chart_series>& series)
  */
 void chart::_write_orientation()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "minMax";
+    xml_attribute_list attributes = {
+        {"val", "minMax"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:orientation", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:orientation", attributes);
 }
 
 /*
@@ -1396,28 +1268,22 @@ void chart::_write_orientation()
  */
 void chart::_write_scaling(const std::shared_ptr<chart_axis>& axis)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_xml_start_tag("c:scaling", NULL);
+    xml_attribute_list attributes;
+    lxw_xml_start_tag("c:scaling");
 
     /* Write the c:orientation element. */
     _write_orientation();
 
     if (!isnan(axis->min_value)) {
-        LXW_INIT_ATTRIBUTES();
-        LXW_PUSH_ATTRIBUTES_DBL("val", axis->min_value);
+        attributes.push_back(std::make_pair("val", std::to_string(axis->min_value)));
 
-        lxw_xml_empty_tag("c:min", &attributes);
-
-        LXW_FREE_ATTRIBUTES();
+        lxw_xml_empty_tag("c:min", attributes);
+        attributes.clear();
     }
     if (!isnan(axis->max_value)) {
-        LXW_INIT_ATTRIBUTES();
-        LXW_PUSH_ATTRIBUTES_DBL("val", axis->max_value);
-
-        lxw_xml_empty_tag("c:max", &attributes);
-
-        LXW_FREE_ATTRIBUTES();
+        attributes.push_back(std::make_pair("val", std::to_string(axis->max_value)));
+        lxw_xml_empty_tag("c:max", attributes);
+        attributes.clear();
     }
 
     lxw_xml_end_tag("c:scaling");
@@ -1428,23 +1294,18 @@ void chart::_write_scaling(const std::shared_ptr<chart_axis>& axis)
  */
 void chart::_write_axis_pos(uint8_t position)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (position == LXW_CHART_RIGHT)
-        LXW_PUSH_ATTRIBUTES_STR("val", "r");
+        attributes.push_back(std::make_pair("val", "r"));
     else if (position == LXW_CHART_LEFT)
-        LXW_PUSH_ATTRIBUTES_STR("val", "l");
+        attributes.push_back(std::make_pair("val", "l"));
     else if (position == LXW_CHART_TOP)
-        LXW_PUSH_ATTRIBUTES_STR("val", "t");
+        attributes.push_back(std::make_pair("val", "t"));
     else if (position == LXW_CHART_BOTTOM)
-        LXW_PUSH_ATTRIBUTES_STR("val", "b");
+        attributes.push_back(std::make_pair("val", "b"));
 
-    lxw_xml_empty_tag("c:axPos", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:axPos", attributes);
 }
 
 /*
@@ -1452,16 +1313,11 @@ void chart::_write_axis_pos(uint8_t position)
  */
 void chart::_write_tick_lbl_pos()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "nextTo";
+    xml_attribute_list attributes = {
+        {"val", "nextTo"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:tickLblPos", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:tickLblPos", attributes);
 }
 
 /*
@@ -1469,15 +1325,11 @@ void chart::_write_tick_lbl_pos()
  */
 void chart::_write_cross_axis(uint32_t axis_id)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(axis_id)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", axis_id);
-
-    lxw_xml_empty_tag("c:crossAx", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:crossAx", attributes);
 }
 
 /*
@@ -1485,19 +1337,14 @@ void chart::_write_cross_axis(uint32_t axis_id)
  */
 void chart::_write_crosses(const std::string& value)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char default_val[] = "autoZero";
+    xml_attribute_list attributes;
 
-    LXW_INIT_ATTRIBUTES();
     if (value.empty())
-        LXW_PUSH_ATTRIBUTES_STR("val", default_val);
+        attributes.push_back(std::make_pair("val", "autoZero"));
     else
-        LXW_PUSH_ATTRIBUTES_STR("val", value);
+        attributes.push_back(std::make_pair("val", value));
 
-    lxw_xml_empty_tag("c:crosses", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:crosses", attributes);
 }
 
 /*
@@ -1505,16 +1352,11 @@ void chart::_write_crosses(const std::string& value)
  */
 void chart::_write_auto()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "1";
+    xml_attribute_list attributes = {
+        {"val", "1"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:auto", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:auto", attributes);
 }
 
 /*
@@ -1522,16 +1364,11 @@ void chart::_write_auto()
  */
 void chart::_write_lbl_algn()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "ctr";
+    xml_attribute_list attributes = {
+        {"val", "ctr"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:lblAlgn", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:lblAlgn", attributes);
 }
 
 /*
@@ -1539,16 +1376,11 @@ void chart::_write_lbl_algn()
  */
 void chart::_write_lbl_offset()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "100";
+    xml_attribute_list attributes = {
+        {"val", "100"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:lblOffset", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:lblOffset", attributes);
 }
 
 /*
@@ -1558,7 +1390,7 @@ void chart::_write_major_gridlines(const std::shared_ptr<chart_axis>& axis)
 {
 
     if (axis->default_major_gridlines)
-        lxw_xml_empty_tag("c:majorGridlines", NULL);
+        lxw_xml_empty_tag("c:majorGridlines");
 }
 
 /*
@@ -1566,43 +1398,33 @@ void chart::_write_major_gridlines(const std::shared_ptr<chart_axis>& axis)
  */
 void chart::_write_number_format(const std::shared_ptr<chart_axis>& axis)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
 
-    LXW_INIT_ATTRIBUTES();
     if (!axis->num_format.empty()) {
-        LXW_PUSH_ATTRIBUTES_STR("formatCode", axis->num_format);
-        LXW_PUSH_ATTRIBUTES_STR("sourceLinked", "0");
+        attributes.push_back(std::make_pair("formatCode", axis->num_format));
+        attributes.push_back(std::make_pair("sourceLinked", "0"));
     }
     else {
-        LXW_PUSH_ATTRIBUTES_STR("formatCode", axis->default_num_format);
-        LXW_PUSH_ATTRIBUTES_STR("sourceLinked", "1");
+        attributes.push_back(std::make_pair("formatCode", axis->default_num_format));
+        attributes.push_back(std::make_pair("sourceLinked", "1"));
     }
 
-    lxw_xml_empty_tag("c:numFmt", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:numFmt", attributes);
 }
 
 /*
  * Write the <c:crossBetween> element.
  */
-void
-chart::_write_cross_between()
+void chart::_write_cross_between()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (cross_between)
-        LXW_PUSH_ATTRIBUTES_STR("val", "midCat");
+        attributes.push_back(std::make_pair("val", "midCat"));
     else
-        LXW_PUSH_ATTRIBUTES_STR("val", "between");
+        attributes.push_back(std::make_pair("val", "between"));
 
-    lxw_xml_empty_tag("c:crossBetween", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:crossBetween", attributes);
 }
 
 /*
@@ -1610,30 +1432,26 @@ chart::_write_cross_between()
  */
 void chart::_write_legend_pos()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;    
+    xml_attribute_list attributes;
 
-    LXW_INIT_ATTRIBUTES();
     switch (legend_position) {
     case LXW_CHART_RIGHT:
-        LXW_PUSH_ATTRIBUTES_STR("val", "r");
+        attributes.push_back(std::make_pair("val", "r"));
         break;
     case LXW_CHART_LEFT:
-        LXW_PUSH_ATTRIBUTES_STR("val", "l");
+        attributes.push_back(std::make_pair("val", "l"));
         break;
     case LXW_CHART_TOP:
-        LXW_PUSH_ATTRIBUTES_STR("val", "t");
+        attributes.push_back(std::make_pair("val", "t"));
         break;
     case LXW_CHART_BOTTOM:
-        LXW_PUSH_ATTRIBUTES_STR("val", "b");
+        attributes.push_back(std::make_pair("val", "b"));
         break;
     default:
-        LXW_PUSH_ATTRIBUTES_STR("val", "r");
+        attributes.push_back(std::make_pair("val", "r"));
     }
 
-    lxw_xml_empty_tag("c:legendPos", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:legendPos", attributes);
 }
 
 /*
@@ -1641,7 +1459,7 @@ void chart::_write_legend_pos()
  */
 void chart::_write_legend()
 {
-    lxw_xml_start_tag("c:legend", NULL);
+    lxw_xml_start_tag("c:legend");
 
     /* Write the c:legendPos element. */
     _write_legend_pos();
@@ -1662,16 +1480,11 @@ void chart::_write_legend()
  */
 void chart::_write_plot_vis_only()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    char val[] = "1";
+    xml_attribute_list attributes = {
+        {"val", "1"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", val);
-
-    lxw_xml_empty_tag("c:plotVisOnly", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:plotVisOnly", attributes);
 }
 
 /*
@@ -1679,7 +1492,7 @@ void chart::_write_plot_vis_only()
  */
 void chart::_write_header_footer()
 {
-    lxw_xml_empty_tag("c:headerFooter", NULL);
+    lxw_xml_empty_tag("c:headerFooter");
 }
 
 /*
@@ -1687,8 +1500,6 @@ void chart::_write_header_footer()
  */
 void chart::_write_page_margins()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char b[] = "0.75";
     char l[] = "0.7";
     char r[] = "0.7";
@@ -1696,17 +1507,16 @@ void chart::_write_page_margins()
     char header[] = "0.3";
     char footer[] = "0.3";
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("b", b);
-    LXW_PUSH_ATTRIBUTES_STR("l", l);
-    LXW_PUSH_ATTRIBUTES_STR("r", r);
-    LXW_PUSH_ATTRIBUTES_STR("t", t);
-    LXW_PUSH_ATTRIBUTES_STR("header", header);
-    LXW_PUSH_ATTRIBUTES_STR("footer", footer);
+    xml_attribute_list attributes = {
+        {"b", b},
+        {"l", l},
+        {"r", r},
+        {"t", t},
+        {"header", header},
+        {"footer", footer}
+    };
 
-    lxw_xml_empty_tag("c:pageMargins", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:pageMargins", attributes);
 }
 
 /*
@@ -1714,7 +1524,7 @@ void chart::_write_page_margins()
  */
 void chart::_write_page_setup()
 {
-    lxw_xml_empty_tag("c:pageSetup", NULL);
+    lxw_xml_empty_tag("c:pageSetup");
 }
 
 /*
@@ -1722,7 +1532,7 @@ void chart::_write_page_setup()
  */
 void chart::_write_print_settings()
 {
-    lxw_xml_start_tag("c:printSettings", NULL);
+    lxw_xml_start_tag("c:printSettings");
 
     /* Write the c:headerFooter element. */
     _write_header_footer();
@@ -1741,15 +1551,11 @@ void chart::_write_print_settings()
  */
 void chart::_write_overlap(int overlap)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(overlap)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", overlap);
-
-    lxw_xml_empty_tag("c:overlap", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:overlap", attributes);
 }
 
 /*
@@ -1784,13 +1590,10 @@ void chart::_write_chart_title()
 
 void chart::_write_delete()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", "1");
-    lxw_xml_empty_tag("c:delete", &attributes);
-    LXW_FREE_ATTRIBUTES();
+    xml_attribute_list attributes = {
+        {"val", "1"}
+    };
+    lxw_xml_empty_tag("c:delete", attributes);
 }
 
 /*
@@ -1803,7 +1606,7 @@ void chart::_write_cat_axis(val_axis_args* args)
 
     uint8_t position = args->x_axis->position;/* cat_axis_position;*/
 
-    lxw_xml_start_tag("c:catAx", NULL);
+    lxw_xml_start_tag("c:catAx");
 
     _write_axis_id(args->id_1);
 
@@ -1861,7 +1664,7 @@ void chart::_write_val_axis(val_axis_args* args)
     if (!args->id_1 && !args->id_2)
         return;
 
-    lxw_xml_start_tag("c:valAx", NULL);
+    lxw_xml_start_tag("c:valAx");
 
     _write_axis_id(args->id_2);
 
@@ -1909,7 +1712,7 @@ void chart::_write_cat_val_axis()
 {
     uint8_t position = cat_axis_position;
 
-    lxw_xml_start_tag("c:valAx", NULL);
+    lxw_xml_start_tag("c:valAx");
 
     _write_axis_id(axis_id_1);
 
@@ -1973,15 +1776,11 @@ std::vector<std::shared_ptr<chart_series>> chart::_get_primary_axes_series()
  */
 void chart::_write_bar_dir(const std::string& type)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", type}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", type);
-
-    lxw_xml_empty_tag("c:barDir", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("c:barDir", attributes);
 }
 
 /*
@@ -1989,7 +1788,7 @@ void chart::_write_bar_dir(const std::string& type)
  */
 void chart::_write_chart()
 {
-    lxw_xml_start_tag("c:chart", NULL);
+    lxw_xml_start_tag("c:chart");
 
     /* Write the c:title element. */
     _write_chart_title();
@@ -2277,6 +2076,21 @@ void chart_axis::set_crossing(const std::string& crossing_str)
     crossing = crossing_str;
 }
 
+void chart_axis::set_major_tick_mark(bool mark)
+{
+    major_tick_mark = mark;
+}
+
+void chart_axis::set_default_num_format(const std::string& format)
+{
+    default_num_format = format;
+}
+
+void chart_axis::set_default_major_gridlines(bool mark)
+{
+    default_major_gridlines = mark;
+}
+
 /*
  * Set the chart title.
  */
@@ -2353,7 +2167,7 @@ void chart_area::write_chart_type(bool primary_axes)
     if (writable_series.empty())
         return;
 
-    lxw_xml_start_tag("c:areaChart", NULL);
+    lxw_xml_start_tag("c:areaChart");
 
     /* Write the c:grouping element. */
     _write_grouping(grouping);
@@ -2376,7 +2190,7 @@ void chart_area::write_chart_type(bool primary_axes)
 
 void chart::write_plot_area()
 {
-    lxw_xml_start_tag("c:plotArea", NULL);
+    lxw_xml_start_tag("c:plotArea");
 
     /* Write the c:layout element. */
     _write_layout();
@@ -2448,7 +2262,7 @@ void chart_area::_initialize()
 
     if (type == LXW_CHART_AREA_STACKED_PERCENT) {
         grouping = LXW_GROUPING_PERCENTSTACKED;
-        y_axis->default_num_format = "0%";
+        y_axis->set_default_num_format("0%");
         subtype = LXW_CHART_SUBTYPE_STACKED;
     }
 }
@@ -2468,7 +2282,7 @@ void chart_bar::write_chart_type(bool primary_axes)
     if (series_list.empty())
         return;
 
-    lxw_xml_start_tag("c:barChart", NULL);
+    lxw_xml_start_tag("c:barChart");
 
     /* Write the c:barDir element. */
     _write_bar_dir("bar");
@@ -2502,8 +2316,8 @@ void chart_bar::_initialize()
     y_axis = tmp;
 
     /*Also reverse some of the defaults. */
-    x_axis->default_major_gridlines = false;
-    y_axis->default_major_gridlines = true;
+    x_axis->set_default_major_gridlines(false);
+    y_axis->set_default_major_gridlines(true);
     has_horiz_cat_axis = true;
     has_horiz_val_axis = false;
 
@@ -2515,7 +2329,7 @@ void chart_bar::_initialize()
 
     if (type == LXW_CHART_BAR_STACKED_PERCENT) {
         grouping = LXW_GROUPING_PERCENTSTACKED;
-        y_axis->default_num_format = "0%";
+        y_axis->set_default_num_format("0%");
         has_overlap = true;
         subtype = LXW_CHART_SUBTYPE_STACKED;
     }
@@ -2540,7 +2354,7 @@ void chart_column::write_chart_type(bool primary_axes)
     if (writable_series.empty())
         return;
 
-    lxw_xml_start_tag("c:barChart", NULL);
+    lxw_xml_start_tag("c:barChart");
 
     /* Write the c:barDir element. */
     _write_bar_dir("col");
@@ -2576,7 +2390,7 @@ void chart_column::_initialize()
 
     if (type == LXW_CHART_COLUMN_STACKED_PERCENT) {
         grouping = LXW_GROUPING_PERCENTSTACKED;
-        y_axis->default_num_format = "0%";
+        y_axis->set_default_num_format("0%");
         has_overlap = true;
         subtype = LXW_CHART_SUBTYPE_STACKED;
     }
@@ -2599,7 +2413,7 @@ void chart_line::write_chart_type(bool primary_axes)
         return;
     }
 
-    lxw_xml_start_tag("c:lineChart", NULL);
+    lxw_xml_start_tag("c:lineChart");
 
     /* Write the c:grouping element. */
     _write_grouping(grouping);
@@ -2644,7 +2458,7 @@ void chart_pie::write_chart_type(bool primary_axes)
         return;
     }
 
-    lxw_xml_start_tag("c:pieChart", NULL);
+    lxw_xml_start_tag("c:pieChart");
 
     /* Write the c:varyColors element. */
     _write_vary_colors();
@@ -2662,7 +2476,7 @@ void chart_pie::write_chart_type(bool primary_axes)
 
 void chart_pie::write_plot_area()
 {
-    lxw_xml_start_tag("c:plotArea", NULL);
+    lxw_xml_start_tag("c:plotArea");
 
     /* Write the c:layout element. */
     _write_layout();
@@ -2696,7 +2510,7 @@ void chart_scatter::write_chart_type(bool primary_axes)
         return;
     }
 
-    lxw_xml_start_tag("c:scatterChart", NULL);
+    lxw_xml_start_tag("c:scatterChart");
 
     /* Write the c:scatterStyle element. */
     _write_scatter_style();
@@ -2714,7 +2528,7 @@ void chart_scatter::write_chart_type(bool primary_axes)
 
 void chart_scatter::write_plot_area()
 {
-    lxw_xml_start_tag("c:plotArea", NULL);
+    lxw_xml_start_tag("c:plotArea");
 
     /* Write the c:layout element. */
     _write_layout();
@@ -2765,7 +2579,7 @@ void chart_radar::write_chart_type(bool primary_axes)
         return;
     }
 
-    lxw_xml_start_tag("c:radarChart", NULL);
+    lxw_xml_start_tag("c:radarChart");
 
     /* Write the c:radarStyle element. */
     _write_radar_style();
@@ -2792,8 +2606,8 @@ void chart_radar::_initialize()
     if (type == LXW_CHART_RADAR)
         has_markers = true;
 
-    x_axis->default_major_gridlines = true;
-    y_axis->major_tick_mark = true;
+    x_axis->set_default_major_gridlines(true);
+    y_axis->set_major_tick_mark(true);
 }
 
 void chart_doughtnut::write_chart_type(bool primary_axes)
@@ -2811,7 +2625,7 @@ void chart_doughtnut::write_chart_type(bool primary_axes)
     if (writable_series.empty())
         return;
 
-    lxw_xml_start_tag("c:doughnutChart", NULL);
+    lxw_xml_start_tag("c:doughnutChart");
 
     /* Write the c:varyColors element. */
     _write_vary_colors();

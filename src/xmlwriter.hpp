@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "common.hpp"
+#include <list>
 
 #include <string>
 
@@ -46,7 +47,7 @@ struct xml_attribute {
 };
 
 /* Use queue.h macros to define the xml_attribute_list type. */
-STAILQ_HEAD(xml_attribute_list, xml_attribute);
+//STAILQ_HEAD(xml_attribute_list, xml_attribute);
 
 /* Create a new attribute struct to add to a xml_attribute_list. */
 struct xml_attribute *lxw_new_attribute_str(const char *key,
@@ -89,6 +90,8 @@ struct xml_attribute *lxw_new_attribute_dbl(const char *key, double value);
 
 namespace xlsxwriter {
 
+typedef std::list<std::pair<std::string, std::string>> xml_attribute_list;
+
 class xmlwriter {
 protected:
 
@@ -106,7 +109,7 @@ protected:
      * @param attributes An optional list of attributes to add to the tag.
      */
     void lxw_xml_start_tag(const char *tag,
-                           struct xml_attribute_list *attributes);
+                           const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
     /**
      * Write an XML start tag with optional un-encoded attributes.
@@ -115,8 +118,7 @@ protected:
      * @param tag        The XML tag to write.
      * @param attributes An optional list of attributes to add to the tag.
      */
-    void lxw_xml_start_tag_unencoded(const char *tag,
-                                     struct xml_attribute_list *attributes);
+    void lxw_xml_start_tag_unencoded(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes);
 
     /**
      * Write an XML end tag.
@@ -132,8 +134,7 @@ protected:
      * @param tag        The XML tag to write.
      * @param attributes An optional list of attributes to add to the tag.
      */
-    void lxw_xml_empty_tag(const char *tag,
-                           struct xml_attribute_list *attributes);
+    void lxw_xml_empty_tag(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
     /**
      * Write an XML empty tag with optional un-encoded attributes.
@@ -143,7 +144,7 @@ protected:
      * @param attributes An optional list of attributes to add to the tag.
      */
     void lxw_xml_empty_tag_unencoded(const char *tag,
-                                     struct xml_attribute_list *attributes);
+                                     const std::list<std::pair<std::string, std::string>>& attributes);
 
     /**
      * Write an XML element containing data and optional attributes.
@@ -154,7 +155,7 @@ protected:
      */
     void lxw_xml_data_element(const std::string& tag,
                               const std::string& data,
-                              struct xml_attribute_list *attributes);
+                              const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
     char *lxw_escape_control_characters(const char *string);
 
@@ -162,6 +163,8 @@ protected:
 
     FILE* file;
 };
+
+
 
 } // namespace xlsxwriter
 

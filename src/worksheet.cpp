@@ -9,11 +9,11 @@
 
 #include <ctype.h>
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/worksheet.h"
-#include "xlsxwriter/format.h"
-#include "xlsxwriter/utility.h"
-#include "xlsxwriter/relationships.h"
+#include "xmlwriter.hpp"
+#include "worksheet.hpp"
+#include "format.hpp"
+#include "utility.hpp"
+#include "relationships.hpp"
 
 #define LXW_STR_MAX      32767
 #define LXW_BUFFER_SIZE  4096
@@ -21,10 +21,12 @@
 #define LXW_LANDSCAPE    0
 #define LXW_PRINT_ACROSS 1
 
+namespace xlsxwriter {
+
 /*
  * Forward declarations.
  */
-STATIC void _worksheet_write_rows(lxw_worksheet *self);
+STATIC void _worksheet_write_rows();
 STATIC int _row_cmp(lxw_row *row1, lxw_row *row2);
 STATIC int _cell_cmp(lxw_cell *cell1, lxw_cell *cell2);
 
@@ -41,7 +43,7 @@ LXW_RB_GENERATE_CELL(lxw_table_cells, lxw_cell, tree_pointers, _cell_cmp);
  * Find but don't create a row object for a given row number.
  */
 lxw_row *
-lxw_worksheet_find_row(lxw_worksheet *self, lxw_row_t row_num)
+lxw_worksheet_find_row(lxw_row_t row_num)
 {
     lxw_row row;
 
@@ -629,7 +631,7 @@ _get_row_list(struct lxw_table_rows *table, lxw_row_t row_num)
  * Get or create the row object for a given row number.
  */
 STATIC lxw_row *
-_get_row(lxw_worksheet *self, lxw_row_t row_num)
+_get_row(lxw_row_t row_num)
 {
     lxw_row *row;
 
@@ -646,7 +648,7 @@ _get_row(lxw_worksheet *self, lxw_row_t row_num)
         }
         else {
             /* Flush row. */
-            lxw_worksheet_write_single_row(self);
+            lxw_worksheet_write_single_row();
             row = self->optimize_row;
             row->row_num = row_num;
             return row;
@@ -684,7 +686,7 @@ _insert_cell_list(struct lxw_table_cells *cell_list,
  * Insert a cell object into the cell list or array.
  */
 STATIC void
-_insert_cell(lxw_worksheet *self, lxw_row_t row_num, lxw_col_t col_num,
+_insert_cell(lxw_row_t row_num, lxw_col_t col_num,
              lxw_cell *cell)
 {
     lxw_row *row = _get_row(self, row_num);
@@ -710,7 +712,7 @@ _insert_cell(lxw_worksheet *self, lxw_row_t row_num, lxw_col_t col_num,
  * Insert a hyperlink object into the hyperlink list.
  */
 STATIC void
-_insert_hyperlink(lxw_worksheet *self, lxw_row_t row_num, lxw_col_t col_num,
+_insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num,
                   lxw_cell *link)
 {
     lxw_row *row = _get_row_list(self->hyperlinks, row_num);
@@ -743,7 +745,7 @@ _next_power_of_two(uint16_t col)
  * perform the dimension check without storing the value.
  */
 STATIC lxw_error
-_check_dimensions(lxw_worksheet *self,
+_check_dimensions(
                   lxw_row_t row_num,
                   lxw_col_t col_num, int8_t ignore_row, int8_t ignore_col)
 {
@@ -871,7 +873,7 @@ lxw_basename(const char *path)
  * Write the XML declaration.
  */
 STATIC void
-_worksheet_xml_declaration(lxw_worksheet *self)
+worksheet::_xml_declaration()
 {
     lxw_xml_declaration();
 }
@@ -880,7 +882,7 @@ _worksheet_xml_declaration(lxw_worksheet *self)
  * Write the <worksheet> element.
  */
 STATIC void
-_worksheet_write_worksheet(lxw_worksheet *self)
+worksheet::_write_worksheet()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -901,7 +903,7 @@ _worksheet_write_worksheet(lxw_worksheet *self)
  * Write the <dimension> element.
  */
 STATIC void
-_worksheet_write_dimension(lxw_worksheet *self)
+worksheet::_write_dimension()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -938,7 +940,7 @@ _worksheet_write_dimension(lxw_worksheet *self)
  * Write the <pane> element for freeze panes.
  */
 STATIC void
-_worksheet_write_freeze_panes(lxw_worksheet *self)
+worksheet::_write_freeze_panes()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1054,7 +1056,7 @@ _worksheet_write_freeze_panes(lxw_worksheet *self)
  * Convert column width from user units to pane split width.
  */
 STATIC uint32_t
-_worksheet_calculate_x_split_width(double x_split)
+worksheet::_calculate_x_split_width(double x_split)
 {
     uint32_t width;
     uint32_t pixels;
@@ -1087,7 +1089,7 @@ _worksheet_calculate_x_split_width(double x_split)
  * Write the <pane> element for split panes.
  */
 STATIC void
-_worksheet_write_split_panes(lxw_worksheet *self)
+worksheet::_write_split_panes()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1226,7 +1228,7 @@ _worksheet_write_split_panes(lxw_worksheet *self)
  * Write the <selection> element.
  */
 STATIC void
-_worksheet_write_selection(lxw_worksheet *self, lxw_selection *selection)
+worksheet::_write_selection(lxw_selection *selection)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1251,7 +1253,7 @@ _worksheet_write_selection(lxw_worksheet *self, lxw_selection *selection)
  * Write the <selection> elements.
  */
 STATIC void
-_worksheet_write_selections(lxw_worksheet *self)
+worksheet::_write_selections()
 {
     lxw_selection *selection;
 
@@ -1264,26 +1266,26 @@ _worksheet_write_selections(lxw_worksheet *self)
  * Write the frozen or split <pane> elements.
  */
 STATIC void
-_worksheet_write_panes(lxw_worksheet *self)
+worksheet::_write_panes()
 {
     if (self->panes.type == NO_PANES)
         return;
 
     else if (self->panes.type == FREEZE_PANES)
-        _worksheet_write_freeze_panes(self);
+        _worksheet_write_freeze_panes();
 
     else if (self->panes.type == FREEZE_SPLIT_PANES)
-        _worksheet_write_freeze_panes(self);
+        _worksheet_write_freeze_panes();
 
     else if (self->panes.type == SPLIT_PANES)
-        _worksheet_write_split_panes(self);
+        _worksheet_write_split_panes();
 }
 
 /*
  * Write the <sheetView> element.
  */
 STATIC void
-_worksheet_write_sheet_view(lxw_worksheet *self)
+worksheet::_write_sheet_view()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1331,8 +1333,8 @@ _worksheet_write_sheet_view(lxw_worksheet *self)
 
     if (self->panes.type != NO_PANES || !STAILQ_EMPTY(self->selections)) {
         lxw_xml_start_tag("sheetView", &attributes);
-        _worksheet_write_panes(self);
-        _worksheet_write_selections(self);
+        _worksheet_write_panes();
+        _worksheet_write_selections();
         lxw_xml_end_tag("sheetView");
     }
     else {
@@ -1346,12 +1348,12 @@ _worksheet_write_sheet_view(lxw_worksheet *self)
  * Write the <sheetViews> element.
  */
 STATIC void
-_worksheet_write_sheet_views(lxw_worksheet *self)
+worksheet::_write_sheet_views()
 {
     lxw_xml_start_tag("sheetViews", NULL);
 
     /* Write the sheetView element. */
-    _worksheet_write_sheet_view(self);
+    _worksheet_write_sheet_view();
 
     lxw_xml_end_tag("sheetViews");
 }
@@ -1360,7 +1362,7 @@ _worksheet_write_sheet_views(lxw_worksheet *self)
  * Write the <sheetFormatPr> element.
  */
 STATIC void
-_worksheet_write_sheet_format_pr(lxw_worksheet *self)
+worksheet::_write_sheet_format_pr()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1383,14 +1385,14 @@ _worksheet_write_sheet_format_pr(lxw_worksheet *self)
  * Write the <sheetData> element.
  */
 STATIC void
-_worksheet_write_sheet_data(lxw_worksheet *self)
+worksheet::_write_sheet_data()
 {
     if (RB_EMPTY(self->table)) {
         lxw_xml_empty_tag("sheetData", NULL);
     }
     else {
         lxw_xml_start_tag("sheetData", NULL);
-        _worksheet_write_rows(self);
+        _worksheet_write_rows();
         lxw_xml_end_tag("sheetData");
     }
 }
@@ -1401,7 +1403,7 @@ _worksheet_write_sheet_data(lxw_worksheet *self)
  * sheet file.
  */
 STATIC void
-_worksheet_write_optimized_sheet_data(lxw_worksheet *self)
+worksheet::_write_optimized_sheet_data()
 {
     size_t read_size = 1;
     char buffer[LXW_BUFFER_SIZE];
@@ -1434,7 +1436,7 @@ _worksheet_write_optimized_sheet_data(lxw_worksheet *self)
  * Write the <pageMargins> element.
  */
 STATIC void
-_worksheet_write_page_margins(lxw_worksheet *self)
+worksheet::_write_page_margins()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1476,7 +1478,7 @@ _worksheet_write_page_margins(lxw_worksheet *self)
  * />
  */
 STATIC void
-_worksheet_write_page_setup(lxw_worksheet *self)
+worksheet::_write_page_setup()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1535,7 +1537,7 @@ _worksheet_write_page_setup(lxw_worksheet *self)
  * Write the <printOptions> element.
  */
 STATIC void
-_worksheet_write_print_options(lxw_worksheet *self)
+worksheet::_write_print_options()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1573,7 +1575,7 @@ _worksheet_write_print_options(lxw_worksheet *self)
  * Write the <row> element.
  */
 STATIC void
-_write_row(lxw_worksheet *self, lxw_row *row, char *spans)
+_write_row(lxw_row *row, char *spans)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1627,7 +1629,7 @@ _write_row(lxw_worksheet *self, lxw_row *row, char *spans)
  * we use the default value. If the column is hidden it has a value of zero.
  */
 STATIC int32_t
-_worksheet_size_col(lxw_worksheet *self, lxw_col_t col_num)
+worksheet::_size_col(lxw_col_t col_num)
 {
     lxw_col_options *col_opt = NULL;
     uint32_t pixels;
@@ -1677,7 +1679,7 @@ _worksheet_size_col(lxw_worksheet *self, lxw_col_t col_num)
  * it has a value of zero.
  */
 STATIC int32_t
-_worksheet_size_row(lxw_worksheet *self, lxw_row_t row_num)
+worksheet::_size_row(lxw_row_t row_num)
 {
     lxw_row *row;
     uint32_t pixels;
@@ -1736,7 +1738,7 @@ _worksheet_size_row(lxw_worksheet *self, lxw_row_t row_num)
  * underlying cells.
  */
 STATIC void
-_worksheet_position_object_pixels(lxw_worksheet *self,
+worksheet::_position_object_pixels(
                                   lxw_image_options *image,
                                   lxw_drawing_object *drawing_object)
 {
@@ -1867,7 +1869,7 @@ _worksheet_position_object_pixels(lxw_worksheet *self,
  * Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
  */
 STATIC void
-_worksheet_position_object_emus(lxw_worksheet *self,
+worksheet::_position_object_emus(
                                 lxw_image_options *image,
                                 lxw_drawing_object *drawing_object)
 {
@@ -1889,7 +1891,7 @@ _worksheet_position_object_emus(lxw_worksheet *self,
  * Set up image/drawings.
  */
 void
-lxw_worksheet_prepare_image(lxw_worksheet *self,
+lxw_worksheet_prepare_image(
                             uint16_t image_ref_id, uint16_t drawing_id,
                             lxw_image_options *image_data)
 {
@@ -1976,7 +1978,7 @@ mem_error:
  * Set up chart/drawings.
  */
 void
-lxw_worksheet_prepare_chart(lxw_worksheet *self,
+lxw_worksheet_prepare_chart(
                             uint16_t chart_ref_id, uint16_t drawing_id,
                             lxw_image_options *image_data)
 {
@@ -2370,7 +2372,7 @@ _get_image_properties(lxw_image_options *image_options)
  * optimization in the inner cell writing loop.
  */
 STATIC void
-_write_number_cell(lxw_worksheet *self, char *range,
+_write_number_cell(char *range,
                    int32_t style_index, lxw_cell *cell)
 {
     if (style_index)
@@ -2387,7 +2389,7 @@ _write_number_cell(lxw_worksheet *self, char *range,
  * optimization in the inner cell writing loop.
  */
 STATIC void
-_write_string_cell(lxw_worksheet *self, char *range,
+_write_string_cell(char *range,
                    int32_t style_index, lxw_cell *cell)
 {
     if (style_index)
@@ -2405,7 +2407,7 @@ _write_string_cell(lxw_worksheet *self, char *range,
  * optimization in the inner cell writing loop.
  */
 STATIC void
-_write_inline_string_cell(lxw_worksheet *self, char *range,
+_write_inline_string_cell(char *range,
                           int32_t style_index, lxw_cell *cell)
 {
     char *string = lxw_escape_data(cell->u.string);
@@ -2443,7 +2445,7 @@ _write_inline_string_cell(lxw_worksheet *self, char *range,
  * Write out a formula worksheet cell with a numeric result.
  */
 STATIC void
-_write_formula_num_cell(lxw_worksheet *self, lxw_cell *cell)
+_write_formula_num_cell(lxw_cell *cell)
 {
     char data[LXW_ATTR_32];
 
@@ -2457,7 +2459,7 @@ _write_formula_num_cell(lxw_worksheet *self, lxw_cell *cell)
  * Write out an array formula worksheet cell with a numeric result.
  */
 STATIC void
-_write_array_formula_num_cell(lxw_worksheet *self, lxw_cell *cell)
+_write_array_formula_num_cell(lxw_cell *cell)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2479,7 +2481,7 @@ _write_array_formula_num_cell(lxw_worksheet *self, lxw_cell *cell)
  * Write out a boolean worksheet cell.
  */
 STATIC void
-_write_boolean_cell(lxw_worksheet *self, lxw_cell *cell)
+_write_boolean_cell(lxw_cell *cell)
 {
     char data[LXW_ATTR_32];
 
@@ -2535,7 +2537,7 @@ _calculate_spans(struct lxw_row *row, char *span, int32_t *block_num)
  * Write out a generic worksheet cell.
  */
 STATIC void
-_write_cell(lxw_worksheet *self, lxw_cell *cell, lxw_format *row_format)
+_write_cell(lxw_cell *cell, lxw_format *row_format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2606,7 +2608,7 @@ _write_cell(lxw_worksheet *self, lxw_cell *cell, lxw_format *row_format)
  * Write out the worksheet data as a series of rows and cells.
  */
 STATIC void
-_worksheet_write_rows(lxw_worksheet *self)
+worksheet::_write_rows()
 {
     lxw_row *row;
     lxw_cell *cell;
@@ -2646,7 +2648,7 @@ _worksheet_write_rows(lxw_worksheet *self)
  * time. We don't write span data in the optimized case since it is optional.
  */
 void
-lxw_worksheet_write_single_row(lxw_worksheet *self)
+lxw_worksheet_write_single_row()
 {
     lxw_row *row = self->optimize_row;
     lxw_col_t col;
@@ -2689,7 +2691,7 @@ lxw_worksheet_write_single_row(lxw_worksheet *self)
  * Write the <col> element.
  */
 STATIC void
-_worksheet_write_col_info(lxw_worksheet *self, lxw_col_options *options)
+worksheet::_write_col_info(lxw_col_options *options)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2759,7 +2761,7 @@ _worksheet_write_col_info(lxw_worksheet *self, lxw_col_options *options)
  * Write the <cols> element and <col> sub elements.
  */
 STATIC void
-_worksheet_write_cols(lxw_worksheet *self)
+worksheet::_write_cols()
 {
     lxw_col_t col;
 
@@ -2780,7 +2782,7 @@ _worksheet_write_cols(lxw_worksheet *self)
  * Write the <mergeCell> element.
  */
 STATIC void
-_worksheet_write_merge_cell(lxw_worksheet *self,
+worksheet::_write_merge_cell(
                             lxw_merged_range *merged_range)
 {
 
@@ -2805,7 +2807,7 @@ _worksheet_write_merge_cell(lxw_worksheet *self,
  * Write the <mergeCells> element.
  */
 STATIC void
-_worksheet_write_merge_cells(lxw_worksheet *self)
+worksheet::_write_merge_cells()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2831,7 +2833,7 @@ _worksheet_write_merge_cells(lxw_worksheet *self)
  * Write the <oddHeader> element.
  */
 STATIC void
-_worksheet_write_odd_header(lxw_worksheet *self)
+worksheet::_write_odd_header()
 {
     lxw_xml_data_element("oddHeader", self->header, NULL);
 }
@@ -2840,7 +2842,7 @@ _worksheet_write_odd_header(lxw_worksheet *self)
  * Write the <oddFooter> element.
  */
 STATIC void
-_worksheet_write_odd_footer(lxw_worksheet *self)
+worksheet::_write_odd_footer()
 {
     lxw_xml_data_element("oddFooter", self->footer, NULL);
 }
@@ -2849,7 +2851,7 @@ _worksheet_write_odd_footer(lxw_worksheet *self)
  * Write the <headerFooter> element.
  */
 STATIC void
-_worksheet_write_header_footer(lxw_worksheet *self)
+worksheet::_write_header_footer()
 {
     if (!self->header_footer_changed)
         return;
@@ -2857,10 +2859,10 @@ _worksheet_write_header_footer(lxw_worksheet *self)
     lxw_xml_start_tag("headerFooter", NULL);
 
     if (self->header[0] != '\0')
-        _worksheet_write_odd_header(self);
+        _worksheet_write_odd_header();
 
     if (self->footer[0] != '\0')
-        _worksheet_write_odd_footer(self);
+        _worksheet_write_odd_footer();
 
     lxw_xml_end_tag("headerFooter");
 }
@@ -2869,7 +2871,7 @@ _worksheet_write_header_footer(lxw_worksheet *self)
  * Write the <pageSetUpPr> element.
  */
 STATIC void
-_worksheet_write_page_set_up_pr(lxw_worksheet *self)
+worksheet::_write_page_set_up_pr()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2890,7 +2892,7 @@ _worksheet_write_page_set_up_pr(lxw_worksheet *self)
  * Write the <tabColor> element.
  */
 STATIC void
-_worksheet_write_tab_color(lxw_worksheet *self)
+worksheet::_write_tab_color()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2914,7 +2916,7 @@ _worksheet_write_tab_color(lxw_worksheet *self)
  * Write the <sheetPr> element for Sheet level properties.
  */
 STATIC void
-_worksheet_write_sheet_pr(lxw_worksheet *self)
+worksheet::_write_sheet_pr()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2937,9 +2939,9 @@ _worksheet_write_sheet_pr(lxw_worksheet *self)
     if (self->fit_page || self->tab_color != LXW_COLOR_UNSET
         || self->outline_changed) {
         lxw_xml_start_tag("sheetPr", &attributes);
-        _worksheet_write_tab_color(self);
-        /* _worksheet_write_outline_pr(self); */
-        _worksheet_write_page_set_up_pr(self);
+        _worksheet_write_tab_color();
+        /* _worksheet_write_outline_pr(); */
+        _worksheet_write_page_set_up_pr();
         lxw_xml_end_tag("sheetPr");
     }
     else {
@@ -2954,7 +2956,7 @@ _worksheet_write_sheet_pr(lxw_worksheet *self)
  * Write the <brk> element.
  */
 STATIC void
-_worksheet_write_brk(lxw_worksheet *self, uint32_t id, uint32_t max)
+worksheet::_write_brk(uint32_t id, uint32_t max)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -2973,7 +2975,7 @@ _worksheet_write_brk(lxw_worksheet *self, uint32_t id, uint32_t max)
  * Write the <rowBreaks> element.
  */
 STATIC void
-_worksheet_write_row_breaks(lxw_worksheet *self)
+worksheet::_write_row_breaks()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -3001,7 +3003,7 @@ _worksheet_write_row_breaks(lxw_worksheet *self)
  * Write the <colBreaks> element.
  */
 STATIC void
-_worksheet_write_col_breaks(lxw_worksheet *self)
+worksheet::_write_col_breaks()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -3029,7 +3031,7 @@ _worksheet_write_col_breaks(lxw_worksheet *self)
  * Write the <autoFilter> element.
  */
 STATIC void
-_worksheet_write_auto_filter(lxw_worksheet *self)
+worksheet::_write_auto_filter()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -3055,7 +3057,7 @@ _worksheet_write_auto_filter(lxw_worksheet *self)
  * Write the <hyperlink> element for external links.
  */
 STATIC void
-_worksheet_write_hyperlink_external(lxw_worksheet *self, lxw_row_t row_num,
+worksheet::_write_hyperlink_external(lxw_row_t row_num,
                                     lxw_col_t col_num, const char *location,
                                     const char *tooltip, uint16_t id)
 {
@@ -3087,7 +3089,7 @@ _worksheet_write_hyperlink_external(lxw_worksheet *self, lxw_row_t row_num,
  * Write the <hyperlink> element for internal links.
  */
 STATIC void
-_worksheet_write_hyperlink_internal(lxw_worksheet *self, lxw_row_t row_num,
+worksheet::_write_hyperlink_internal(lxw_row_t row_num,
                                     lxw_col_t col_num, const char *location,
                                     const char *display, const char *tooltip)
 {
@@ -3119,7 +3121,7 @@ _worksheet_write_hyperlink_internal(lxw_worksheet *self, lxw_row_t row_num,
  * element. The attributes are different for internal and external links.
  */
 STATIC void
-_worksheet_write_hyperlinks(lxw_worksheet *self)
+worksheet::_write_hyperlinks()
 {
 
     lxw_row *row;
@@ -3193,7 +3195,7 @@ mem_error:
  * Write the <sheetProtection> element.
  */
 STATIC void
-_worksheet_write_sheet_protection(lxw_worksheet *self)
+worksheet::_write_sheet_protection()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -3268,7 +3270,7 @@ _worksheet_write_sheet_protection(lxw_worksheet *self)
  * Write the <drawing> element.
  */
 STATIC void
-_write_drawing(lxw_worksheet *self, uint16_t id)
+_write_drawing(uint16_t id)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -3290,7 +3292,7 @@ _write_drawing(lxw_worksheet *self, uint16_t id)
  * Write the <drawing> elements.
  */
 STATIC void
-_write_drawings(lxw_worksheet *self)
+_write_drawings()
 {
     if (!self->drawing)
         return;
@@ -3303,68 +3305,67 @@ _write_drawings(lxw_worksheet *self)
 /*
  * Assemble and write the XML file.
  */
-void
-lxw_worksheet_assemble_xml_file(lxw_worksheet *self)
+void worksheet::assemble_xml_file()
 {
     /* Write the XML declaration. */
-    _worksheet_xml_declaration(self);
+    _worksheet_xml_declaration();
 
     /* Write the worksheet element. */
-    _worksheet_write_worksheet(self);
+    _worksheet_write_worksheet();
 
     /* Write the worksheet properties. */
-    _worksheet_write_sheet_pr(self);
+    _worksheet_write_sheet_pr();
 
     /* Write the worksheet dimensions. */
-    _worksheet_write_dimension(self);
+    _worksheet_write_dimension();
 
     /* Write the sheet view properties. */
-    _worksheet_write_sheet_views(self);
+    _worksheet_write_sheet_views();
 
     /* Write the sheet format properties. */
-    _worksheet_write_sheet_format_pr(self);
+    _worksheet_write_sheet_format_pr();
 
     /* Write the sheet column info. */
-    _worksheet_write_cols(self);
+    _worksheet_write_cols();
 
     /* Write the sheetData element. */
     if (!self->optimize)
-        _worksheet_write_sheet_data(self);
+        _worksheet_write_sheet_data();
     else
-        _worksheet_write_optimized_sheet_data(self);
+        _worksheet_write_optimized_sheet_data();
 
     /* Write the sheetProtection element. */
-    _worksheet_write_sheet_protection(self);
+    _worksheet_write_sheet_protection();
 
     /* Write the autoFilter element. */
-    _worksheet_write_auto_filter(self);
+    _worksheet_write_auto_filter();
 
     /* Write the mergeCells element. */
-    _worksheet_write_merge_cells(self);
+    _worksheet_write_merge_cells();
 
     /* Write the hyperlink element. */
-    _worksheet_write_hyperlinks(self);
+    _worksheet_write_hyperlinks();
 
     /* Write the printOptions element. */
-    _worksheet_write_print_options(self);
+    _worksheet_write_print_options();
 
     /* Write the worksheet page_margins. */
-    _worksheet_write_page_margins(self);
+    _worksheet_write_page_margins();
 
     /* Write the worksheet page setup. */
-    _worksheet_write_page_setup(self);
+    _worksheet_write_page_setup();
 
     /* Write the headerFooter element. */
-    _worksheet_write_header_footer(self);
+    _worksheet_write_header_footer();
 
     /* Write the rowBreaks element. */
-    _worksheet_write_row_breaks(self);
+    _worksheet_write_row_breaks();
 
     /* Write the colBreaks element. */
-    _worksheet_write_col_breaks(self);
+    _worksheet_write_col_breaks();
 
     /* Write the drawing element. */
-    _write_drawings(self);
+    _write_drawings();
 
     /* Close the worksheet tag. */
     lxw_xml_end_tag("worksheet");
@@ -3380,8 +3381,7 @@ lxw_worksheet_assemble_xml_file(lxw_worksheet *self)
  * Write a number to a cell in Excel.
  */
 lxw_error
-worksheet_write_number(lxw_worksheet *self,
-                       lxw_row_t row_num,
+worksheet::write_number(lxw_row_t row_num,
                        lxw_col_t col_num, double value, lxw_format *format)
 {
     lxw_cell *cell;
@@ -3402,8 +3402,7 @@ worksheet_write_number(lxw_worksheet *self,
  * Write a string to an Excel file.
  */
 lxw_error
-worksheet_write_string(lxw_worksheet *self,
-                       lxw_row_t row_num,
+worksheet::write_string(lxw_row_t row_num,
                        lxw_col_t col_num, const char *string,
                        lxw_format *format)
 {
@@ -3461,12 +3460,11 @@ worksheet_write_string(lxw_worksheet *self,
 /*
  * Write a formula with a numerical result to a cell in Excel.
  */
-lxw_error
-worksheet_write_formula_num(lxw_worksheet *self,
-                            lxw_row_t row_num,
-                            lxw_col_t col_num,
-                            const char *formula,
-                            lxw_format *format, double result)
+lxw_error worksheet::write_formula_num(
+        lxw_row_t row_num,
+        lxw_col_t col_num,
+        const std::string& formula,
+        const format_ptr& format, double result)
 {
     lxw_cell *cell;
     char *formula_copy;
@@ -3497,26 +3495,26 @@ worksheet_write_formula_num(lxw_worksheet *self,
  * Write a formula with a default result to a cell in Excel .
  */
 lxw_error
-worksheet_write_formula(lxw_worksheet *self,
-                        lxw_row_t row_num,
-                        lxw_col_t col_num, const char *formula,
-                        lxw_format *format)
+worksheet::write_formula(
+        lxw_row_t row_num,
+        lxw_col_t col_num,
+        const std::string& formula,
+        const format_ptr& format)
 {
-    return worksheet_write_formula_num(self, row_num, col_num, formula,
-                                       format, 0);
+    return write_formula_num(row_num, col_num, formula, format, 0);
 }
 
 /*
  * Write a formula with a numerical result to a cell in Excel.
  */
 lxw_error
-worksheet_write_array_formula_num(lxw_worksheet *self,
-                                  lxw_row_t first_row,
-                                  lxw_col_t first_col,
-                                  lxw_row_t last_row,
-                                  lxw_col_t last_col,
-                                  const char *formula,
-                                  lxw_format *format, double result)
+worksheet::write_array_formula_num(
+        lxw_row_t first_row,
+        lxw_col_t first_col,
+        lxw_row_t last_row,
+        lxw_col_t last_col,
+        const std::string& formula,
+        const format_ptr format, double result)
 {
     lxw_cell *cell;
     lxw_row_t tmp_row;
@@ -3594,7 +3592,7 @@ worksheet_write_array_formula_num(lxw_worksheet *self,
  * Write an array formula with a default result to a cell in Excel .
  */
 lxw_error
-worksheet_write_array_formula(lxw_worksheet *self,
+worksheet::write_array_formula(
                               lxw_row_t first_row,
                               lxw_col_t first_col,
                               lxw_row_t last_row,
@@ -3610,7 +3608,7 @@ worksheet_write_array_formula(lxw_worksheet *self,
  * Write a blank cell with a format to a cell in Excel.
  */
 lxw_error
-worksheet_write_blank(lxw_worksheet *self,
+worksheet::write_blank(
                       lxw_row_t row_num, lxw_col_t col_num,
                       lxw_format *format)
 {
@@ -3636,7 +3634,7 @@ worksheet_write_blank(lxw_worksheet *self,
  * Write a boolean cell with a format to a cell in Excel.
  */
 lxw_error
-worksheet_write_boolean(lxw_worksheet *self,
+worksheet::write_boolean(
                         lxw_row_t row_num, lxw_col_t col_num,
                         int value, lxw_format *format)
 {
@@ -3659,7 +3657,7 @@ worksheet_write_boolean(lxw_worksheet *self,
  * Write a date and or time to a cell in Excel.
  */
 lxw_error
-worksheet_write_datetime(lxw_worksheet *self,
+worksheet::write_datetime(
                          lxw_row_t row_num,
                          lxw_col_t col_num, lxw_datetime *datetime,
                          lxw_format *format)
@@ -3685,7 +3683,7 @@ worksheet_write_datetime(lxw_worksheet *self,
  * Write a hyperlink/url to an Excel file.
  */
 lxw_error
-worksheet_write_url_opt(lxw_worksheet *self,
+worksheet::write_url_opt(
                         lxw_row_t row_num,
                         lxw_col_t col_num, const char *url,
                         lxw_format *format, const char *string,
@@ -3898,7 +3896,7 @@ mem_error:
  * Write a hyperlink/url to an Excel file.
  */
 lxw_error
-worksheet_write_url(lxw_worksheet *self,
+worksheet::write_url(
                     lxw_row_t row_num,
                     lxw_col_t col_num, const char *url, lxw_format *format)
 {
@@ -3910,7 +3908,7 @@ worksheet_write_url(lxw_worksheet *self,
  * Set the properties of a single column or a range of columns with options.
  */
 lxw_error
-worksheet_set_column_opt(lxw_worksheet *self,
+worksheet::set_column_opt(
                          lxw_col_t firstcol,
                          lxw_col_t lastcol,
                          double width,
@@ -4023,7 +4021,7 @@ worksheet_set_column_opt(lxw_worksheet *self,
  * Set the properties of a single column or a range of columns.
  */
 lxw_error
-worksheet_set_column(lxw_worksheet *self,
+worksheet::set_column(
                      lxw_col_t firstcol,
                      lxw_col_t lastcol, double width, lxw_format *format)
 {
@@ -4035,7 +4033,7 @@ worksheet_set_column(lxw_worksheet *self,
  * Set the properties of a row with options.
  */
 lxw_error
-worksheet_set_row_opt(lxw_worksheet *self,
+worksheet::set_row_opt(
                       lxw_row_t row_num,
                       double height,
                       lxw_format *format, lxw_row_col_options *user_options)
@@ -4089,7 +4087,7 @@ worksheet_set_row_opt(lxw_worksheet *self,
  * Set the properties of a row.
  */
 lxw_error
-worksheet_set_row(lxw_worksheet *self,
+worksheet::set_row(
                   lxw_row_t row_num, double height, lxw_format *format)
 {
     return worksheet_set_row_opt(self, row_num, height, format, NULL);
@@ -4100,7 +4098,7 @@ worksheet_set_row(lxw_worksheet *self,
  * should be blank. All cells should contain the same format.
  */
 lxw_error
-worksheet_merge_range(lxw_worksheet *self, lxw_row_t first_row,
+worksheet::merge_range(lxw_row_t first_row,
                       lxw_col_t first_col, lxw_row_t last_row,
                       lxw_col_t last_col, const char *string,
                       lxw_format *format)
@@ -4163,7 +4161,7 @@ worksheet_merge_range(lxw_worksheet *self, lxw_row_t first_row,
  * Set the autofilter area in the worksheet.
  */
 lxw_error
-worksheet_autofilter(lxw_worksheet *self, lxw_row_t first_row,
+worksheet::autofilter(lxw_row_t first_row,
                      lxw_col_t first_col, lxw_row_t last_row,
                      lxw_col_t last_col)
 {
@@ -4206,7 +4204,7 @@ worksheet_autofilter(lxw_worksheet *self, lxw_row_t first_row,
  * highlighted.
  */
 void
-worksheet_select(lxw_worksheet *self)
+worksheet::select()
 {
     self->selected = true;
 
@@ -4219,7 +4217,7 @@ worksheet_select(lxw_worksheet *self)
  * displayed when the workbook is opened. Also set it as selected.
  */
 void
-worksheet_activate(lxw_worksheet *self)
+worksheet::activate()
 {
     self->selected = true;
     self->active = true;
@@ -4236,7 +4234,7 @@ worksheet_activate(lxw_worksheet *self)
  * worksheet is not visible on the screen.
  */
 void
-worksheet_set_first_sheet(lxw_worksheet *self)
+worksheet::set_first_sheet()
 {
     /* Active worksheet can't be hidden. */
     self->hidden = false;
@@ -4248,7 +4246,7 @@ worksheet_set_first_sheet(lxw_worksheet *self)
  * Hide this worksheet.
  */
 void
-worksheet_hide(lxw_worksheet *self)
+worksheet::hide()
 {
     self->hidden = true;
 
@@ -4267,7 +4265,7 @@ worksheet_hide(lxw_worksheet *self)
  * Set which cell or cells are selected in a worksheet.
  */
 void
-worksheet_set_selection(lxw_worksheet *self,
+worksheet::set_selection(
                         lxw_row_t first_row, lxw_col_t first_col,
                         lxw_row_t last_row, lxw_col_t last_col)
 {
@@ -4322,7 +4320,7 @@ worksheet_set_selection(lxw_worksheet *self,
  * Set panes and mark them as frozen. With extra options.
  */
 void
-worksheet_freeze_panes_opt(lxw_worksheet *self,
+worksheet::freeze_panes_opt(
                            lxw_row_t first_row, lxw_col_t first_col,
                            lxw_row_t top_row, lxw_col_t left_col,
                            uint8_t type)
@@ -4344,7 +4342,7 @@ worksheet_freeze_panes_opt(lxw_worksheet *self,
  * Set panes and mark them as frozen.
  */
 void
-worksheet_freeze_panes(lxw_worksheet *self,
+worksheet::freeze_panes(
                        lxw_row_t first_row, lxw_col_t first_col)
 {
     worksheet_freeze_panes_opt(self, first_row, first_col,
@@ -4355,7 +4353,7 @@ worksheet_freeze_panes(lxw_worksheet *self,
  * Set panes and mark them as split.With extra options.
  */
 void
-worksheet_split_panes_opt(lxw_worksheet *self,
+worksheet::split_panes_opt(
                           double y_split, double x_split,
                           lxw_row_t top_row, lxw_col_t left_col)
 {
@@ -4372,7 +4370,7 @@ worksheet_split_panes_opt(lxw_worksheet *self,
  * Set panes and mark them as split.
  */
 void
-worksheet_split_panes(lxw_worksheet *self, double y_split, double x_split)
+worksheet::split_panes(double y_split, double x_split)
 {
     worksheet_split_panes_opt(self, y_split, x_split, 0, 0);
 }
@@ -4381,7 +4379,7 @@ worksheet_split_panes(lxw_worksheet *self, double y_split, double x_split)
  * Set the page orientation as portrait.
  */
 void
-worksheet_set_portrait(lxw_worksheet *self)
+worksheet::set_portrait()
 {
     self->orientation = LXW_PORTRAIT;
     self->page_setup_changed = true;
@@ -4391,7 +4389,7 @@ worksheet_set_portrait(lxw_worksheet *self)
  * Set the page orientation as landscape.
  */
 void
-worksheet_set_landscape(lxw_worksheet *self)
+worksheet::set_landscape()
 {
     self->orientation = LXW_LANDSCAPE;
     self->page_setup_changed = true;
@@ -4401,7 +4399,7 @@ worksheet_set_landscape(lxw_worksheet *self)
  * Set the page view mode for Mac Excel.
  */
 void
-worksheet_set_page_view(lxw_worksheet *self)
+worksheet::set_page_view()
 {
     self->page_view = true;
 }
@@ -4410,7 +4408,7 @@ worksheet_set_page_view(lxw_worksheet *self)
  * Set the paper type. Example. 1 = US Letter, 9 = A4
  */
 void
-worksheet_set_paper(lxw_worksheet *self, uint8_t paper_size)
+worksheet::set_paper(uint8_t paper_size)
 {
     self->paper_size = paper_size;
     self->page_setup_changed = true;
@@ -4420,7 +4418,7 @@ worksheet_set_paper(lxw_worksheet *self, uint8_t paper_size)
  * Set the order in which pages are printed.
  */
 void
-worksheet_print_across(lxw_worksheet *self)
+worksheet::print_across()
 {
     self->page_order = LXW_PRINT_ACROSS;
     self->page_setup_changed = true;
@@ -4430,7 +4428,7 @@ worksheet_print_across(lxw_worksheet *self)
  * Set all the page margins in inches.
  */
 void
-worksheet_set_margins(lxw_worksheet *self, double left, double right,
+worksheet::set_margins(double left, double right,
                       double top, double bottom)
 {
 
@@ -4451,7 +4449,7 @@ worksheet_set_margins(lxw_worksheet *self, double left, double right,
  * Set the page header caption and options.
  */
 lxw_error
-worksheet_set_header_opt(lxw_worksheet *self, const char *string,
+worksheet::set_header_opt(const char *string,
                          lxw_header_footer_options *options)
 {
     if (options) {
@@ -4475,7 +4473,7 @@ worksheet_set_header_opt(lxw_worksheet *self, const char *string,
  * Set the page footer caption and options.
  */
 lxw_error
-worksheet_set_footer_opt(lxw_worksheet *self, const char *string,
+worksheet::set_footer_opt(const char *string,
                          lxw_header_footer_options *options)
 {
     if (options) {
@@ -4499,7 +4497,7 @@ worksheet_set_footer_opt(lxw_worksheet *self, const char *string,
  * Set the page header caption.
  */
 lxw_error
-worksheet_set_header(lxw_worksheet *self, const char *string)
+worksheet::set_header(const char *string)
 {
     return worksheet_set_header_opt(self, string, NULL);
 }
@@ -4508,7 +4506,7 @@ worksheet_set_header(lxw_worksheet *self, const char *string)
  * Set the page footer caption.
  */
 lxw_error
-worksheet_set_footer(lxw_worksheet *self, const char *string)
+worksheet::set_footer(const char *string)
 {
     return worksheet_set_footer_opt(self, string, NULL);
 }
@@ -4517,7 +4515,7 @@ worksheet_set_footer(lxw_worksheet *self, const char *string)
  * Set the option to show/hide gridlines on the screen and the printed page.
  */
 void
-worksheet_gridlines(lxw_worksheet *self, uint8_t option)
+worksheet::gridlines(uint8_t option)
 {
     if (option == LXW_HIDE_ALL_GRIDLINES) {
         self->print_gridlines = 0;
@@ -4538,7 +4536,7 @@ worksheet_gridlines(lxw_worksheet *self, uint8_t option)
  * Center the page horizontally.
  */
 void
-worksheet_center_horizontally(lxw_worksheet *self)
+worksheet::center_horizontally()
 {
     self->print_options_changed = 1;
     self->hcenter = 1;
@@ -4548,7 +4546,7 @@ worksheet_center_horizontally(lxw_worksheet *self)
  * Center the page horizontally.
  */
 void
-worksheet_center_vertically(lxw_worksheet *self)
+worksheet::center_vertically()
 {
     self->print_options_changed = 1;
     self->vcenter = 1;
@@ -4558,7 +4556,7 @@ worksheet_center_vertically(lxw_worksheet *self)
  * Set the option to print the row and column headers on the printed page.
  */
 void
-worksheet_print_row_col_headers(lxw_worksheet *self)
+worksheet::print_row_col_headers()
 {
     self->print_headers = 1;
     self->print_options_changed = 1;
@@ -4568,7 +4566,7 @@ worksheet_print_row_col_headers(lxw_worksheet *self)
  * Set the rows to repeat at the top of each printed page.
  */
 lxw_error
-worksheet_repeat_rows(lxw_worksheet *self, lxw_row_t first_row,
+worksheet::repeat_rows(lxw_row_t first_row,
                       lxw_row_t last_row)
 {
     lxw_row_t tmp_row;
@@ -4595,7 +4593,7 @@ worksheet_repeat_rows(lxw_worksheet *self, lxw_row_t first_row,
  * Set the columns to repeat at the left hand side of each printed page.
  */
 lxw_error
-worksheet_repeat_columns(lxw_worksheet *self, lxw_col_t first_col,
+worksheet::repeat_columns(lxw_col_t first_col,
                          lxw_col_t last_col)
 {
     lxw_col_t tmp_col;
@@ -4622,7 +4620,7 @@ worksheet_repeat_columns(lxw_worksheet *self, lxw_col_t first_col,
  * Set the print area in the current worksheet.
  */
 lxw_error
-worksheet_print_area(lxw_worksheet *self, lxw_row_t first_row,
+worksheet::print_area(lxw_row_t first_row,
                      lxw_col_t first_col, lxw_row_t last_row,
                      lxw_col_t last_col)
 {
@@ -4665,7 +4663,7 @@ worksheet_print_area(lxw_worksheet *self, lxw_row_t first_row,
  * maximum area printed.
  */
 void
-worksheet_fit_to_pages(lxw_worksheet *self, uint16_t width, uint16_t height)
+worksheet::fit_to_pages(uint16_t width, uint16_t height)
 {
     self->fit_page = 1;
     self->fit_width = width;
@@ -4677,7 +4675,7 @@ worksheet_fit_to_pages(lxw_worksheet *self, uint16_t width, uint16_t height)
  * Set the start page number.
  */
 void
-worksheet_set_start_page(lxw_worksheet *self, uint16_t start_page)
+worksheet::set_start_page(uint16_t start_page)
 {
     self->page_start = start_page;
 }
@@ -4686,7 +4684,7 @@ worksheet_set_start_page(lxw_worksheet *self, uint16_t start_page)
  * Set the scale factor for the printed page.
  */
 void
-worksheet_set_print_scale(lxw_worksheet *self, uint16_t scale)
+worksheet::set_print_scale(uint16_t scale)
 {
     /* Confine the scale to Excel"s range */
     if (scale < 10 || scale > 400)
@@ -4703,7 +4701,7 @@ worksheet_set_print_scale(lxw_worksheet *self, uint16_t scale)
  * Store the horizontal page breaks on a worksheet.
  */
 lxw_error
-worksheet_set_h_pagebreaks(lxw_worksheet *self, lxw_row_t hbreaks[])
+worksheet::set_h_pagebreaks(lxw_row_t hbreaks[])
 {
     uint16_t count = 0;
 
@@ -4730,7 +4728,7 @@ worksheet_set_h_pagebreaks(lxw_worksheet *self, lxw_row_t hbreaks[])
  * Store the vertical page breaks on a worksheet.
  */
 lxw_error
-worksheet_set_v_pagebreaks(lxw_worksheet *self, lxw_col_t vbreaks[])
+worksheet::set_v_pagebreaks(lxw_col_t vbreaks[])
 {
     uint16_t count = 0;
 
@@ -4757,7 +4755,7 @@ worksheet_set_v_pagebreaks(lxw_worksheet *self, lxw_col_t vbreaks[])
  * Set the worksheet zoom factor.
  */
 void
-worksheet_set_zoom(lxw_worksheet *self, uint16_t scale)
+worksheet::set_zoom(uint16_t scale)
 {
     /* Confine the scale to Excel"s range */
     if (scale < 10 || scale > 400) {
@@ -4773,7 +4771,7 @@ worksheet_set_zoom(lxw_worksheet *self, uint16_t scale)
  * Hide cell zero values.
  */
 void
-worksheet_hide_zero(lxw_worksheet *self)
+worksheet::hide_zero()
 {
     self->show_zeros = false;
 }
@@ -4782,7 +4780,7 @@ worksheet_hide_zero(lxw_worksheet *self)
  * Display the worksheet right to left for some eastern versions of Excel.
  */
 void
-worksheet_right_to_left(lxw_worksheet *self)
+worksheet::right_to_left()
 {
     self->right_to_left = true;
 }
@@ -4791,7 +4789,7 @@ worksheet_right_to_left(lxw_worksheet *self)
  * Set the color of the worksheet tab.
  */
 void
-worksheet_set_tab_color(lxw_worksheet *self, lxw_color_t color)
+worksheet::set_tab_color(lxw_color_t color)
 {
     self->tab_color = color;
 }
@@ -4801,7 +4799,7 @@ worksheet_set_tab_color(lxw_worksheet *self, lxw_color_t color)
  * objects.
  */
 void
-worksheet_protect(lxw_worksheet *self, const char *password,
+worksheet::protect(const char *password,
                   lxw_protection *options)
 {
     struct lxw_protection *protect = &self->protection;
@@ -4825,7 +4823,7 @@ worksheet_protect(lxw_worksheet *self, const char *password,
  * Set the default row properties
  */
 void
-worksheet_set_default_row(lxw_worksheet *self, double height,
+worksheet::set_default_row(double height,
                           uint8_t hide_unused_rows)
 {
     if (height < 0)
@@ -4846,7 +4844,7 @@ worksheet_set_default_row(lxw_worksheet *self, double height,
  * Insert an image into the worksheet.
  */
 lxw_error
-worksheet_insert_image_opt(lxw_worksheet *self,
+worksheet::insert_image_opt(
                            lxw_row_t row_num, lxw_col_t col_num,
                            const char *filename,
                            lxw_image_options *user_options)
@@ -4915,7 +4913,7 @@ worksheet_insert_image_opt(lxw_worksheet *self,
  * Insert an image into the worksheet.
  */
 lxw_error
-worksheet_insert_image(lxw_worksheet *self,
+worksheet::insert_image(
                        lxw_row_t row_num, lxw_col_t col_num,
                        const char *filename)
 {
@@ -4926,7 +4924,7 @@ worksheet_insert_image(lxw_worksheet *self,
  * Insert an chart into the worksheet.
  */
 lxw_error
-worksheet_insert_chart_opt(lxw_worksheet *self,
+worksheet::insert_chart_opt(
                            lxw_row_t row_num, lxw_col_t col_num,
                            lxw_chart *chart, lxw_image_options *user_options)
 {
@@ -4999,8 +4997,10 @@ worksheet_insert_chart_opt(lxw_worksheet *self,
  * Insert an image into the worksheet.
  */
 lxw_error
-worksheet_insert_chart(lxw_worksheet *self,
+worksheet::insert_chart(
                        lxw_row_t row_num, lxw_col_t col_num, lxw_chart *chart)
 {
     return worksheet_insert_chart_opt(self, row_num, col_num, chart, NULL);
+}
+
 }

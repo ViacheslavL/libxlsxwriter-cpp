@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "xlsxwriter/xmlwriter.h"
+#include "xmlwriter.hpp"
+#include <list>
 
 #define LXW_AMP  "&amp;"
 #define LXW_LT   "&lt;"
@@ -34,7 +35,7 @@ void xlsxwriter::lxw_xml_declaration()
 /*
  * Write an XML start tag with optional attributes.
  */
-void xlsxwriter::lxw_xml_start_tag(const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_start_tag(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
     fprintf(file, "<%s", tag);
 
@@ -47,7 +48,7 @@ void xlsxwriter::lxw_xml_start_tag(const char *tag, struct xml_attribute_list *a
  * Write an XML start tag with optional, unencoded, attributes.
  * This is a minor speed optimization for elements that don't need encoding.
  */
-void xlsxwriter::lxw_xml_start_tag_unencoded(const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_start_tag_unencoded(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
     struct xml_attribute *attribute;
 
@@ -73,7 +74,7 @@ void xlsxwriter::lxw_xml_end_tag(const char *tag)
 /*
  * Write an empty XML tag with optional attributes.
  */
-void xlsxwriter::lxw_xml_empty_tag(const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_empty_tag(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
     fprintf(file, "<%s", tag);
 
@@ -86,7 +87,7 @@ void xlsxwriter::lxw_xml_empty_tag(const char *tag, struct xml_attribute_list *a
  * Write an XML start tag with optional, unencoded, attributes.
  * This is a minor speed optimization for elements that don't need encoding.
  */
-void xlsxwriter::lxw_xml_empty_tag_unencoded(const char *tag, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_empty_tag_unencoded(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
     struct xml_attribute *attribute;
 
@@ -104,7 +105,7 @@ void xlsxwriter::lxw_xml_empty_tag_unencoded(const char *tag, struct xml_attribu
 /*
  * Write an XML element containing data with optional attributes.
  */
-void xlsxwriter::lxw_xml_data_element(const std::string& tag, const std::string& data, struct xml_attribute_list *attributes)
+void xlsxwriter::lxw_xml_data_element(const std::string& tag, const std::string& data, const std::list<std::pair<std::string, std::string>>& attributes)
 {
     fprintf(file, "<%s", tag);
 
@@ -249,25 +250,21 @@ char * xlsxwriter::lxw_escape_control_characters(const char *string)
 }
 
 /* Write out escaped attributes. */
-void xlsxwriter::_fprint_escaped_attributes(struct xml_attribute_list *attributes)
+void xlsxwriter::_fprint_escaped_attributes(const std::list<std::pair<std::string, std::string>>& attributes)
 {
-    struct xml_attribute *attribute;
+    for (const auto& attribute : attributes) {
+        fprintf(file, " %s=", attribute.first);
 
-    if (attributes) {
-        STAILQ_FOREACH(attribute, attributes, list_entries) {
-            fprintf(file, " %s=", attribute->key);
+        if (!strpbrk(attribute->value, "&<>\"")) {
+            fprintf(file, "\"%s\"", attribute.second);
+        }
+        else {
+            char *encoded = _escape_attributes(attribute);
 
-            if (!strpbrk(attribute->value, "&<>\"")) {
-                fprintf(file, "\"%s\"", attribute->value);
-            }
-            else {
-                char *encoded = _escape_attributes(attribute);
+            if (encoded) {
+                fprintf(file, "\"%s\"", encoded);
 
-                if (encoded) {
-                    fprintf(file, "\"%s\"", encoded);
-
-                    free(encoded);
-                }
+                free(encoded);
             }
         }
     }

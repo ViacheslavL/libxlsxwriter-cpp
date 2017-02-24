@@ -452,6 +452,11 @@ public:
 
     void set_crossing(const std::string& crossing);
 
+    void set_major_tick_mark(bool mark);
+
+    void set_default_num_format(const std::string &format);
+
+    void set_default_major_gridlines(bool mark);
 private:
 
     lxw_chart_title title;
