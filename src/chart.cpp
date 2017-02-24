@@ -1995,7 +1995,7 @@ void chart::_write_chart()
     _write_chart_title();
 
     /* Write the c:plotArea element. */
-    write_plot_area(this);
+    write_plot_area();
 
     /* Write the c:legend element. */
     _write_legend();
@@ -2011,6 +2011,7 @@ void chart::_write_chart()
  */
 void chart::_initialize(uint8_t type)
 {
+    /*
     switch (type) {
 
         case LXW_CHART_AREA:
@@ -2061,6 +2062,7 @@ void chart::_initialize(uint8_t type)
             LXW_WARN_FORMAT1("workbook_add_chart(): "
                              "unhandled chart type '%d'", type);
     }
+    */
 }
 
 /*
@@ -2521,10 +2523,6 @@ void chart_bar::_initialize()
     /* Override the default axis positions for a bar chart. */
     cat_axis_position = LXW_CHART_LEFT;
     val_axis_position = LXW_CHART_BOTTOM;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _write_bar_chart;
-    write_plot_area = _write_plot_area;
 }
 
 void chart_column::write_chart_type(bool primary_axes)
