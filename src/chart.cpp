@@ -104,10 +104,10 @@ chart::chart(uint8_t type)
     /* Set the default legend position */
     legend_position = LXW_CHART_RIGHT;
 
-    lxw_strcpy(x_axis->default_num_format, "General");
-    lxw_strcpy(y_axis->default_num_format, "General");
-    lxw_strcpy(x2_axis->default_num_format, "General");
-    lxw_strcpy(y2_axis->default_num_format, "General");
+    x_axis->default_num_format = "General";
+    y_axis->default_num_format = "General";
+    x2_axis->default_num_format = "General";
+    y2_axis->default_num_format = "General";
 
     x_axis->default_major_gridlines = false;
     y_axis->default_major_gridlines = true;
@@ -651,7 +651,6 @@ void chart::_write_num_pt(uint16_t index, const std::shared_ptr<series_data_poin
  */
 void chart::_write_num_cache(series_range *range)
 {
-    lxw_series_data_point *data_point;
     uint16_t index = 0;
 
     lxw_xml_start_tag("c:numCache", NULL);
@@ -662,7 +661,7 @@ void chart::_write_num_cache(series_range *range)
     /* Write the c:ptCount element. */
     _write_pt_count(range->num_data_points);
 
-    STAILQ_FOREACH(data_point, range->data_cache, list_pointers) {
+    for(const auto& data_point: range->data_cache) {
         /* Write the c:pt element. */
         _write_num_pt(index, data_point);
         index++;
@@ -703,7 +702,7 @@ void chart::_write_num_ref(series_range *range)
     /* Write the c:f element. */
     _write_f(range->formula);
 
-    if (!STAILQ_EMPTY(range->data_cache)) {
+    if (!range->data_cache.empty()) {
         /* Write the c:numCache element. */
         _write_num_cache(range);
     }
@@ -721,7 +720,7 @@ void chart::_write_str_ref(series_range *range)
     /* Write the c:f element. */
     _write_f(range->formula);
 
-    if (!STAILQ_EMPTY(range->data_cache)) {
+    if (range->data_cache.size() > 0) {
         /* Write the c:strCache element. */
         _write_str_cache(range);
     }
@@ -1986,437 +1985,6 @@ void chart::_write_bar_dir(const std::string& type)
 }
 
 /*
- * Write a area chart.
- */
-void chart::_write_area_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (writable_series.empty())
-        return;
-
-    lxw_xml_start_tag("c:areaChart", NULL);
-
-    /* Write the c:grouping element. */
-    _write_grouping(grouping);
-
-    for(const auto& series : writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    if (has_overlap) {
-        /* Write the c:overlap element. */
-        _write_overlap(series_overlap_1);
-    }
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:areaChart");
-}
-
-/*
- * Write a bar chart.
- */
-void chart::_write_bar_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (STAILQ_EMPTY(series_list))
-        return;
-
-    lxw_xml_start_tag("c:barChart", NULL);
-
-    /* Write the c:barDir element. */
-    _write_bar_dir("bar");
-
-    /* Write the c:grouping element. */
-    _write_grouping(grouping);
-
-    for(const auto& series: writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    if (has_overlap) {
-        /* Write the c:overlap element. */
-        _write_overlap(series_overlap_1);
-    }
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:barChart");
-}
-
-/*
- * Write a column chart.
- */
-void chart::_write_column_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (writable_series.empty())
-        return;
-
-    lxw_xml_start_tag("c:barChart", NULL);
-
-    /* Write the c:barDir element. */
-    _write_bar_dir("col");
-
-    /* Write the c:grouping element. */
-    _write_grouping(grouping);
-
-    for(const auto& series : writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    if (has_overlap) {
-        /* Write the c:overlap element. */
-        _write_overlap(series_overlap_1);
-    }
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:barChart");
-}
-
-/*
- * Write a doughnut chart.
- */
-void chart::_write_doughnut_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (writable_series.empty())
-        return;
-
-    lxw_xml_start_tag("c:doughnutChart", NULL);
-
-    /* Write the c:varyColors element. */
-    _write_vary_colors();
-
-    for(const auto& series: writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    /* Write the c:firstSliceAng element. */
-    _write_first_slice_ang();
-
-    /* Write the c:holeSize element. */
-    _write_hole_size();
-
-    lxw_xml_end_tag("c:doughnutChart");
-}
-
-/*
- * Write a line chart.
- */
-void chart::_write_line_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (writable_series.empty())
-    {
-        return;
-    }
-
-    lxw_xml_start_tag("c:lineChart", NULL);
-
-    /* Write the c:grouping element. */
-    _write_grouping(grouping);
-
-    for(const auto& series: writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-    
-    /*
-    lxw_marker marker = {0};
-     Write the c:marker element. 
-    _chart_write_marker(&marker);
-    */
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:lineChart");
-}
-
-/*
- * Write a pie chart.
- */
-void chart::_write_pie_chart(uint8_t primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-    if (writable_series.empty())
-    {
-        return;
-    }
-
-    lxw_xml_start_tag("c:pieChart", NULL);
-
-    /* Write the c:varyColors element. */
-    _write_vary_colors();
-
-    for(const auto& series: writable_series) {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    /* Write the c:firstSliceAng element. */
-    _write_first_slice_ang();
-
-    lxw_xml_end_tag("c:pieChart");
-}
-
-/*
- * Write a scatter chart.
- */
-void chart::_write_scatter_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> writable_series;
-
-    if (primary_axes)
-    {
-        writable_series = _get_primary_axes_series();
-    }
-    else
-    {
-        writable_series = _get_secondary_axes_series();
-    }
-
-    if (writable_series.empty())
-    {
-        return;
-    }
-
-    lxw_xml_start_tag("c:scatterChart", NULL);
-
-    /* Write the c:scatterStyle element. */
-    _write_scatter_style();
-
-    for( const auto& series : writable_series) {
-        /* Write the c:ser element. */
-        _write_xval_ser(series);
-    }
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:scatterChart");
-}
-
-/*
- * Write a radar chart.
- */
-void chart::_write_radar_chart(bool primary_axes)
-{
-    std::vector<std::shared_ptr<chart_series>> series_list;
-
-    if (primary_axes)
-    {
-        series_list = _get_primary_axes_series();
-    }
-    else
-    {
-        series_list = _get_secondary_axes_series();
-    }
-    if (series_list.empty())
-    {
-        return;
-    }
-
-    lxw_xml_start_tag("c:radarChart", NULL);
-
-    /* Write the c:radarStyle element. */
-    _write_radar_style();
-
-    for(const auto& series : series_list)
-    {
-        /* Write the c:ser element. */
-        _write_ser(series);
-    }
-
-    if (has_overlap) {
-        /* Write the c:overlap element. */
-        _write_overlap(series_overlap_1);
-    }
-
-    /* Write the c:axId elements. */
-    _write_axis_ids(primary_axes);
-
-    lxw_xml_end_tag("c:radarChart");
-}
-
-/*
- * Write the <c:plotArea> element.
- */
-void chart::_write_scatter_plot_area()
-{
-    lxw_xml_start_tag("c:plotArea", NULL);
-
-    /* Write the c:layout element. */
-    _write_layout();
-
-    /* Write subclass chart type elements for primary and secondary axes. */
-    write_chart_type(this, true);
-    write_chart_type(this, false);
-
-    /* Write the c:catAx element. */
-    _write_cat_val_axis();
-
-    has_horiz_val_axis = true;
-
-    val_axis_args args;
-    args.x_axis = x_axis;
-    args.y_axis = y_axis;
-    args.id_1 = axis_id_1;
-    args.id_2 = axis_id_2;
-
-    /* Write the c:valAx element. */
-    _write_val_axis(&args);
-
-    lxw_xml_end_tag("c:plotArea");
-}
-
-/*
- * Write the <c:plotArea> element. Special handling for pie/doughnut.
- */
-void chart::_write_pie_plot_area()
-{
-    lxw_xml_start_tag("c:plotArea", NULL);
-
-    /* Write the c:layout element. */
-    _write_layout();
-
-    /* Write subclass chart type elements for primary and secondary axes. */
-    write_chart_type(this, true);
-
-    lxw_xml_end_tag("c:plotArea");
-}
-
-/*
- * Write the <c:plotArea> element.
- */
-void chart::_write_plot_area()
-{
-    lxw_xml_start_tag("c:plotArea", NULL);
-
-    /* Write the c:layout element. */
-    _write_layout();
-
-    /* Write subclass chart type elements for primary and secondary axes. */
-    write_chart_type(this, true);
-    write_chart_type(this, false);
-
-    /* Write combined chart, if exist*/
-    
-    const std::shared_ptr<chart>& second_chart = combined;
-    if (second_chart)
-    {
-        _chart_initialize(second_chart, second_chart->type);
-
-        second_chart->id = second_chart->is_secondary ? id + 1000 : id;
-        second_chart->file = file;
-        second_chart->series_index = series_index;
-        second_chart->write_chart_type(combined.get(), true);
-        second_chart->write_chart_type(combined.get(), false);
-    }
-    
-    
-
-    val_axis_args args;
-    args.x_axis = x_axis;
-    args.y_axis = y_axis;
-    args.id_1 = axis_id_1;
-    args.id_2 = axis_id_2;
-
-    /* Write the c:catAx element. */
-    _write_cat_axis(&args);
-
-    /* Write the c:valAx element. */
-    _write_val_axis(&args);
-
-    args.x_axis = x2_axis;
-    args.y_axis = y2_axis;
-    args.id_1 = axis_id_3;
-    args.id_2 = axis_id_4;
-
-    /* Write the c:valAx element. */
-    _write_val_axis(&args);
-
-    if (second_chart && second_chart->is_secondary)
-    {
-        args.x_axis = second_chart->x2_axis;
-        args.y_axis = second_chart->y2_axis;
-        args.id_1 = second_chart->axis_id_3;
-        args.id_2 = second_chart->axis_id_4;
-        _chart_write_val_axis(second_chart, &args);
-    }
-
-    _write_cat_axis(&args);
-
-    /* TODO add c:dTable elemnt */
-    /* TODO add c:spPr element */
-
-    lxw_xml_end_tag("c:plotArea");
-}
-
-/*
  * Write the <c:chart> element.
  */
 void chart::_write_chart()
@@ -2436,163 +2004,6 @@ void chart::_write_chart()
     _write_plot_vis_only();
 
     lxw_xml_end_tag("c:chart");
-}
-
-/*
- * Initialize a area chart.
- */
-void chart::_initialize_area_chart(uint8_t type)
-{
-    grouping = LXW_GROUPING_STANDARD;
-    cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
-
-    if (type == LXW_CHART_AREA_STACKED) {
-        grouping = LXW_GROUPING_STACKED;
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    if (type == LXW_CHART_AREA_STACKED_PERCENT) {
-        grouping = LXW_GROUPING_PERCENTSTACKED;
-        lxw_strcpy((y_axis)->default_num_format, "0%");
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_area_chart;
-    write_plot_area = _chart_write_plot_area;
-}
-
-/*
- * Initialize a bar chart.
- */
-void chart::_initialize_bar_chart(uint8_t type)
-{
-    std::shared_ptr<chart_axis> tmp;
-
-    /* Reverse the X and Y axes for Bar charts. */
-    tmp = x_axis;
-    x_axis = y_axis;
-    y_axis = tmp;
-
-    /*Also reverse some of the defaults. */
-    x_axis->default_major_gridlines = false;
-    y_axis->default_major_gridlines = true;
-    has_horiz_cat_axis = true;
-    has_horiz_val_axis = false;
-
-    if (type == LXW_CHART_BAR_STACKED) {
-        grouping = LXW_GROUPING_STACKED;
-        has_overlap = true;
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    if (type == LXW_CHART_BAR_STACKED_PERCENT) {
-        grouping = LXW_GROUPING_PERCENTSTACKED;
-        lxw_strcpy((y_axis)->default_num_format, "0%");
-        has_overlap = true;
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    /* Override the default axis positions for a bar chart. */
-    cat_axis_position = LXW_CHART_LEFT;
-    val_axis_position = LXW_CHART_BOTTOM;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_bar_chart;
-    write_plot_area = _chart_write_plot_area;
-}
-
-/*
- * Initialize a column chart.
- */
-void chart::_initialize_column_chart(uint8_t type)
-{
-    has_horiz_val_axis = false;
-
-    if (type == LXW_CHART_COLUMN_STACKED) {
-        grouping = LXW_GROUPING_STACKED;
-        has_overlap = true;
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    if (type == LXW_CHART_COLUMN_STACKED_PERCENT) {
-        grouping = LXW_GROUPING_PERCENTSTACKED;
-        lxw_strcpy((y_axis)->default_num_format, "0%");
-        has_overlap = true;
-        subtype = LXW_CHART_SUBTYPE_STACKED;
-    }
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_column_chart;
-    write_plot_area = _chart_write_plot_area;
-}
-
-/*
- * Initialize a doughnut chart.
- */
-void chart::_initialize_doughnut_chart()
-{
-    has_markers = false;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_doughnut_chart;
-    write_plot_area = _chart_write_pie_plot_area;
-}
-
-/*
- * Initialize a line chart.
- */
-void chart::_initialize_line_chart()
-{
-    has_markers = true;
-    grouping = LXW_GROUPING_STANDARD;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_line_chart;
-    write_plot_area = _chart_write_plot_area;
-}
-
-/*
- * Initialize a pie chart.
- */
-void chart::_initialize_pie_chart()
-{
-    has_markers = false;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_pie_chart;
-    write_plot_area = _chart_write_pie_plot_area;
-}
-
-/*
- * Initialize a scatter chart.
- */
-void chart::_initialize_scatter_chart()
-{
-    has_horiz_val_axis = false;
-    cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
-    is_scatter = true;
-    has_markers = true;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_scatter_chart;
-    write_plot_area = _chart_write_scatter_plot_area;
-}
-
-/*
- * Initialize a radar chart.
- */
-void chart::_initialize_radar_chart(uint8_t type)
-{
-    if (type == LXW_CHART_RADAR)
-        has_markers = true;
-
-    x_axis->default_major_gridlines = true;
-    y_axis->major_tick_mark = true;
-
-    /* Initialize the function pointers for this chart type. */
-    write_chart_type = _chart_write_radar_chart;
-    write_plot_area = _chart_write_plot_area;
 }
 
 /*
@@ -2923,6 +2334,507 @@ void chart::set_hole_size(uint8_t size)
     else
         LXW_WARN_FORMAT1("chart_set_hole_size(): Hole size '%d' outside "
                          "Excel range: 10 <= size <= 90", size);
+}
+
+void chart_area::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (writable_series.empty())
+        return;
+
+    lxw_xml_start_tag("c:areaChart", NULL);
+
+    /* Write the c:grouping element. */
+    _write_grouping(grouping);
+
+    for(const auto& series : writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    if (has_overlap) {
+        /* Write the c:overlap element. */
+        _write_overlap(series_overlap_1);
+    }
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:areaChart");
+}
+
+void chart::write_plot_area()
+{
+    lxw_xml_start_tag("c:plotArea", NULL);
+
+    /* Write the c:layout element. */
+    _write_layout();
+
+    /* Write subclass chart type elements for primary and secondary axes. */
+    write_chart_type(true);
+    write_chart_type(false);
+
+    /* Write combined chart, if exist*/
+
+    const std::shared_ptr<chart>& second_chart = combined;
+    if (second_chart)
+    {
+        second_chart->_initialize();
+
+        second_chart->id = second_chart->is_secondary ? id + 1000 : id;
+        second_chart->file = file;
+        second_chart->series_index = series_index;
+        second_chart->write_chart_type(true);
+        second_chart->write_chart_type(false);
+    }
+
+    val_axis_args args;
+    args.x_axis = x_axis;
+    args.y_axis = y_axis;
+    args.id_1 = axis_id_1;
+    args.id_2 = axis_id_2;
+
+    /* Write the c:catAx element. */
+    _write_cat_axis(&args);
+
+    /* Write the c:valAx element. */
+    _write_val_axis(&args);
+
+    args.x_axis = x2_axis;
+    args.y_axis = y2_axis;
+    args.id_1 = axis_id_3;
+    args.id_2 = axis_id_4;
+
+    /* Write the c:valAx element. */
+    _write_val_axis(&args);
+
+    if (second_chart && second_chart->is_secondary)
+    {
+        args.x_axis = second_chart->x2_axis;
+        args.y_axis = second_chart->y2_axis;
+        args.id_1 = second_chart->axis_id_3;
+        args.id_2 = second_chart->axis_id_4;
+        second_chart->_write_val_axis(&args);
+    }
+
+    _write_cat_axis(&args);
+
+    /* TODO add c:dTable elemnt */
+    /* TODO add c:spPr element */
+
+    lxw_xml_end_tag("c:plotArea");
+}
+
+void chart_area::_initialize()
+{
+    grouping = LXW_GROUPING_STANDARD;
+    cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
+
+    if (type == LXW_CHART_AREA_STACKED) {
+        grouping = LXW_GROUPING_STACKED;
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+
+    if (type == LXW_CHART_AREA_STACKED_PERCENT) {
+        grouping = LXW_GROUPING_PERCENTSTACKED;
+        y_axis->default_num_format = "0%";
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+}
+
+void chart_bar::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (series_list.empty())
+        return;
+
+    lxw_xml_start_tag("c:barChart", NULL);
+
+    /* Write the c:barDir element. */
+    _write_bar_dir("bar");
+
+    /* Write the c:grouping element. */
+    _write_grouping(grouping);
+
+    for(const auto& series: writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    if (has_overlap) {
+        /* Write the c:overlap element. */
+        _write_overlap(series_overlap_1);
+    }
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:barChart");
+}
+
+void chart_bar::_initialize()
+{
+    std::shared_ptr<chart_axis> tmp;
+
+    /* Reverse the X and Y axes for Bar charts. */
+    tmp = x_axis;
+    x_axis = y_axis;
+    y_axis = tmp;
+
+    /*Also reverse some of the defaults. */
+    x_axis->default_major_gridlines = false;
+    y_axis->default_major_gridlines = true;
+    has_horiz_cat_axis = true;
+    has_horiz_val_axis = false;
+
+    if (type == LXW_CHART_BAR_STACKED) {
+        grouping = LXW_GROUPING_STACKED;
+        has_overlap = true;
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+
+    if (type == LXW_CHART_BAR_STACKED_PERCENT) {
+        grouping = LXW_GROUPING_PERCENTSTACKED;
+        y_axis->default_num_format = "0%";
+        has_overlap = true;
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+
+    /* Override the default axis positions for a bar chart. */
+    cat_axis_position = LXW_CHART_LEFT;
+    val_axis_position = LXW_CHART_BOTTOM;
+
+    /* Initialize the function pointers for this chart type. */
+    write_chart_type = _write_bar_chart;
+    write_plot_area = _write_plot_area;
+}
+
+void chart_column::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (writable_series.empty())
+        return;
+
+    lxw_xml_start_tag("c:barChart", NULL);
+
+    /* Write the c:barDir element. */
+    _write_bar_dir("col");
+
+    /* Write the c:grouping element. */
+    _write_grouping(grouping);
+
+    for(const auto& series : writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    if (has_overlap) {
+        /* Write the c:overlap element. */
+        _write_overlap(series_overlap_1);
+    }
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:barChart");
+}
+
+void chart_column::_initialize()
+{
+    has_horiz_val_axis = false;
+
+    if (type == LXW_CHART_COLUMN_STACKED) {
+        grouping = LXW_GROUPING_STACKED;
+        has_overlap = true;
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+
+    if (type == LXW_CHART_COLUMN_STACKED_PERCENT) {
+        grouping = LXW_GROUPING_PERCENTSTACKED;
+        y_axis->default_num_format = "0%";
+        has_overlap = true;
+        subtype = LXW_CHART_SUBTYPE_STACKED;
+    }
+}
+
+void chart_line::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (writable_series.empty())
+    {
+        return;
+    }
+
+    lxw_xml_start_tag("c:lineChart", NULL);
+
+    /* Write the c:grouping element. */
+    _write_grouping(grouping);
+
+    for(const auto& series: writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    /*
+    lxw_marker marker = {0};
+     Write the c:marker element.
+    _chart_write_marker(&marker);
+    */
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:lineChart");
+}
+
+void chart_line::_initialize()
+{
+    has_markers = true;
+    grouping = LXW_GROUPING_STANDARD;
+}
+
+void chart_pie::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (writable_series.empty())
+    {
+        return;
+    }
+
+    lxw_xml_start_tag("c:pieChart", NULL);
+
+    /* Write the c:varyColors element. */
+    _write_vary_colors();
+
+    for(const auto& series: writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    /* Write the c:firstSliceAng element. */
+    _write_first_slice_ang();
+
+    lxw_xml_end_tag("c:pieChart");
+}
+
+void chart_pie::write_plot_area()
+{
+    lxw_xml_start_tag("c:plotArea", NULL);
+
+    /* Write the c:layout element. */
+    _write_layout();
+
+    /* Write subclass chart type elements for primary and secondary axes. */
+    write_chart_type(true);
+
+    lxw_xml_end_tag("c:plotArea");
+}
+
+void chart_pie::_initialize()
+{
+    has_markers = false;
+}
+
+void chart_scatter::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+
+    if (writable_series.empty())
+    {
+        return;
+    }
+
+    lxw_xml_start_tag("c:scatterChart", NULL);
+
+    /* Write the c:scatterStyle element. */
+    _write_scatter_style();
+
+    for( const auto& series : writable_series) {
+        /* Write the c:ser element. */
+        _write_xval_ser(series);
+    }
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:scatterChart");
+}
+
+void chart_scatter::write_plot_area()
+{
+    lxw_xml_start_tag("c:plotArea", NULL);
+
+    /* Write the c:layout element. */
+    _write_layout();
+
+    /* Write subclass chart type elements for primary and secondary axes. */
+    write_chart_type(true);
+    write_chart_type(false);
+
+    /* Write the c:catAx element. */
+    _write_cat_val_axis();
+
+    has_horiz_val_axis = true;
+
+    val_axis_args args;
+    args.x_axis = x_axis;
+    args.y_axis = y_axis;
+    args.id_1 = axis_id_1;
+    args.id_2 = axis_id_2;
+
+    /* Write the c:valAx element. */
+    _write_val_axis(&args);
+
+    lxw_xml_end_tag("c:plotArea");
+}
+
+void chart_scatter::_initialize()
+{
+    has_horiz_val_axis = false;
+    cross_between = LXW_CHART_AXIS_POSITION_ON_TICK;
+    is_scatter = true;
+    has_markers = true;
+}
+
+void chart_radar::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> series_list;
+
+    if (primary_axes)
+    {
+        series_list = _get_primary_axes_series();
+    }
+    else
+    {
+        series_list = _get_secondary_axes_series();
+    }
+    if (series_list.empty())
+    {
+        return;
+    }
+
+    lxw_xml_start_tag("c:radarChart", NULL);
+
+    /* Write the c:radarStyle element. */
+    _write_radar_style();
+
+    for(const auto& series : series_list)
+    {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    if (has_overlap) {
+        /* Write the c:overlap element. */
+        _write_overlap(series_overlap_1);
+    }
+
+    /* Write the c:axId elements. */
+    _write_axis_ids(primary_axes);
+
+    lxw_xml_end_tag("c:radarChart");
+}
+
+void chart_radar::_initialize()
+{
+    if (type == LXW_CHART_RADAR)
+        has_markers = true;
+
+    x_axis->default_major_gridlines = true;
+    y_axis->major_tick_mark = true;
+}
+
+void chart_doughtnut::write_chart_type(bool primary_axes)
+{
+    std::vector<std::shared_ptr<chart_series>> writable_series;
+
+    if (primary_axes)
+    {
+        writable_series = _get_primary_axes_series();
+    }
+    else
+    {
+        writable_series = _get_secondary_axes_series();
+    }
+    if (writable_series.empty())
+        return;
+
+    lxw_xml_start_tag("c:doughnutChart", NULL);
+
+    /* Write the c:varyColors element. */
+    _write_vary_colors();
+
+    for(const auto& series: writable_series) {
+        /* Write the c:ser element. */
+        _write_ser(series);
+    }
+
+    /* Write the c:firstSliceAng element. */
+    _write_first_slice_ang();
+
+    /* Write the c:holeSize element. */
+    _write_hole_size();
+
+    lxw_xml_end_tag("c:doughnutChart");
+}
+
+void chart_doughtnut::_initialize()
+{
+    has_markers = false;
 }
 
 } //namespace xlsxwriter

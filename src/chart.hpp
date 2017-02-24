@@ -669,16 +669,16 @@ public:
     static void set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
 
     void set_y2_axis(const std::shared_ptr<chart_axis> &axis);
-protected:
 
-    FILE *file;
+protected:
 
     uint8_t type;
     uint8_t subtype;
     uint16_t series_index;
 
-    void(chart::*write_chart_type) (chart *, bool primary_axes);
-    void (chart::*write_plot_area) (chart *);
+    virtual void write_chart_type(bool) = 0;
+    virtual void write_plot_area();
+    virtual void _initialize() = 0;
 
     /**
      * A pointer to the chart x_axis object which can be used in functions
@@ -839,7 +839,6 @@ protected:
     void _write_line_chart(bool primary_axes);
     void _write_print_settings();
     void _write_pie_plot_area();
-    void _write_plot_area();
     void _write_pie_chart(uint8_t primary_axes);
     void _write_scatter_chart(bool primary_axes);
     void _write_chart();
@@ -856,6 +855,62 @@ protected:
 };
 
 typedef std::shared_ptr<chart> chart_ptr;
+
+class chart_area : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_bar : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_column : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_line : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_pie : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_scatter: public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_radar : public chart {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
+
+class chart_doughtnut : public chart_pie {
+protected:
+    void write_chart_type(bool);
+    void write_plot_area();
+    void _initialize();
+};
 
 int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
                              uint16_t rows, uint8_t cols, uint8_t col);
