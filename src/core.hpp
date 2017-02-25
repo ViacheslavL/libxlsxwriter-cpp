@@ -14,38 +14,36 @@
 #include "workbook.hpp"
 #include "common.hpp"
 
+namespace xlsxwriter {
+
 /*
  * Struct to represent a core.
  */
-typedef struct lxw_core {
+class core : public xmlwriter {
+public:
+    void assemble_xml_file();
 
-    FILE *file;
-    lxw_doc_properties *properties;
+    /* Declarations required for unit testing. */
 
-} lxw_core;
+    void _xml_declaration();
 
+private:
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
+    doc_properties *properties;
 
-lxw_core *lxw_core_new();
-void lxw_core_free(lxw_core *core);
-void lxw_core_assemble_xml_file(lxw_core *self);
+    void _write_cp_core_properties();
+    void _write_dc_creator();
+    void _write_dcterms_modified();
+    void _write_dcterms_created();
+    void _write_cp_last_modified_by();
+    void _write_dc_title();
+    void _write_cp_keywords();
+    void _write_dc_description();
+    void _write_cp_category();
+    void _write_cp_content_status();
+    void _write_dc_subject();
+};
 
-/* Declarations required for unit testing. */
-#ifdef TESTING
-
-STATIC void _core_xml_declaration(lxw_core *self);
-
-#endif /* TESTING */
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
 #endif /* __LXW_CORE_H__ */
