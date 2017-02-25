@@ -11,6 +11,8 @@
 #include "content_types.hpp"
 #include "utility.hpp"
 
+namespace xlsxwriter {
+
 /*
  * Forward declarations.
  */
@@ -24,73 +26,16 @@
 /*
  * Create a new content_types object.
  */
-lxw_content_types *
-lxw_content_types_new()
+content_types::content_types()
 {
-    lxw_content_types *content_types = calloc(1, sizeof(lxw_content_types));
-    GOTO_LABEL_ON_MEM_ERROR(content_types, mem_error);
+    add_default("rels", LXW_APP_PACKAGE "relationships+xml");
+    add_default("xml", "application/xml");
 
-    content_types->default_types = calloc(1, sizeof(struct lxw_tuples));
-    GOTO_LABEL_ON_MEM_ERROR(content_types->default_types, mem_error);
-    STAILQ_INIT(content_types->default_types);
-
-    content_types->overrides = calloc(1, sizeof(struct lxw_tuples));
-    GOTO_LABEL_ON_MEM_ERROR(content_types->overrides, mem_error);
-    STAILQ_INIT(content_types->overrides);
-
-    lxw_ct_add_default(content_types, "rels",
-                       LXW_APP_PACKAGE "relationships+xml");
-    lxw_ct_add_default(content_types, "xml", "application/xml");
-
-    lxw_ct_add_override(content_types, "/docProps/app.xml",
-                        LXW_APP_DOCUMENT "extended-properties+xml");
-    lxw_ct_add_override(content_types, "/docProps/core.xml",
-                        LXW_APP_PACKAGE "core-properties+xml");
-    lxw_ct_add_override(content_types, "/xl/styles.xml",
-                        LXW_APP_DOCUMENT "spreadsheetml.styles+xml");
-    lxw_ct_add_override(content_types, "/xl/theme/theme1.xml",
-                        LXW_APP_DOCUMENT "theme+xml");
-    lxw_ct_add_override(content_types, "/xl/workbook.xml",
-                        LXW_APP_DOCUMENT "spreadsheetml.sheet.main+xml");
-
-    return content_types;
-
-mem_error:
-    lxw_content_types_free(content_types);
-    return NULL;
-}
-
-/*
- * Free a content_types object.
- */
-void
-lxw_content_types_free(lxw_content_types *content_types)
-{
-    lxw_tuple *default_type;
-    lxw_tuple *override;
-
-    if (!content_types)
-        return;
-
-    while (!STAILQ_EMPTY(content_types->default_types)) {
-        default_type = STAILQ_FIRST(content_types->default_types);
-        STAILQ_REMOVE_HEAD(content_types->default_types, list_pointers);
-        free(default_type->key);
-        free(default_type->value);
-        free(default_type);
-    }
-
-    while (!STAILQ_EMPTY(content_types->overrides)) {
-        override = STAILQ_FIRST(content_types->overrides);
-        STAILQ_REMOVE_HEAD(content_types->overrides, list_pointers);
-        free(override->key);
-        free(override->value);
-        free(override);
-    }
-
-    free(content_types->default_types);
-    free(content_types->overrides);
-    free(content_types);
+    add_override("/docProps/app.xml", LXW_APP_DOCUMENT "extended-properties+xml");
+    add_override("/docProps/core.xml", LXW_APP_PACKAGE "core-properties+xml");
+    add_override("/xl/styles.xml", LXW_APP_DOCUMENT "spreadsheetml.styles+xml");
+    add_override("/xl/theme/theme1.xml", LXW_APP_DOCUMENT "theme+xml");
+    add_override("/xl/workbook.xml", LXW_APP_DOCUMENT "spreadsheetml.sheet.main+xml");
 }
 
 /*****************************************************************************
@@ -102,8 +47,7 @@ lxw_content_types_free(lxw_content_types *content_types)
 /*
  * Write the XML declaration.
  */
-STATIC void
-_content_types_xml_declaration(lxw_content_types *self)
+void content_types::_xml_declaration()
 {
     lxw_xml_declaration();
 }
@@ -111,55 +55,39 @@ _content_types_xml_declaration(lxw_content_types *self)
 /*
  * Write the <Types> element.
  */
-STATIC void
-_write_types(lxw_content_types *self)
+void content_types::_write_types()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"xmlns", LXW_SCHEMA_CONTENT}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("xmlns", LXW_SCHEMA_CONTENT);
-
-    lxw_xml_start_tag("Types", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_start_tag("Types", attributes);
 }
 
 /*
  * Write the <Default> element.
  */
-STATIC void
-_write_default(lxw_content_types *self, const char *ext, const char *type)
+void content_types::_write_default(const std::string& ext, const std::string& type)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"Extension", ext},
+        {"ContentType", type}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("Extension", ext);
-    LXW_PUSH_ATTRIBUTES_STR("ContentType", type);
-
-    lxw_xml_empty_tag("Default", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("Default", attributes);
 }
 
 /*
  * Write the <Override> element.
  */
-STATIC void
-_write_override(lxw_content_types *self, const char *part_name,
-                const char *type)
+void content_types::_write_override(const std::string& part_name, const std::string& type)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"PartName", part_name},
+        {"ContentType", type}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("PartName", part_name);
-    LXW_PUSH_ATTRIBUTES_STR("ContentType", type);
-
-    lxw_xml_empty_tag("Override", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("Override", attributes);
 }
 
 /*****************************************************************************
@@ -171,41 +99,34 @@ _write_override(lxw_content_types *self, const char *part_name,
 /*
  * Write out all of the <Default> types.
  */
-STATIC void
-_write_defaults(lxw_content_types *self)
+void content_types::_write_defaults()
 {
-    lxw_tuple *tuple;
-
-    STAILQ_FOREACH(tuple, self->default_types, list_pointers) {
-        _write_default(self, tuple->key, tuple->value);
+    for(const auto& pair : default_types) {
+        _write_default(pair.first, pair.second);
     }
 }
 
 /*
  * Write out all of the <Override> types.
  */
-STATIC void
-_write_overrides(lxw_content_types *self)
+void content_types::_write_overrides()
 {
-    lxw_tuple *tuple;
-
-    STAILQ_FOREACH(tuple, self->overrides, list_pointers) {
-        _write_override(self, tuple->key, tuple->value);
+    for(const auto& pair : overrides) {
+        _write_override(pair.first, pair.second);
     }
 }
 
 /*
  * Assemble and write the XML file.
  */
-void
-lxw_content_types_assemble_xml_file(lxw_content_types *self)
+void content_types::assemble_xml_file()
 {
     /* Write the XML declaration. */
-    _content_types_xml_declaration(self);
+    _content_types_xml_declaration();
 
-    _write_types(self);
-    _write_defaults(self);
-    _write_overrides(self);
+    _write_types();
+    _write_defaults();
+    _write_overrides();
 
     /* Close the content_types tag. */
     lxw_xml_end_tag("Types");
@@ -219,123 +140,71 @@ lxw_content_types_assemble_xml_file(lxw_content_types *self)
 /*
  * Add elements to the ContentTypes defaults.
  */
-void
-lxw_ct_add_default(lxw_content_types *self, const char *key,
-                   const char *value)
+void content_types::add_default(const std::string& key, const std::string& value)
 {
-    lxw_tuple *tuple;
-
-    if (!key || !value)
+    if (key.empty())
         return;
 
-    tuple = calloc(1, sizeof(lxw_tuple));
-    GOTO_LABEL_ON_MEM_ERROR(tuple, mem_error);
-
-    tuple->key = lxw_strdup(key);
-    GOTO_LABEL_ON_MEM_ERROR(tuple->key, mem_error);
-
-    tuple->value = lxw_strdup(value);
-    GOTO_LABEL_ON_MEM_ERROR(tuple->value, mem_error);
-
-    STAILQ_INSERT_TAIL(self->default_types, tuple, list_pointers);
-
-    return;
-
-mem_error:
-    if (tuple) {
-        free(tuple->key);
-        free(tuple->value);
-        free(tuple);
-    }
+    default_types.push_back(std::make_pair(key, value));
 }
 
 /*
  * Add elements to the ContentTypes overrides.
  */
-void
-lxw_ct_add_override(lxw_content_types *self, const char *key,
-                    const char *value)
+void content_types::add_override(const std::string& key, const std::string& value)
 {
-    lxw_tuple *tuple;
-
-    if (!key || !value)
+    if (key.empty())
         return;
 
-    tuple = calloc(1, sizeof(lxw_tuple));
-    GOTO_LABEL_ON_MEM_ERROR(tuple, mem_error);
-
-    tuple->key = lxw_strdup(key);
-    GOTO_LABEL_ON_MEM_ERROR(tuple->key, mem_error);
-
-    tuple->value = lxw_strdup(value);
-    GOTO_LABEL_ON_MEM_ERROR(tuple->value, mem_error);
-
-    STAILQ_INSERT_TAIL(self->overrides, tuple, list_pointers);
-
-    return;
-
-mem_error:
-    if (tuple) {
-        free(tuple->key);
-        free(tuple->value);
-        free(tuple);
-    }
+    overrides.push_back(std::make_pair(key, value));
 }
 
 /*
  * Add the name of a worksheet to the ContentTypes overrides.
  */
-void
-lxw_ct_add_worksheet_name(lxw_content_types *self, const char *name)
+void content_types::add_worksheet_name(const std::string& name)
 {
-    lxw_ct_add_override(self, name,
-                        LXW_APP_DOCUMENT "spreadsheetml.worksheet+xml");
+    add_override(name, LXW_APP_DOCUMENT "spreadsheetml.worksheet+xml");
 }
 
 /*
  * Add the name of a chart to the ContentTypes overrides.
  */
-void
-lxw_ct_add_chart_name(lxw_content_types *self, const char *name)
+void content_types::add_chart_name(const std::string& name)
 {
-    lxw_ct_add_override(self, name, LXW_APP_DOCUMENT "drawingml.chart+xml");
+    add_override(name, LXW_APP_DOCUMENT "drawingml.chart+xml");
 }
 
 /*
  * Add the name of a drawing to the ContentTypes overrides.
  */
-void
-lxw_ct_add_drawing_name(lxw_content_types *self, const char *name)
+void content_types::add_drawing_name(const std::string& name)
 {
-    lxw_ct_add_override(self, name, LXW_APP_DOCUMENT "drawing+xml");
+    add_override(name, LXW_APP_DOCUMENT "drawing+xml");
 }
 
 /*
  * Add the sharedStrings link to the ContentTypes overrides.
  */
-void
-lxw_ct_add_shared_strings(lxw_content_types *self)
+void content_types::add_shared_strings()
 {
-    lxw_ct_add_override(self, "/xl/sharedStrings.xml",
-                        LXW_APP_DOCUMENT "spreadsheetml.sharedStrings+xml");
+    add_override("/xl/sharedStrings.xml", LXW_APP_DOCUMENT "spreadsheetml.sharedStrings+xml");
 }
 
 /*
  * Add the calcChain link to the ContentTypes overrides.
  */
-void
-lxw_ct_add_calc_chain(lxw_content_types *self)
+void content_types::add_calc_chain()
 {
-    lxw_ct_add_override(self, "/xl/calcChain.xml",
-                        LXW_APP_DOCUMENT "spreadsheetml.calcChain+xml");
+    add_override("/xl/calcChain.xml", LXW_APP_DOCUMENT "spreadsheetml.calcChain+xml");
 }
 
 /*
  * Add the custom properties to the ContentTypes overrides.
  */
-void
-lxw_ct_add_custom_properties(lxw_content_types *self)
+void content_types::add_custom_properties()
 {
-    lxw_ct_add_override(self, "/docProps/custom.xml",
-                        LXW_APP_DOCUMENT "custom-properties+xml");
+    add_override("/docProps/custom.xml", LXW_APP_DOCUMENT "custom-properties+xml");
 }
+
+} // namespace xlsxwriter

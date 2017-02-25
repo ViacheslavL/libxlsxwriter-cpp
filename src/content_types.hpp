@@ -12,8 +12,11 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "xmlwriter.hpp"
 
 #include "common.hpp"
+
+namespace xlsxwriter {
 
 #define LXW_APP_PACKAGE  "application/vnd.openxmlformats-package."
 #define LXW_APP_DOCUMENT "application/vnd.openxmlformats-officedocument."
@@ -21,54 +24,46 @@
 /*
  * Struct to represent a content_types.
  */
-typedef struct lxw_content_types {
+struct content_types : public xmlwriter {
 
-    FILE *file;
+public:
 
-    struct lxw_tuples *default_types;
-    struct lxw_tuples *overrides;
+    content_types();
+    ~content_types();
 
-} lxw_content_types;
+    void assemble_xml_file();
 
+    void add_default(const std::string& key, const std::string& value);
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
+    void add_override(const std::string& key, const std::string& value);
 
-lxw_content_types *lxw_content_types_new();
-void lxw_content_types_free(lxw_content_types *content_types);
-void lxw_content_types_assemble_xml_file(lxw_content_types *content_types);
-void lxw_ct_add_default(lxw_content_types *content_types, const char *key,
-                        const char *value);
-void lxw_ct_add_override(lxw_content_types *content_types, const char *key,
-                         const char *value);
-void lxw_ct_add_worksheet_name(lxw_content_types *content_types,
-                               const char *name);
-void lxw_ct_add_chart_name(lxw_content_types *content_types,
-                           const char *name);
-void lxw_ct_add_drawing_name(lxw_content_types *content_types,
-                             const char *name);
-void lxw_ct_add_shared_strings(lxw_content_types *content_types);
-void lxw_ct_add_calc_chain(lxw_content_types *content_types);
-void lxw_ct_add_custom_properties(lxw_content_types *content_types);
+    void add_worksheet_name(const std::string& name);
 
-/* Declarations required for unit testing. */
-#ifdef TESTING
+    void add_chart_name(const std::string& name);
 
-STATIC void _content_types_xml_declaration(lxw_content_types *self);
-STATIC void _write_default(lxw_content_types *self, const char *ext,
-                           const char *type);
-STATIC void _write_override(lxw_content_types *self, const char *part_name,
-                            const char *type);
+    void add_drawing_name(const std::string& name);
 
-#endif /* TESTING */
+    void add_shared_strings();
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+    void add_calc_chain();
+
+    void add_custom_properties();
+
+    /* Declarations required for unit testing. */
+    void _content_types_xml_declaration();
+    void _write_default(const std::string& ext, const std::string& type);
+    void _write_override(const std::string& part_name, const std::string& type);
+
+private:
+    std::list<std::pair<std::string, std::string>> default_types;
+    std::list<std::pair<std::string, std::string>> overrides;
+
+    void _write_defaults();
+    void _write_types();
+    void _xml_declaration();
+    void _write_overrides();
+};
+
+} // namespace xlsxwriter
 
 #endif /* __LXW_CONTENT_TYPES_H__ */

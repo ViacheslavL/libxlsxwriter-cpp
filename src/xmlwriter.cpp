@@ -319,4 +319,9 @@ xml_attribute * xlsxwriter::lxw_new_attribute_dbl(const char *key, double value)
     return attribute;
 }
 
+xmlwriter::~xmlwriter()
+{
+
+}
+
 } // namespace xlsxwriter
