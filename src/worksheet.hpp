@@ -2494,7 +2494,7 @@ private:
 
     lxw_protection protection;
 
-    lxw_drawing *drawing;
+    xlsxwriter::drawing *drawing;
 
     STAILQ_ENTRY (lxw_worksheet) list_pointers;
 
