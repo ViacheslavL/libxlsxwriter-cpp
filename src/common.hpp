@@ -19,6 +19,8 @@
 #include "xlsxwriter/third_party/queue.h"
 #include "xlsxwriter/third_party/tree.h"
 
+#include <memory>
+
 #ifndef TESTING
 #define STATIC static
 #else
@@ -288,7 +290,7 @@ typedef struct lxw_tuple {
 } lxw_tuple;
 
 /* Define custom property used in workbook.c and custom.c. */
-typedef struct lxw_custom_property {
+struct lxw_custom_property {
 
     enum lxw_custom_property_types type;
     char *name;
@@ -303,7 +305,9 @@ typedef struct lxw_custom_property {
 
     STAILQ_ENTRY (lxw_custom_property) list_pointers;
 
-} lxw_custom_property;
+};
+
+typedef std::shared_ptr<lxw_custom_property> custom_property_ptr;
 
 
 /* Declarations required for unit testing. */
