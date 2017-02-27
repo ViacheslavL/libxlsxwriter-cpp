@@ -78,14 +78,14 @@ lxw_insert_hash_element(lxw_hash_table *lxw_hash, void *key, void *value,
         /* The key isn't in the LXW_HASH hash table. */
 
         /* Create a linked list in the bucket to hold the lxw_hash keys. */
-        list = calloc(1, sizeof(struct lxw_hash_bucket_list));
+        list = (lxw_hash_bucket_list*)calloc(1, sizeof(struct lxw_hash_bucket_list));
         GOTO_LABEL_ON_MEM_ERROR(list, mem_error1);
 
         /* Initialize the bucket linked list. */
         SLIST_INIT(list);
 
         /* Create an lxw_hash element to add to the linked list. */
-        element = calloc(1, sizeof(lxw_hash_element));
+        element = (lxw_hash_element*)calloc(1, sizeof(lxw_hash_element));
         GOTO_LABEL_ON_MEM_ERROR(element, mem_error1);
 
         /* Store the key and value. */
@@ -125,7 +125,7 @@ lxw_insert_hash_element(lxw_hash_table *lxw_hash, void *key, void *value,
 
         /* Key doesn't exist in the list so this is a hash collision.
          * Create an lxw_hash element to add to the linked list. */
-        element = calloc(1, sizeof(lxw_hash_element));
+        element = (lxw_hash_element*)calloc(1, sizeof(lxw_hash_element));
         GOTO_LABEL_ON_MEM_ERROR(element, mem_error2);
 
         /* Store the key and value. */
@@ -159,19 +159,18 @@ lxw_hash_table *
 lxw_hash_new(uint32_t num_buckets, uint8_t free_key, uint8_t free_value)
 {
     /* Create the new hash table. */
-    lxw_hash_table *lxw_hash = calloc(1, sizeof(lxw_hash_table));
+    lxw_hash_table *lxw_hash = (lxw_hash_table*)calloc(1, sizeof(lxw_hash_table));
     RETURN_ON_MEM_ERROR(lxw_hash, NULL);
 
     lxw_hash->free_key = free_key;
     lxw_hash->free_value = free_value;
 
     /* Add the lxw_hash element buckets. */
-    lxw_hash->buckets =
-        calloc(num_buckets, sizeof(struct lxw_hash_bucket_list *));
+    lxw_hash->buckets = (lxw_hash_bucket_list**)calloc(num_buckets, sizeof(lxw_hash_bucket_list *));
     GOTO_LABEL_ON_MEM_ERROR(lxw_hash->buckets, mem_error);
 
     /* Add a list for tracking the insertion order. */
-    lxw_hash->order_list = calloc(1, sizeof(struct lxw_hash_order_list));
+    lxw_hash->order_list = (lxw_hash_order_list*)calloc(1, sizeof(lxw_hash_order_list));
     GOTO_LABEL_ON_MEM_ERROR(lxw_hash->order_list, mem_error);
 
     /* Initialize the order list. */
