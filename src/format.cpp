@@ -7,9 +7,11 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/format.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "format.hpp"
+#include "utility.hpp"
+
+namespace xlsxwriter {
 
 /*****************************************************************************
  *
@@ -20,100 +22,74 @@
 /*
  * Create a new format object.
  */
-lxw_format *
-lxw_format_new()
+format::format()
 {
-    lxw_format *format = calloc(1, sizeof(lxw_format));
-    GOTO_LABEL_ON_MEM_ERROR(format, mem_error);
+    xf_format_indices = NULL;
 
-    format->xf_format_indices = NULL;
+    xf_index = LXW_PROPERTY_UNSET;
+    dxf_index = LXW_PROPERTY_UNSET;
 
-    format->xf_index = LXW_PROPERTY_UNSET;
-    format->dxf_index = LXW_PROPERTY_UNSET;
+    num_format_index = 0;
+    font_index = 0;
+    has_font = false;
+    has_dxf_font = false;
+    font_size = 11;
+    bold = false;
+    italic = false;
+    font_color = LXW_COLOR_UNSET;
+    underline = false;
+    font_strikeout = false;
+    font_outline = false;
+    font_shadow = false;
+    font_script = false;
+    font_family = LXW_DEFAULT_FONT_FAMILY;
+    font_charset = false;
+    font_condense = false;
+    font_extend = false;
+    theme = false;
+    hyperlink = false;
 
-    format->font_name[0] = '\0';
-    format->font_scheme[0] = '\0';
-    format->num_format[0] = '\0';
-    format->num_format_index = 0;
-    format->font_index = 0;
-    format->has_font = false;
-    format->has_dxf_font = false;
-    format->font_size = 11;
-    format->bold = false;
-    format->italic = false;
-    format->font_color = LXW_COLOR_UNSET;
-    format->underline = false;
-    format->font_strikeout = false;
-    format->font_outline = false;
-    format->font_shadow = false;
-    format->font_script = false;
-    format->font_family = LXW_DEFAULT_FONT_FAMILY;
-    format->font_charset = false;
-    format->font_condense = false;
-    format->font_extend = false;
-    format->theme = false;
-    format->hyperlink = false;
+    hidden = false;
+    locked = true;
 
-    format->hidden = false;
-    format->locked = true;
+    text_h_align = LXW_ALIGN_NONE;
+    text_wrap = false;
+    text_v_align = LXW_ALIGN_NONE;
+    text_justlast = false;
+    rotation = 0;
 
-    format->text_h_align = LXW_ALIGN_NONE;
-    format->text_wrap = false;
-    format->text_v_align = LXW_ALIGN_NONE;
-    format->text_justlast = false;
-    format->rotation = 0;
+    fg_color = LXW_COLOR_UNSET;
+    bg_color = LXW_COLOR_UNSET;
+    pattern = LXW_PATTERN_NONE;
+    has_fill = false;
+    has_dxf_fill = false;
+    fill_index = 0;
+    fill_count = 0;
 
-    format->fg_color = LXW_COLOR_UNSET;
-    format->bg_color = LXW_COLOR_UNSET;
-    format->pattern = LXW_PATTERN_NONE;
-    format->has_fill = false;
-    format->has_dxf_fill = false;
-    format->fill_index = 0;
-    format->fill_count = 0;
+    border_index = 0;
+    has_border = false;
+    has_dxf_border = false;
+    border_count = 0;
 
-    format->border_index = 0;
-    format->has_border = false;
-    format->has_dxf_border = false;
-    format->border_count = 0;
+    bottom = LXW_BORDER_NONE;
+    left = LXW_BORDER_NONE;
+    right = LXW_BORDER_NONE;
+    top = LXW_BORDER_NONE;
+    diag_border = LXW_BORDER_NONE;
+    diag_type = LXW_BORDER_NONE;
+    bottom_color = LXW_COLOR_UNSET;
+    left_color = LXW_COLOR_UNSET;
+    right_color = LXW_COLOR_UNSET;
+    top_color = LXW_COLOR_UNSET;
+    diag_color = LXW_COLOR_UNSET;
 
-    format->bottom = LXW_BORDER_NONE;
-    format->left = LXW_BORDER_NONE;
-    format->right = LXW_BORDER_NONE;
-    format->top = LXW_BORDER_NONE;
-    format->diag_border = LXW_BORDER_NONE;
-    format->diag_type = LXW_BORDER_NONE;
-    format->bottom_color = LXW_COLOR_UNSET;
-    format->left_color = LXW_COLOR_UNSET;
-    format->right_color = LXW_COLOR_UNSET;
-    format->top_color = LXW_COLOR_UNSET;
-    format->diag_color = LXW_COLOR_UNSET;
-
-    format->indent = 0;
-    format->shrink = false;
-    format->merge_range = false;
-    format->reading_order = 0;
-    format->just_distrib = false;
-    format->color_indexed = false;
-    format->font_only = false;
-
-    return format;
-
-mem_error:
-    lxw_format_free(format);
-    return NULL;
-}
-
-/*
- * Free a format object.
- */
-void
-lxw_format_free(lxw_format *format)
-{
-    if (!format)
-        return;
-
-    free(format);
-    format = NULL;
+    indent = 0;
+    shrink = false;
+    merge_range = false;
+    reading_order = 0;
+    just_distrib = false;
+    color_indexed = false;
+    font_only = false;
 }
 
 /*
@@ -150,13 +126,11 @@ _check_border(uint8_t border)
  * Returns a format struct suitable for hashing as a lookup key. This is
  * mainly a memcpy with any pointer members set to NULL.
  */
-STATIC lxw_format *
-_get_format_key(lxw_format *self)
+format* format::_get_format_key()
 {
-    lxw_format *key = calloc(1, sizeof(lxw_format));
-    GOTO_LABEL_ON_MEM_ERROR(key, mem_error);
+    format *key = new format();
 
-    memcpy(key, self, sizeof(lxw_format));
+    memcpy(key, this, sizeof(format));
 
     /* Set pointer members to NULL since they aren't part of the comparison. */
     key->xf_format_indices = NULL;
@@ -172,26 +146,24 @@ mem_error:
 /*
  * Returns a font struct suitable for hashing as a lookup key.
  */
-lxw_font *
-lxw_format_get_font_key(lxw_format *self)
+lxw_font * format::get_font_key()
 {
-    lxw_font *key = calloc(1, sizeof(lxw_font));
-    GOTO_LABEL_ON_MEM_ERROR(key, mem_error);
+    lxw_font *key = new lxw_font{};
 
-    LXW_FORMAT_FIELD_COPY(key->font_name, self->font_name);
-    key->font_size = self->font_size;
-    key->bold = self->bold;
-    key->italic = self->italic;
-    key->font_color = self->font_color;
-    key->underline = self->underline;
-    key->font_strikeout = self->font_strikeout;
-    key->font_outline = self->font_outline;
-    key->font_shadow = self->font_shadow;
-    key->font_script = self->font_script;
-    key->font_family = self->font_family;
-    key->font_charset = self->font_charset;
-    key->font_condense = self->font_condense;
-    key->font_extend = self->font_extend;
+    key->font_name = font_name;
+    key->font_size = font_size;
+    key->bold = bold;
+    key->italic = italic;
+    key->font_color = font_color;
+    key->underline = underline;
+    key->font_strikeout = font_strikeout;
+    key->font_outline = font_outline;
+    key->font_shadow = font_shadow;
+    key->font_script = font_script;
+    key->font_family = font_family;
+    key->font_charset = font_charset;
+    key->font_condense = font_condense;
+    key->font_extend = font_extend;
 
     return key;
 
@@ -202,23 +174,21 @@ mem_error:
 /*
  * Returns a border struct suitable for hashing as a lookup key.
  */
-lxw_border *
-lxw_format_get_border_key(lxw_format *self)
+lxw_border * format::get_border_key()
 {
-    lxw_border *key = calloc(1, sizeof(lxw_border));
-    GOTO_LABEL_ON_MEM_ERROR(key, mem_error);
+    lxw_border *key = new lxw_border{};
 
-    key->bottom = self->bottom;
-    key->left = self->left;
-    key->right = self->right;
-    key->top = self->top;
-    key->diag_border = self->diag_border;
-    key->diag_type = self->diag_type;
-    key->bottom_color = self->bottom_color;
-    key->left_color = self->left_color;
-    key->right_color = self->right_color;
-    key->top_color = self->top_color;
-    key->diag_color = self->diag_color;
+    key->bottom = bottom;
+    key->left = left;
+    key->right = right;
+    key->top = top;
+    key->diag_border = diag_border;
+    key->diag_type = diag_type;
+    key->bottom_color = bottom_color;
+    key->left_color = left_color;
+    key->right_color = right_color;
+    key->top_color = top_color;
+    key->diag_color = diag_color;
 
     return key;
 
@@ -229,32 +199,26 @@ mem_error:
 /*
  * Returns a pattern fill struct suitable for hashing as a lookup key.
  */
-lxw_fill *
-lxw_format_get_fill_key(lxw_format *self)
+lxw_fill * format::get_fill_key()
 {
-    lxw_fill *key = calloc(1, sizeof(lxw_fill));
-    GOTO_LABEL_ON_MEM_ERROR(key, mem_error);
+    lxw_fill *key = new lxw_fill{};
 
-    key->fg_color = self->fg_color;
-    key->bg_color = self->bg_color;
-    key->pattern = self->pattern;
+    key->fg_color = fg_color;
+    key->bg_color = bg_color;
+    key->pattern = pattern;
 
     return key;
-
-mem_error:
-    return NULL;
 }
 
 /*
  * Returns the XF index number used by Excel to identify a format.
  */
-int32_t
-lxw_format_get_xf_index(lxw_format *self)
+int32_t format::get_xf_index()
 {
-    lxw_format *format_key;
-    lxw_format *existing_format;
+    format *format_key;
+    format *existing_format;
     lxw_hash_element *hash_element;
-    lxw_hash_table *formats_hash_table = self->xf_format_indices;
+    lxw_hash_table *formats_hash_table = xf_format_indices;
     int32_t index;
 
     /* Note: The formats_hash_table/xf_format_indices contains the unique and
@@ -262,14 +226,14 @@ lxw_format_get_xf_index(lxw_format *self)
      */
 
     /* Format already has an index number so return it. */
-    if (self->xf_index != LXW_PROPERTY_UNSET) {
-        return self->xf_index;
+    if (xf_index != LXW_PROPERTY_UNSET) {
+        return xf_index;
     }
 
     /* Otherwise, the format doesn't have an index number so we assign one.
      * First generate a unique key to identify the format in the hash table.
      */
-    format_key = _get_format_key(self);
+    format_key = _get_format_key();
 
     /* Return the default format index if the key generation failed. */
     if (!format_key)
@@ -278,20 +242,20 @@ lxw_format_get_xf_index(lxw_format *self)
     /* Look up the format in the hash table. */
     hash_element =
         lxw_hash_key_exists(formats_hash_table, format_key,
-                            sizeof(lxw_format));
+                            sizeof(format));
 
     if (hash_element) {
         /* Format matches existing format with an index. */
-        free(format_key);
-        existing_format = hash_element->value;
+        delete format_key;
+        existing_format = (format*)hash_element->value;
         return existing_format->xf_index;
     }
     else {
         /* New format requiring an index. */
         index = formats_hash_table->unique_count;
-        self->xf_index = index;
-        lxw_insert_hash_element(formats_hash_table, format_key, self,
-                                sizeof(lxw_format));
+        xf_index = index;
+        lxw_insert_hash_element(formats_hash_table, format_key, this,
+                                sizeof(format));
         return index;
     }
 }
@@ -299,430 +263,388 @@ lxw_format_get_xf_index(lxw_format *self)
 /*
  * Set the font_name property.
  */
-void
-format_set_font_name(lxw_format *self, const char *font_name)
+void format::set_font_name(const std::string& name)
 {
-    LXW_FORMAT_FIELD_COPY(self->font_name, font_name);
+    font_name = name;
 }
 
 /*
  * Set the font_size property.
  */
-void
-format_set_font_size(lxw_format *self, uint16_t size)
+void format::set_font_size(uint16_t size)
 {
 
     if (size >= LXW_MIN_FONT_SIZE && size <= LXW_MAX_FONT_SIZE)
-        self->font_size = size;
+        font_size = size;
 }
 
 /*
  * Set the font_color property.
  */
-void
-format_set_font_color(lxw_format *self, lxw_color_t color)
+void format::set_font_color(lxw_color_t color)
 {
-    self->font_color = _check_color(color);
+    font_color = _check_color(color);
 }
 
 /*
  * Set the bold property.
  */
-void
-format_set_bold(lxw_format *self)
+void format::set_bold()
 {
-    self->bold = true;
+    bold = true;
 }
 
 /*
  * Set the italic property.
  */
 
-void
-format_set_italic(lxw_format *self)
+void format::set_italic()
 {
-    self->italic = true;
+    italic = true;
 }
 
 /*
  * Set the underline property.
  */
-void
-format_set_underline(lxw_format *self, uint8_t style)
+void format::set_underline(uint8_t style)
 {
     if (style >= LXW_UNDERLINE_SINGLE
         && style <= LXW_UNDERLINE_DOUBLE_ACCOUNTING)
-        self->underline = style;
+        underline = style;
 }
 
 /*
  * Set the font_strikeout property.
  */
-void
-format_set_font_strikeout(lxw_format *self)
+void format::set_font_strikeout()
 {
-    self->font_strikeout = true;
+    font_strikeout = true;
 }
 
 /*
  * Set the font_script property.
  */
-void
-format_set_font_script(lxw_format *self, uint8_t style)
+void format::set_font_script(uint8_t style)
 {
     if (style >= LXW_FONT_SUPERSCRIPT && style <= LXW_FONT_SUBSCRIPT)
-        self->font_script = style;
+        font_script = style;
 }
 
 /*
  * Set the font_outline property.
  */
-void
-format_set_font_outline(lxw_format *self)
+void format::set_font_outline()
 {
-    self->font_outline = true;
+    font_outline = true;
 }
 
 /*
  * Set the font_shadow property.
  */
-void
-format_set_font_shadow(lxw_format *self)
+void format::set_font_shadow()
 {
-    self->font_shadow = true;
+    font_shadow = true;
 }
 
 /*
  * Set the num_format property.
  */
-void
-format_set_num_format(lxw_format *self, const char *num_format)
+void format::set_num_format(const std::string& format)
 {
-    LXW_FORMAT_FIELD_COPY(self->num_format, num_format);
+    num_format = format;
 }
 
 /*
  * Set the unlocked property.
  */
-void
-format_set_unlocked(lxw_format *self)
+void format::set_unlocked()
 {
-    self->locked = false;
+    locked = false;
 }
 
 /*
  * Set the hidden property.
  */
-void
-format_set_hidden(lxw_format *self)
+void format::set_hidden()
 {
-    self->hidden = true;
+    hidden = true;
 }
 
 /*
  * Set the align property.
  */
-void
-format_set_align(lxw_format *self, uint8_t value)
+void format::set_align(uint8_t value)
 {
     if (value >= LXW_ALIGN_LEFT && value <= LXW_ALIGN_DISTRIBUTED) {
-        self->text_h_align = value;
+        text_h_align = value;
     }
 
     if (value >= LXW_ALIGN_VERTICAL_TOP
         && value <= LXW_ALIGN_VERTICAL_DISTRIBUTED) {
-        self->text_v_align = value;
+        text_v_align = value;
     }
 }
 
 /*
  * Set the text_wrap property.
  */
-void
-format_set_text_wrap(lxw_format *self)
+void format::set_text_wrap()
 {
-    self->text_wrap = true;
+    text_wrap = true;
 }
 
 /*
  * Set the rotation property.
  */
-void
-format_set_rotation(lxw_format *self, int16_t angle)
+void format::set_rotation(int16_t angle)
 {
     /* Convert user angle to Excel angle. */
     if (angle == 270) {
-        self->rotation = 255;
+        rotation = 255;
     }
     else if (angle >= -90 || angle <= 90) {
         if (angle < 0)
             angle = -angle + 90;
 
-        self->rotation = angle;
+        rotation = angle;
     }
     else {
         LXW_WARN("Rotation rotation outside range: -90 <= angle <= 90.");
-        self->rotation = 0;
+        rotation = 0;
     }
 }
 
 /*
  * Set the indent property.
  */
-void
-format_set_indent(lxw_format *self, uint8_t value)
+void format::set_indent(uint8_t value)
 {
-    self->indent = value;
+    indent = value;
 }
 
 /*
  * Set the shrink property.
  */
-void
-format_set_shrink(lxw_format *self)
+void format::set_shrink()
 {
-    self->shrink = true;
+    shrink = true;
 }
 
 /*
  * Set the text_justlast property.
  */
-void
-format_set_text_justlast(lxw_format *self)
+void format::set_text_justlast()
 {
-    self->text_justlast = true;
+    text_justlast = true;
 }
 
 /*
  * Set the pattern property.
  */
-void
-format_set_pattern(lxw_format *self, uint8_t value)
+void format::set_pattern(uint8_t value)
 {
-    self->pattern = value;
+    pattern = value;
 }
 
 /*
  * Set the bg_color property.
  */
-void
-format_set_bg_color(lxw_format *self, lxw_color_t color)
+void format::set_bg_color(lxw_color_t color)
 {
-    self->bg_color = _check_color(color);
+    bg_color = _check_color(color);
 }
 
 /*
  * Set the fg_color property.
  */
-void
-format_set_fg_color(lxw_format *self, lxw_color_t color)
+void format::set_fg_color(lxw_color_t color)
 {
-    self->fg_color = _check_color(color);
+    fg_color = _check_color(color);
 }
 
 /*
  * Set the border property.
  */
-void
-format_set_border(lxw_format *self, uint8_t style)
+void format::set_border(uint8_t style)
 {
     style = _check_border(style);
-    self->bottom = style;
-    self->top = style;
-    self->left = style;
-    self->right = style;
+    bottom = style;
+    top = style;
+    left = style;
+    right = style;
 }
 
 /*
  * Set the border_color property.
  */
-void
-format_set_border_color(lxw_format *self, lxw_color_t color)
+void format::set_border_color(lxw_color_t color)
 {
     color = _check_color(color);
-    self->bottom_color = color;
-    self->top_color = color;
-    self->left_color = color;
-    self->right_color = color;
+    bottom_color = color;
+    top_color = color;
+    left_color = color;
+    right_color = color;
 }
 
 /*
  * Set the bottom property.
  */
-void
-format_set_bottom(lxw_format *self, uint8_t style)
+void format::set_bottom(uint8_t style)
 {
-    self->bottom = _check_border(style);
+    bottom = _check_border(style);
 }
 
 /*
  * Set the bottom_color property.
  */
-void
-format_set_bottom_color(lxw_format *self, lxw_color_t color)
+void format::set_bottom_color(lxw_color_t color)
 {
-    self->bottom_color = _check_color(color);
+    bottom_color = _check_color(color);
 }
 
 /*
  * Set the left property.
  */
-void
-format_set_left(lxw_format *self, uint8_t style)
+void format::set_left(uint8_t style)
 {
-    self->left = _check_border(style);
+    left = _check_border(style);
 }
 
 /*
  * Set the left_color property.
  */
-void
-format_set_left_color(lxw_format *self, lxw_color_t color)
+void format::set_left_color(lxw_color_t color)
 {
-    self->left_color = _check_color(color);
+    left_color = _check_color(color);
 }
 
 /*
  * Set the right property.
  */
-void
-format_set_right(lxw_format *self, uint8_t style)
+void format::set_right(uint8_t style)
 {
-    self->right = _check_border(style);
+    right = _check_border(style);
 }
 
 /*
  * Set the right_color property.
  */
-void
-format_set_right_color(lxw_format *self, lxw_color_t color)
+void format::set_right_color(lxw_color_t color)
 {
-    self->right_color = _check_color(color);
+    right_color = _check_color(color);
 }
 
 /*
  * Set the top property.
  */
-void
-format_set_top(lxw_format *self, uint8_t style)
+void format::set_top(uint8_t style)
 {
-    self->top = _check_border(style);
+    top = _check_border(style);
 }
 
 /*
  * Set the top_color property.
  */
-void
-format_set_top_color(lxw_format *self, lxw_color_t color)
+void format::set_top_color(lxw_color_t color)
 {
-    self->top_color = _check_color(color);
+    top_color = _check_color(color);
 }
 
 /*
  * Set the diag_type property.
  */
-void
-format_set_diag_type(lxw_format *self, uint8_t type)
+void format::set_diag_type(uint8_t type)
 {
     if (type >= LXW_DIAGONAL_BORDER_UP && type <= LXW_DIAGONAL_BORDER_UP_DOWN)
-        self->diag_type = type;
+        diag_type = type;
 }
 
 /*
  * Set the diag_color property.
  */
-void
-format_set_diag_color(lxw_format *self, lxw_color_t color)
+void format::set_diag_color(lxw_color_t color)
 {
-    self->diag_color = _check_color(color);
+    diag_color = _check_color(color);
 }
 
 /*
  * Set the diag_border property.
  */
-void
-format_set_diag_border(lxw_format *self, uint8_t style)
+void format::set_diag_border(uint8_t style)
 {
-    self->diag_border = style;
+    diag_border = style;
 }
 
 /*
  * Set the num_format_index property.
  */
-void
-format_set_num_format_index(lxw_format *self, uint8_t value)
+void format::set_num_format_index(uint8_t value)
 {
-    self->num_format_index = value;
+    num_format_index = value;
 }
 
 /*
  * Set the valign property.
  */
-void
-format_set_valign(lxw_format *self, uint8_t value)
+void format::set_text_v_align(uint8_t value)
 {
-    self->text_v_align = value;
+    text_v_align = value;
 }
 
 /*
  * Set the reading_order property.
  */
-void
-format_set_reading_order(lxw_format *self, uint8_t value)
+void format::set_reading_order(uint8_t value)
 {
-    self->reading_order = value;
+    reading_order = value;
 }
 
 /*
  * Set the font_family property.
  */
-void
-format_set_font_family(lxw_format *self, uint8_t value)
+void format::set_font_family(uint8_t value)
 {
-    self->font_family = value;
+    font_family = value;
 }
 
 /*
  * Set the font_charset property.
  */
-void
-format_set_font_charset(lxw_format *self, uint8_t value)
+void format::set_font_charset(uint8_t value)
 {
-    self->font_charset = value;
+    font_charset = value;
 }
 
 /*
  * Set the font_scheme property.
  */
-void
-format_set_font_scheme(lxw_format *self, const char *font_scheme)
+void format::set_font_scheme(const std::string& value)
 {
-    LXW_FORMAT_FIELD_COPY(self->font_scheme, font_scheme);
+    font_scheme = value;
 }
 
 /*
  * Set the font_condense property.
  */
-void
-format_set_font_condense(lxw_format *self)
+void format::set_font_condense()
 {
-    self->font_condense = true;
+    font_condense = true;
 }
 
 /*
  * Set the font_extend property.
  */
-void
-format_set_font_extend(lxw_format *self)
+void format::set_font_extend()
 {
-    self->font_extend = true;
+    font_extend = true;
 }
 
 /*
  * Set the theme property.
  */
-void
-format_set_theme(lxw_format *self, uint8_t value)
+void format::set_theme(uint8_t value)
 {
-    self->theme = value;
+    theme = value;
 }
+
+} // namespace xlsxwriter

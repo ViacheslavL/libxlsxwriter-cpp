@@ -399,14 +399,13 @@ struct lxw_fill {
  * @endcode
  *
  */
-class lxw_format {
+class format {
 public:
-    lxw_format *lxw_format_new();
-    void lxw_format_free();
-    int32_t lxw_format_get_xf_index();
-    lxw_font *lxw_format_get_font_key();
-    lxw_border *lxw_format_get_border_key();
-    lxw_fill *lxw_format_get_fill_key();
+    format();
+    int32_t get_xf_index();
+    lxw_font *get_font_key();
+    lxw_border *get_border_key();
+    lxw_fill *get_fill_key();
 
     /**
      * @brief Set the font used in the cell.
@@ -428,7 +427,7 @@ public:
      *
      * The default font in Excel 2007, and later, is Calibri.
      */
-    void set_font_name(const char *font_name);
+    void set_font_name(const std::string& font_name);
 
     /**
      * @brief Set the size of the font used in the cell.
@@ -1085,7 +1084,7 @@ public:
     void set_font_shadow();
     void set_font_family(uint8_t value);
     void set_font_charset(uint8_t value);
-    void set_font_scheme(const char *font_scheme);
+    void set_font_scheme(const std::string& font_scheme);
     void set_font_condense();
     void set_font_extend();
     void set_reading_order(uint8_t value);
@@ -1097,6 +1096,8 @@ public:
     #endif /* TESTING */
 
 
+    void set_text_v_align(uint8_t value);
+    void set_text_justlast();
 private:
 
     FILE *file;
@@ -1112,44 +1113,44 @@ private:
     std::string font_scheme;
     uint16_t num_format_index;
     uint16_t font_index;
-    uint8_t has_font;
-    uint8_t has_dxf_font;
+    bool has_font;
+    bool has_dxf_font;
     uint16_t font_size;
-    uint8_t bold;
-    uint8_t italic;
+    bool bold;
+    bool italic;
     lxw_color_t font_color;
     uint8_t underline;
-    uint8_t font_strikeout;
-    uint8_t font_outline;
-    uint8_t font_shadow;
-    uint8_t font_script;
+    bool font_strikeout;
+    bool font_outline;
+    bool font_shadow;
+    bool font_script;
     uint8_t font_family;
-    uint8_t font_charset;
-    uint8_t font_condense;
-    uint8_t font_extend;
-    uint8_t theme;
-    uint8_t hyperlink;
+    bool font_charset;
+    bool font_condense;
+    bool font_extend;
+    bool theme;
+    bool hyperlink;
 
-    uint8_t hidden;
-    uint8_t locked;
+    bool hidden;
+    bool locked;
 
     uint8_t text_h_align;
-    uint8_t text_wrap;
+    bool text_wrap;
     uint8_t text_v_align;
-    uint8_t text_justlast;
+    bool text_justlast;
     int16_t rotation;
 
     lxw_color_t fg_color;
     lxw_color_t bg_color;
     uint8_t pattern;
-    uint8_t has_fill;
-    uint8_t has_dxf_fill;
+    bool has_fill;
+    bool has_dxf_fill;
     int32_t fill_index;
     int32_t fill_count;
 
     int32_t border_index;
-    uint8_t has_border;
-    uint8_t has_dxf_border;
+    bool has_border;
+    bool has_dxf_border;
     int32_t border_count;
 
     uint8_t bottom;
@@ -1165,17 +1166,18 @@ private:
     lxw_color_t top_color;
 
     uint8_t indent;
-    uint8_t shrink;
-    uint8_t merge_range;
+    bool shrink;
+    bool merge_range;
     uint8_t reading_order;
-    uint8_t just_distrib;
-    uint8_t color_indexed;
-    uint8_t font_only;
+    bool just_distrib;
+    bool color_indexed;
+    bool font_only;
 
-    STAILQ_ENTRY (lxw_format) list_pointers;
+    STAILQ_ENTRY (format) list_pointers;
+    format *_get_format_key();
 };
 
-typedef std::shared_ptr<lxw_format> format_ptr;
+typedef std::shared_ptr<format> format_ptr;
 
 } // namespace xlsxwriter
 

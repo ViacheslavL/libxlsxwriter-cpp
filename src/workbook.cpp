@@ -1491,8 +1491,7 @@ workbook_add_chart(lxw_workbook *self, uint8_t type)
 /*
  * Add a new format to the Excel workbook.
  */
-lxw_format *
-workbook_add_format(lxw_workbook *self)
+format * workbook::add_format()
 {
     /* Create a new format object. */
     lxw_format *format = lxw_format_new();
