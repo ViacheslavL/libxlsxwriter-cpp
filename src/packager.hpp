@@ -82,6 +82,9 @@ private:
     uint8_t _write_worksheet_rels_file();
     uint8_t _write_drawing_rels_file();
     uint8_t _write_content_types_file();
+    uint8_t _write_workbook_rels_file();
+    uint8_t _write_theme_file();
+    uint8_t _write_styles_file();
 };
 
 } // namespace xlsxwriter

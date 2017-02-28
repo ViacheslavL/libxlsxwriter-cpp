@@ -12,36 +12,24 @@
 #include <stdint.h>
 
 #include "common.hpp"
+#include "xmlwriter.hpp"
+
+namespace xlsxwriter {
 
 /*
  * Struct to represent a theme.
  */
-typedef struct lxw_theme {
-
-    FILE *file;
-} lxw_theme;
-
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
-lxw_theme *lxw_theme_new();
-void lxw_theme_free(lxw_theme *theme);
-void lxw_theme_xml_declaration(lxw_theme *self);
-void lxw_theme_assemble_xml_file(lxw_theme *self);
+class theme : public xmlwriter {
+public:
+    void xml_declaration();
+    void assemble_xml_file();
+};
 
 /* Declarations required for unit testing. */
 #ifdef TESTING
-
 #endif /* TESTING */
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+
+} // namespace xlsxwriter
 
 #endif /* __LXW_THEME_H__ */

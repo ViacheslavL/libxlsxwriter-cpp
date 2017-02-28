@@ -12,13 +12,46 @@
 #include <stdint.h>
 
 #include "format.hpp"
+#include "xmlwriter.hpp"
 
 namespace xlsxwriter {
 
 /*
  * Struct to represent a styles.
  */
-struct lxw_styles {
+struct styles : public xmlwriter{
+
+public:
+    void assemble_xml_file();
+
+    /* Declarations required for unit testing. */
+    #ifdef TESTING
+
+    #endif /* TESTING */
+
+    void _xml_declaration();
+    void _write_style_sheet();
+    void _write_font_size(uint16_t font_size);
+    void _write_font_color_theme(uint8_t theme);
+    void _write_font_name(const char *font_name);
+    void _write_font_family(uint8_t font_family);
+    void _write_font_scheme(const char *font_scheme);
+    void _write_font(format *format);
+    void _write_fonts();
+    void _write_default_fill(const char *pattern);
+    void _write_fills();
+    void _write_border(format *format);
+    void _write_borders();
+    void _write_style_xf();
+    void _write_cell_style_xfs();
+    void _write_xf(format *format);
+    void _write_cell_xfs();
+    void _write_cell_style();
+    void _write_cell_styles();
+    void _write_dxfs();
+    void _write_table_styles();
+
+private:
 
     FILE *file;
     uint32_t font_count;
@@ -32,36 +65,7 @@ struct lxw_styles {
 
 };
 
-lxw_styles *lxw_styles_new();
-void lxw_styles_free(lxw_styles *styles);
-void lxw_styles_assemble_xml_file(lxw_styles *self);
 
-/* Declarations required for unit testing. */
-#ifdef TESTING
-
-STATIC void _styles_xml_declaration(lxw_styles *self);
-STATIC void _write_style_sheet(lxw_styles *self);
-STATIC void _write_font_size(lxw_styles *self, uint16_t font_size);
-STATIC void _write_font_color_theme(lxw_styles *self, uint8_t theme);
-STATIC void _write_font_name(lxw_styles *self, const char *font_name);
-STATIC void _write_font_family(lxw_styles *self, uint8_t font_family);
-STATIC void _write_font_scheme(lxw_styles *self, const char *font_scheme);
-STATIC void _write_font(lxw_styles *self, lxw_format *format);
-STATIC void _write_fonts(lxw_styles *self);
-STATIC void _write_default_fill(lxw_styles *self, const char *pattern);
-STATIC void _write_fills(lxw_styles *self);
-STATIC void _write_border(lxw_styles *self, lxw_format *format);
-STATIC void _write_borders(lxw_styles *self);
-STATIC void _write_style_xf(lxw_styles *self);
-STATIC void _write_cell_style_xfs(lxw_styles *self);
-STATIC void _write_xf(lxw_styles *self, lxw_format *format);
-STATIC void _write_cell_xfs(lxw_styles *self);
-STATIC void _write_cell_style(lxw_styles *self);
-STATIC void _write_cell_styles(lxw_styles *self);
-STATIC void _write_dxfs(lxw_styles *self);
-STATIC void _write_table_styles(lxw_styles *self);
-
-#endif /* TESTING */
 
 } // namespace xlsxwriter
 

@@ -38,24 +38,21 @@ void relationships::_xml_declaration()
  */
 void relationships::_write_relationship(const std::string& type, const std::string& target, const std::string& target_mode)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char r_id[LXW_MAX_ATTRIBUTE_LENGTH] = { 0 };
 
-    self->rel_id++;
-    lxw_snprintf(r_id, LXW_ATTR_32, "rId%d", self->rel_id);
+    rel_id++;
+    lxw_snprintf(r_id, LXW_ATTR_32, "rId%d", rel_id);
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("Id", r_id);
-    LXW_PUSH_ATTRIBUTES_STR("Type", type);
-    LXW_PUSH_ATTRIBUTES_STR("Target", target);
+    xml_attribute_list attributes = {
+        {"Id", r_id},
+        {"Type", type},
+        {"Target", target}
+    };
 
     if (target_mode)
-        LXW_PUSH_ATTRIBUTES_STR("TargetMode", target_mode);
+        attributes.push_back(std::make_pair("TargetMode", target_mode));
 
-    lxw_xml_empty_tag("Relationship", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("Relationship", attributes);
 }
 
 /*
@@ -63,20 +60,15 @@ void relationships::_write_relationship(const std::string& type, const std::stri
  */
 void relationships::_write_relationships()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_rel_tuple *rel;
+    xml_attribute_list attributes = {
+        {"xmlns", LXW_SCHEMA_PACKAGE}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("xmlns", LXW_SCHEMA_PACKAGE);
+    lxw_xml_start_tag("Relationships", attributes);
 
-    lxw_xml_start_tag("Relationships", &attributes);
-
-    STAILQ_FOREACH(rel, self->relationships, list_pointers) {
-        _write_relationship(self, rel->type, rel->target, rel->target_mode);
+    for (const auto& rel : relations) {
+        _write_relationship(rel->type, rel->target, rel->target_mode);
     }
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*****************************************************************************

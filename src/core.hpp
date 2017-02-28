@@ -16,10 +16,12 @@
 
 namespace xlsxwriter {
 
+class packager;
 /*
  * Struct to represent a core.
  */
 class core : public xmlwriter {
+    friend class packager;
 public:
     void assemble_xml_file();
 

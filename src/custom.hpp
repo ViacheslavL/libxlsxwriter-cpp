@@ -16,10 +16,13 @@
 
 namespace xlsxwriter {
 
+
+class packager;
 /*
  * class to represent a custom property file object.
  */
 class custom : public xmlwriter {
+    friend class packager;
 public:
 
     custom(const std::list<custom_property_ptr>& properties);

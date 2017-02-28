@@ -7,13 +7,15 @@
  *
  */
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/styles.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "styles.hpp"
+#include "utility.hpp"
 
 /*
  * Forward declarations.
  */
+
+namespace xlsxwriter {
 
 /*****************************************************************************
  *
@@ -73,8 +75,7 @@ lxw_styles_free(lxw_styles *styles)
 /*
  * Write the XML declaration.
  */
-STATIC void
-_styles_xml_declaration(lxw_styles *self)
+void styles::_xml_declaration()
 {
     lxw_xml_declaration();
 }
@@ -83,7 +84,7 @@ _styles_xml_declaration(lxw_styles *self)
  * Write the <styleSheet> element.
  */
 STATIC void
-_write_style_sheet(lxw_styles *self)
+_write_style_sheet()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -100,7 +101,7 @@ _write_style_sheet(lxw_styles *self)
  * Write the <numFmt> element.
  */
 STATIC void
-_write_num_fmt(lxw_styles *self, uint16_t num_fmt_id, char *format_code)
+_write_num_fmt(uint16_t num_fmt_id, char *format_code)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -118,7 +119,7 @@ _write_num_fmt(lxw_styles *self, uint16_t num_fmt_id, char *format_code)
  * Write the <numFmts> element.
  */
 STATIC void
-_write_num_fmts(lxw_styles *self)
+_write_num_fmts()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -151,7 +152,7 @@ _write_num_fmts(lxw_styles *self)
  * Write the <sz> element.
  */
 STATIC void
-_write_font_size(lxw_styles *self, uint16_t font_size)
+_write_font_size(uint16_t font_size)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -168,7 +169,7 @@ _write_font_size(lxw_styles *self, uint16_t font_size)
  * Write the <color> element for themes.
  */
 STATIC void
-_write_font_color_theme(lxw_styles *self, uint8_t theme)
+_write_font_color_theme(uint8_t theme)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -185,7 +186,7 @@ _write_font_color_theme(lxw_styles *self, uint8_t theme)
  * Write the <color> element for RGB colors.
  */
 STATIC void
-_write_font_color_rgb(lxw_styles *self, int32_t rgb)
+_write_font_color_rgb(int32_t rgb)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -205,7 +206,7 @@ _write_font_color_rgb(lxw_styles *self, int32_t rgb)
  * Write the <name> element.
  */
 STATIC void
-_write_font_name(lxw_styles *self, const char *font_name)
+_write_font_name(const char *font_name)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -226,7 +227,7 @@ _write_font_name(lxw_styles *self, const char *font_name)
  * Write the <family> element.
  */
 STATIC void
-_write_font_family(lxw_styles *self, uint8_t font_family)
+_write_font_family(uint8_t font_family)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -243,7 +244,7 @@ _write_font_family(lxw_styles *self, uint8_t font_family)
  * Write the <scheme> element.
  */
 STATIC void
-_write_font_scheme(lxw_styles *self, const char *font_scheme)
+_write_font_scheme(const char *font_scheme)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -264,7 +265,7 @@ _write_font_scheme(lxw_styles *self, const char *font_scheme)
  * Write the underline font element.
  */
 STATIC void
-_write_font_underline(lxw_styles *self, uint8_t underline)
+_write_font_underline(uint8_t underline)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -290,7 +291,7 @@ _write_font_underline(lxw_styles *self, uint8_t underline)
  * Write the <vertAlign> font sub-element.
  */
 STATIC void
-_write_vert_align(lxw_styles *self, const char *align)
+_write_vert_align(const char *align)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -307,7 +308,7 @@ _write_vert_align(lxw_styles *self, const char *align)
  * Write the <font> element.
  */
 STATIC void
-_write_font(lxw_styles *self, lxw_format *format)
+_write_font(lxw_format *format)
 {
     lxw_xml_start_tag("font", NULL);
 
@@ -363,7 +364,7 @@ _write_font(lxw_styles *self, lxw_format *format)
  * Write the <fonts> element.
  */
 STATIC void
-_write_fonts(lxw_styles *self)
+_write_fonts()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -388,7 +389,7 @@ _write_fonts(lxw_styles *self)
  * Write the default <fill> element.
  */
 STATIC void
-_write_default_fill(lxw_styles *self, const char *pattern)
+_write_default_fill(const char *pattern)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -407,7 +408,7 @@ _write_default_fill(lxw_styles *self, const char *pattern)
  * Write the <fgColor> element.
  */
 STATIC void
-_write_fg_color(lxw_styles *self, lxw_color_t color)
+_write_fg_color(lxw_color_t color)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -427,7 +428,7 @@ _write_fg_color(lxw_styles *self, lxw_color_t color)
  * Write the <bgColor> element.
  */
 STATIC void
-_write_bg_color(lxw_styles *self, lxw_color_t color)
+_write_bg_color(lxw_color_t color)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -452,7 +453,7 @@ _write_bg_color(lxw_styles *self, lxw_color_t color)
  * Write the <fill> element.
  */
 STATIC void
-_write_fill(lxw_styles *self, lxw_format *format)
+_write_fill(lxw_format *format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -507,7 +508,7 @@ _write_fill(lxw_styles *self, lxw_format *format)
  * Write the <fills> element.
  */
 STATIC void
-_write_fills(lxw_styles *self)
+_write_fills()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -536,7 +537,7 @@ _write_fills(lxw_styles *self)
  * Write the border <color> element.
  */
 STATIC void
-_write_border_color(lxw_styles *self, lxw_color_t color)
+_write_border_color(lxw_color_t color)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -561,7 +562,7 @@ _write_border_color(lxw_styles *self, lxw_color_t color)
  * Write the <border> sub elements such as <right>, <top>, etc.
  */
 STATIC void
-_write_sub_border(lxw_styles *self, const char *type, uint8_t style,
+_write_sub_border(const char *type, uint8_t style,
                   lxw_color_t color)
 {
     struct xml_attribute_list attributes;
@@ -605,7 +606,7 @@ _write_sub_border(lxw_styles *self, const char *type, uint8_t style,
  * Write the <border> element.
  */
 STATIC void
-_write_border(lxw_styles *self, lxw_format *format)
+_write_border(lxw_format *format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -649,7 +650,7 @@ _write_border(lxw_styles *self, lxw_format *format)
  * Write the <borders> element.
  */
 STATIC void
-_write_borders(lxw_styles *self)
+_write_borders()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -674,7 +675,7 @@ _write_borders(lxw_styles *self)
  * Write the <xf> element for styles.
  */
 STATIC void
-_write_style_xf(lxw_styles *self)
+_write_style_xf()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -694,7 +695,7 @@ _write_style_xf(lxw_styles *self)
  * Write the <cellStyleXfs> element.
  */
 STATIC void
-_write_cell_style_xfs(lxw_styles *self)
+_write_cell_style_xfs()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -744,7 +745,7 @@ _has_alignment(lxw_format *format)
  * Write the <alignment> element.
  */
 STATIC void
-_write_alignment(lxw_styles *self, lxw_format *format)
+_write_alignment(lxw_format *format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -852,7 +853,7 @@ _write_alignment(lxw_styles *self, lxw_format *format)
  * Write the <protection> element.
  */
 STATIC void
-_write_protection(lxw_styles *self, lxw_format *format)
+_write_protection(lxw_format *format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -874,7 +875,7 @@ _write_protection(lxw_styles *self, lxw_format *format)
  * Write the <xf> element.
  */
 STATIC void
-_write_xf(lxw_styles *self, lxw_format *format)
+_write_xf(lxw_format *format)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -934,7 +935,7 @@ _write_xf(lxw_styles *self, lxw_format *format)
  * Write the <cellXfs> element.
  */
 STATIC void
-_write_cell_xfs(lxw_styles *self)
+_write_cell_xfs()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -958,7 +959,7 @@ _write_cell_xfs(lxw_styles *self)
  * Write the <cellStyle> element.
  */
 STATIC void
-_write_cell_style(lxw_styles *self)
+_write_cell_style()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -977,7 +978,7 @@ _write_cell_style(lxw_styles *self)
  * Write the <cellStyles> element.
  */
 STATIC void
-_write_cell_styles(lxw_styles *self)
+_write_cell_styles()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -995,7 +996,7 @@ _write_cell_styles(lxw_styles *self)
  * Write the <dxfs> element.
  */
 STATIC void
-_write_dxfs(lxw_styles *self)
+_write_dxfs()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1012,7 +1013,7 @@ _write_dxfs(lxw_styles *self)
  * Write the <tableStyles> element.
  */
 STATIC void
-_write_table_styles(lxw_styles *self)
+_write_table_styles()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -1036,41 +1037,40 @@ _write_table_styles(lxw_styles *self)
 /*
  * Assemble and write the XML file.
  */
-void
-lxw_styles_assemble_xml_file(lxw_styles *self)
+void styles::assemble_xml_file()
 {
     /* Write the XML declaration. */
-    _styles_xml_declaration(self);
+    _xml_declaration();
 
     /* Add the style sheet. */
-    _write_style_sheet(self);
+    _write_style_sheet();
 
     /* Write the number formats. */
-    _write_num_fmts(self);
+    _write_num_fmts();
 
     /* Write the fonts. */
-    _write_fonts(self);
+    _write_fonts();
 
     /* Write the fills. */
-    _write_fills(self);
+    _write_fills();
 
     /* Write the borders element. */
-    _write_borders(self);
+    _write_borders();
 
     /* Write the cellStyleXfs element. */
-    _write_cell_style_xfs(self);
+    _write_cell_style_xfs();
 
     /* Write the cellXfs element. */
-    _write_cell_xfs(self);
+    _write_cell_xfs();
 
     /* Write the cellStyles element. */
-    _write_cell_styles(self);
+    _write_cell_styles();
 
     /* Write the dxfs element. */
-    _write_dxfs(self);
+    _write_dxfs();
 
     /* Write the tableStyles element. */
-    _write_table_styles(self);
+    _write_table_styles();
 
     /* Write the colors element. */
     /* _write_colors(self); */
@@ -1079,6 +1079,8 @@ lxw_styles_assemble_xml_file(lxw_styles *self)
     lxw_xml_end_tag("styleSheet");
 }
 
+
+} // namespace xlsxwriter
 /*****************************************************************************
  *
  * Public functions.

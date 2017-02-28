@@ -25,7 +25,8 @@ namespace xlsxwriter {
 /*
  * Create a new app object.
  */
-app::app()
+app::app() :
+    properties(nullptr)
 {
 }
 
@@ -193,8 +194,8 @@ void app::_write_titles_of_parts()
  */
 void app::_write_manager()
 {
-    if (!properties.manager.empty())
-        lxw_xml_data_element("Manager", properties.manager);
+    if (properties && !properties->manager.empty())
+        lxw_xml_data_element("Manager", properties->manager);
 }
 
 /*
@@ -203,8 +204,8 @@ void app::_write_manager()
 void app::_write_company()
 {
 
-    if (!properties.company.empty())
-        lxw_xml_data_element("Company", properties.company);
+    if (properties && !properties->company.empty())
+        lxw_xml_data_element("Company", properties->company);
     else
         lxw_xml_data_element("Company", "");
 }
@@ -230,8 +231,8 @@ void app::_write_shared_doc()
  */
 void app::_write_hyperlink_base()
 {
-    if (!properties.hyperlink_base.empty())
-        lxw_xml_data_element("HyperlinkBase", properties.hyperlink_base);
+    if (properties && !properties->hyperlink_base.empty())
+        lxw_xml_data_element("HyperlinkBase", properties->hyperlink_base);
 }
 
 /*

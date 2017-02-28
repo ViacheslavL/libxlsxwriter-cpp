@@ -9,9 +9,11 @@
 
 #include <string.h>
 
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/theme.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "theme.hpp"
+#include "utility.hpp"
+
+namespace xlsxwriter {
 
 const char *theme_strs[] = {
     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n",
@@ -281,40 +283,6 @@ const char *theme_strs[] = {
 
 /*****************************************************************************
  *
- * Private functions.
- *
- ****************************************************************************/
-
-/*
- * Create a new theme object.
- */
-lxw_theme *
-lxw_theme_new()
-{
-    lxw_theme *theme = calloc(1, sizeof(lxw_theme));
-    GOTO_LABEL_ON_MEM_ERROR(theme, mem_error);
-
-    return theme;
-
-mem_error:
-    lxw_theme_free(theme);
-    return NULL;
-}
-
-/*
- * Free a theme object.
- */
-void
-lxw_theme_free(lxw_theme *theme)
-{
-    if (!theme)
-        return;
-
-    free(theme);
-}
-
-/*****************************************************************************
- *
  * XML functions.
  *
  ****************************************************************************/
@@ -330,16 +298,17 @@ lxw_theme_free(lxw_theme *theme)
 /*
  * Assemble and write the XML file.
  */
-void
-lxw_theme_assemble_xml_file(lxw_theme *self)
+void theme::assemble_xml_file()
 {
     int i = 0;
 
     while (strlen(theme_strs[i])) {
-        fprintf(self->file, "%s", theme_strs[i]);
+        fprintf(file, "%s", theme_strs[i]);
         i++;
     }
 }
+
+} // namespace xlsxwriter
 
 /*****************************************************************************
  *

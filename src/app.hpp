@@ -40,7 +40,7 @@ private:
 
     std::map<std::string, std::string> heading_pairs;
     std::list<std::string> part_names;
-    doc_properties properties;
+    doc_properties* properties;
 
     uint32_t num_heading_pairs;
     uint32_t num_part_names;

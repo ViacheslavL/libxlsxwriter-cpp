@@ -2489,9 +2489,9 @@ private:
     uint16_t hbreaks_count;
     uint16_t vbreaks_count;
 
-    std::list<rel_tuple> external_hyperlinks;
-    std::list<rel_tuple> external_drawing_links;
-    std::list<rel_tuple> drawing_links;
+    std::list<rel_tuple_ptr> external_hyperlinks;
+    std::list<rel_tuple_ptr> external_drawing_links;
+    std::list<rel_tuple_ptr> drawing_links;
 
     lxw_panes panes;
 
