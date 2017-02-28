@@ -481,6 +481,8 @@ struct series_options {
     uint8_t y2_axis;
 };
 
+class packager;
+
 /**
  * @brief Class to represent an Excel chart.
  *
@@ -488,7 +490,7 @@ struct series_options {
  * the chart properties are set by calling the functions shown in chart.h.
  */
 class chart : public xmlwriter {
-
+    friend class packager;
 public:
 
     chart(uint8_t type);

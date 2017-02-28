@@ -259,7 +259,7 @@ void app::_write_app_version()
 /*
  * Assemble and write the XML file.
  */
-void app::_assemble_xml_file()
+void app::assemble_xml_file()
 {
 
     /* Write the XML declaration. */
@@ -291,7 +291,7 @@ void app::_assemble_xml_file()
 /*
  * Add the name of a workbook Part such as 'Sheet1' or 'Print_Titles'.
  */
-void app::_add_part_name(const std::string& name)
+void app::add_part_name(const std::string& name)
 {
     part_names.push_back(name);
 }
@@ -300,7 +300,7 @@ void app::_add_part_name(const std::string& name)
  * Add the name of a workbook Heading Pair such as 'Worksheets', 'Charts' or
  * 'Named Ranges'.
  */
-void app::_add_heading_pair(const std::string& key, const std::string& value)
+void app::add_heading_pair(const std::string& key, const std::string& value)
 {
     heading_pairs.insert(std::make_pair(key, value));
 }

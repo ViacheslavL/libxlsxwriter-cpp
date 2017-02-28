@@ -18,15 +18,18 @@
 
 namespace xlsxwriter {
 
+class packager;
+
 /* Class to represent an App object. */
 class app : public xmlwriter {
+    friend class packager;
 public:
 
     app();
     ~app();
-    void _assemble_xml_file();
-    void _add_part_name(const std::string& name);
-    void _add_heading_pair(const std::string& key, const std::string& value);
+    void assemble_xml_file();
+    void add_part_name(const std::string& name);
+    void add_heading_pair(const std::string& key, const std::string& value);
 
     /* Declarations required for unit testing. */
     void _xml_declaration();

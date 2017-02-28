@@ -284,7 +284,7 @@ lxw_worksheet_free(lxw_worksheet *worksheet)
     lxw_merged_range *merged_range;
     lxw_image_options *image_options;
     lxw_selection *selection;
-    lxw_rel_tuple *relationship;
+    rel_tuple *relationship;
 
     if (!worksheet)
         return;
@@ -1896,7 +1896,7 @@ lxw_worksheet_prepare_image(
                             lxw_image_options *image_data)
 {
     lxw_drawing_object *drawing_object;
-    lxw_rel_tuple *relationship;
+    rel_tuple *relationship;
     double width;
     double height;
     char filename[LXW_FILENAME_LENGTH];
@@ -1906,7 +1906,7 @@ lxw_worksheet_prepare_image(
         self->drawing->embedded = true;
         RETURN_VOID_ON_MEM_ERROR(self->drawing);
 
-        relationship = calloc(1, sizeof(lxw_rel_tuple));
+        relationship = calloc(1, sizeof(rel_tuple));
         GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
 
         relationship->type = lxw_strdup("/drawing");
@@ -1949,7 +1949,7 @@ lxw_worksheet_prepare_image(
 
     lxw_add_drawing_object(self->drawing, drawing_object);
 
-    relationship = calloc(1, sizeof(lxw_rel_tuple));
+    relationship = calloc(1, sizeof(rel_tuple));
     GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
 
     relationship->type = lxw_strdup("/image");
@@ -1983,7 +1983,7 @@ lxw_worksheet_prepare_chart(
                             lxw_image_options *image_data)
 {
     lxw_drawing_object *drawing_object;
-    lxw_rel_tuple *relationship;
+    rel_tuple *relationship;
     double width;
     double height;
     char filename[LXW_FILENAME_LENGTH];
@@ -1993,7 +1993,7 @@ lxw_worksheet_prepare_chart(
         self->drawing->embedded = true;
         RETURN_VOID_ON_MEM_ERROR(self->drawing);
 
-        relationship = calloc(1, sizeof(lxw_rel_tuple));
+        relationship = calloc(1, sizeof(rel_tuple));
         GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
 
         relationship->type = lxw_strdup("/drawing");
@@ -2046,7 +2046,7 @@ lxw_worksheet_prepare_chart(
 
     lxw_add_drawing_object(self->drawing, drawing_object);
 
-    relationship = calloc(1, sizeof(lxw_rel_tuple));
+    relationship = calloc(1, sizeof(rel_tuple));
     GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
 
     relationship->type = lxw_strdup("/chart");
@@ -3126,7 +3126,7 @@ worksheet::_write_hyperlinks()
 
     lxw_row *row;
     lxw_cell *link;
-    lxw_rel_tuple *relationship;
+    rel_tuple *relationship;
 
     if (RB_EMPTY(self->hyperlinks))
         return;
@@ -3143,7 +3143,7 @@ worksheet::_write_hyperlinks()
 
                 self->rel_count++;
 
-                relationship = calloc(1, sizeof(lxw_rel_tuple));
+                relationship = calloc(1, sizeof(rel_tuple));
                 GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
 
                 relationship->type = lxw_strdup("/hyperlink");

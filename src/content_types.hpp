@@ -64,6 +64,8 @@ private:
     void _write_overrides();
 };
 
+typedef std::shared_ptr<content_types> content_types_ptr;
+
 } // namespace xlsxwriter
 
 #endif /* __LXW_CONTENT_TYPES_H__ */

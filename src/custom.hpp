@@ -42,6 +42,8 @@ private:
     void _chart_write_custom_property(const custom_property_ptr &custom_property);
 };
 
+typedef std::shared_ptr<custom> custom_ptr;
+
 }
 
 #endif /* __LXW_CUSTOM_HPP__ */

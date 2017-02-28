@@ -8,63 +8,14 @@
  */
 
 #include <string.h>
-#include "xlsxwriter/xmlwriter.h"
-#include "xlsxwriter/relationships.h"
-#include "xlsxwriter/utility.h"
+#include "xmlwriter.hpp"
+#include "relationships.hpp"
+#include "utility.hpp"
 
 /*
  * Forward declarations.
  */
 
-/*****************************************************************************
- *
- * Private functions.
- *
- ****************************************************************************/
-
-/*
- * Create a new relationships object.
- */
-lxw_relationships *
-lxw_relationships_new()
-{
-    lxw_relationships *rels = calloc(1, sizeof(lxw_relationships));
-    GOTO_LABEL_ON_MEM_ERROR(rels, mem_error);
-
-    rels->relationships = calloc(1, sizeof(struct lxw_rel_tuples));
-    GOTO_LABEL_ON_MEM_ERROR(rels->relationships, mem_error);
-    STAILQ_INIT(rels->relationships);
-
-    return rels;
-
-mem_error:
-    lxw_free_relationships(rels);
-    return NULL;
-}
-
-/*
- * Free a relationships object.
- */
-void
-lxw_free_relationships(lxw_relationships *rels)
-{
-    lxw_rel_tuple *relationship;
-
-    if (!rels)
-        return;
-
-    while (!STAILQ_EMPTY(rels->relationships)) {
-        relationship = STAILQ_FIRST(rels->relationships);
-        STAILQ_REMOVE_HEAD(rels->relationships, list_pointers);
-        free(relationship->type);
-        free(relationship->target);
-        free(relationship->target_mode);
-        free(relationship);
-    }
-
-    free(rels->relationships);
-    free(rels);
-}
 
 /*****************************************************************************
  *
@@ -72,11 +23,12 @@ lxw_free_relationships(lxw_relationships *rels)
  *
  ****************************************************************************/
 
+namespace xlsxwriter {
+
 /*
  * Write the XML declaration.
  */
-STATIC void
-_relationships_xml_declaration(lxw_relationships *self)
+void relationships::_xml_declaration()
 {
     lxw_xml_declaration();
 }
@@ -84,9 +36,7 @@ _relationships_xml_declaration(lxw_relationships *self)
 /*
  * Write the <Relationship> element.
  */
-STATIC void
-_write_relationship(lxw_relationships *self, const char *type,
-                    const char *target, const char *target_mode)
+void relationships::_write_relationship(const std::string& type, const std::string& target, const std::string& target_mode)
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -111,8 +61,7 @@ _write_relationship(lxw_relationships *self, const char *type,
 /*
  * Write the <Relationships> element.
  */
-STATIC void
-_write_relationships(lxw_relationships *self)
+void relationships::_write_relationships()
 {
     struct xml_attribute_list attributes;
     struct xml_attribute *attribute;
@@ -139,13 +88,12 @@ _write_relationships(lxw_relationships *self)
 /*
  * Assemble and write the XML file.
  */
-void
-lxw_relationships_assemble_xml_file(lxw_relationships *self)
+void relationships::assemble_xml_file()
 {
     /* Write the XML declaration. */
-    _relationships_xml_declaration(self);
+    _xml_declaration();
 
-    _write_relationships(self);
+    _write_relationships();
 
     /* Close the relationships tag. */
     lxw_xml_end_tag("Relationships");
@@ -154,45 +102,28 @@ lxw_relationships_assemble_xml_file(lxw_relationships *self)
 /*
  * Add a generic container relationship to XLSX .rels xml files.
  */
-STATIC void
-_add_relationship(lxw_relationships *self, const char *schema,
-                  const char *type, const char *target,
-                  const char *target_mode)
+void relationships::_add_relationship(
+    const std::string& schema,
+    const std::string& type,
+    const std::string& target,
+    const std::string& target_mode)
 {
-    lxw_rel_tuple *relationship;
+    rel_tuple_ptr relationship = std::make_shared<rel_tuple>();
 
-    if (!schema || !type || !target)
+    if (schema.empty() || type.empty() || target.empty())
         return;
 
-    relationship = calloc(1, sizeof(lxw_rel_tuple));
-    GOTO_LABEL_ON_MEM_ERROR(relationship, mem_error);
-
-    relationship->type = calloc(1, LXW_MAX_ATTRIBUTE_LENGTH);
-    GOTO_LABEL_ON_MEM_ERROR(relationship->type, mem_error);
-
     /* Add the schema to the relationship type. */
-    lxw_snprintf(relationship->type, LXW_MAX_ATTRIBUTE_LENGTH, "%s%s",
-                 schema, type);
+    /// @todo reduce to LXW_MAX_ATTRIBUTE_TYPE
+    relationship->type = schema + type;
 
-    relationship->target = lxw_strdup(target);
-    GOTO_LABEL_ON_MEM_ERROR(relationship->target, mem_error);
+    relationship->target = target;
 
-    if (target_mode) {
-        relationship->target_mode = lxw_strdup(target_mode);
-        GOTO_LABEL_ON_MEM_ERROR(relationship->target_mode, mem_error);
+    if (!target_mode.empty()) {
+        relationship->target_mode = target_mode;
     }
 
-    STAILQ_INSERT_TAIL(self->relationships, relationship, list_pointers);
-
-    return;
-
-mem_error:
-    if (relationship) {
-        free(relationship->type);
-        free(relationship->target);
-        free(relationship->target_mode);
-        free(relationship);
-    }
+    relations.push_back(relationship);
 }
 
 /*****************************************************************************
@@ -204,39 +135,42 @@ mem_error:
 /*
  * Add a document relationship to XLSX .rels xml files.
  */
-void
-lxw_add_document_relationship(lxw_relationships *self, const char *type,
-                              const char *target)
+void relationships::add_document(
+    const std::string& type,
+    const std::string& target)
 {
-    _add_relationship(self, LXW_SCHEMA_DOCUMENT, type, target, NULL);
+    _add_relationship(LXW_SCHEMA_DOCUMENT, type, target, std::string());
 }
 
 /*
  * Add a package relationship to XLSX .rels xml files.
  */
-void
-lxw_add_package_relationship(lxw_relationships *self, const char *type,
-                             const char *target)
+void relationships::add_package(
+    const std::string& type,
+    const std::string& target)
 {
-    _add_relationship(self, LXW_SCHEMA_PACKAGE, type, target, NULL);
+    _add_relationship(LXW_SCHEMA_PACKAGE, type, target, std::string());
 }
 
 /*
  * Add a MS schema package relationship to XLSX .rels xml files.
  */
-void
-lxw_add_ms_package_relationship(lxw_relationships *self, const char *type,
-                                const char *target)
+void relationships::add_ms_package(
+    const std::string& type,
+    const std::string& target)
 {
-    _add_relationship(self, LXW_SCHEMA_MS, type, target, NULL);
+    _add_relationship(LXW_SCHEMA_MS, type, target, std::string());
 }
 
 /*
  * Add a worksheet relationship to sheet .rels xml files.
  */
-void
-lxw_add_worksheet_relationship(lxw_relationships *self, const char *type,
-                               const char *target, const char *target_mode)
+void relationships::add_worksheet(
+    const std::string& type,
+    const std::string& target,
+    const std::string& target_mode)
 {
-    _add_relationship(self, LXW_SCHEMA_DOCUMENT, type, target, target_mode);
+    _add_relationship(LXW_SCHEMA_DOCUMENT, type, target, target_mode);
 }
+
+} // namespace xlsxwriter

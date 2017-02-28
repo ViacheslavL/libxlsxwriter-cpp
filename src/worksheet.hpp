@@ -365,6 +365,8 @@ typedef struct lxw_cell {
     RB_ENTRY (lxw_cell) tree_pointers;
 } lxw_cell;
 
+class packager;
+
 /**
  * @class worksheet The Worksheet object
  *
@@ -400,7 +402,9 @@ typedef struct lxw_cell {
  * @endcode
  *
  */
-class worksheet {
+class worksheet : public xmlwriter{
+    friend class xlsxwriter::packager;
+
 public:
     /**
      * @brief Write a number to a worksheet cell.
@@ -2377,22 +2381,21 @@ public:
     void write_single_row();
 
     void prepare_image(uint16_t image_ref_id, uint16_t drawing_id,
-                       lxw_image_options *image_data);
+                       image_options *image_data);
 
     void prepare_chart(uint16_t chart_ref_id, uint16_t drawing_id,
-                       lxw_image_options *image_data);
+                       image_options *image_data);
 
     lxw_row *find_row(lxw_row_t row_num);
     lxw_cell *find_cell(lxw_row *row, lxw_col_t col_num);
 private:
-    FILE *file_;
     FILE *optimize_tmpfile;
     lxw_table_rows *table;
     lxw_table_rows *hyperlinks;
     lxw_cell **array;
     lxw_merged_ranges *merged_ranges;
     lxw_selections *selections;
-    lxw_image_data *image_data;
+    std::vector<std::shared_ptr<image_options>> image_data;
     lxw_chart_data *chart_data;
 
     lxw_row_t dim_rowmin;
@@ -2486,9 +2489,9 @@ private:
     uint16_t hbreaks_count;
     uint16_t vbreaks_count;
 
-    std::list<lxw_rel_tuple> external_hyperlinks;
-    std::list<lxw_rel_tuple> external_drawing_links;
-    std::list<lxw_rel_tuple> drawing_links;
+    std::list<rel_tuple> external_hyperlinks;
+    std::list<rel_tuple> external_drawing_links;
+    std::list<rel_tuple> drawing_links;
 
     lxw_panes panes;
 

@@ -100,6 +100,8 @@ struct defined_name {
     TAILQ_ENTRY (lxw_defined_name) list_pointers;
 };
 
+typedef std::shared_ptr<defined_name> defined_name_ptr;
+
 /**
  * Workbook document properties.
  */
@@ -171,6 +173,8 @@ struct workbook_options {
     std::string tmpdir;
 };
 
+class packager;
+
 /**
  * @brief Struct to represent an Excel workbook.
  *
@@ -179,6 +183,7 @@ struct workbook_options {
  * workbook.h.
  */
 class workbook : public xmlwriter {
+    friend class packager;
 
 public:
     /**
@@ -573,9 +578,9 @@ private:
     std::vector<worksheet_ptr> worksheets;
     std::map<std::string, worksheet_ptr> worksheet_names;
     std::vector<chart_ptr> charts;
-    std::vector<chart_ptr> *ordered_charts;
-    std::vector<format_ptr> *formats;
-    struct lxw_defined_names *defined_names;
+    std::vector<chart_ptr> ordered_charts;
+    std::vector<format_ptr> formats;
+    std::vector<defined_name_ptr> defined_names;
     lxw_sst *sst;
     doc_properties properties;
     std::map<std::string, std::string> custom_properties;

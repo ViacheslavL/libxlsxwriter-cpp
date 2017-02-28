@@ -61,9 +61,9 @@ private:
     size_t buffer_size;
     zipFile zipfile;
     zip_fileinfo zipfile_info;
-    char *filename;
-    char *buffer;
-    char *tmpdir;
+    std::string filename;
+    std::string buffer;
+    std::string tmpdir;
 
     uint16_t chart_count;
     uint16_t drawing_count;
@@ -71,6 +71,17 @@ private:
     uint8_t _write_workbook_file();
     uint8_t _write_worksheet_files();
     uint8_t _write_image_files();
+    uint8_t _write_root_rels_file();
+    uint8_t _write_shared_strings_file();
+    uint8_t _write_app_file();
+    uint8_t _write_chart_files();
+    uint8_t _write_drawing_files();
+    uint8_t _write_core_file();
+    uint8_t _write_custom_file();
+    uint8_t _add_file_to_zip(FILE *file, const char *filename);
+    uint8_t _write_worksheet_rels_file();
+    uint8_t _write_drawing_rels_file();
+    uint8_t _write_content_types_file();
 };
 
 } // namespace xlsxwriter

@@ -69,10 +69,12 @@ struct drawing_object {
 
 typedef std::shared_ptr<drawing_object> drawing_object_ptr;
 
+class packager;
 /*
  * Struct to represent a collection of drawings.
  */
 struct drawing : public xmlwriter {
+    friend class packager;
 public:
     void assemble_xml_file();
     void add_drawing_object(const drawing_object_ptr& drawing_object);
