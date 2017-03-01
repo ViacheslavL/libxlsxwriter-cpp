@@ -18,6 +18,8 @@
 
 namespace xlsxwriter {
 
+class packager;
+
 struct rel_tuple {
     std::string type;
     std::string target;
@@ -30,7 +32,7 @@ typedef std::shared_ptr<rel_tuple> rel_tuple_ptr;
  * Struct to represent a relationships.
  */
 class relationships : public xmlwriter{
-
+    friend class packager;
 public:
     void assemble_xml_file();
 
@@ -43,10 +45,10 @@ public:
     #ifdef TESTING
 
 
-    void _xml_declaration();
+
 
     #endif /* TESTING */
-
+    void _xml_declaration();
 
 private:
     uint32_t rel_id;
@@ -55,7 +57,11 @@ private:
 
     void _write_relationships();
     void _add_relationship(const std::string &schema, const std::string &type, const std::string &target, const std::string &target_mode);
+    void _write_relationship(const std::string &type, const std::string &target, const std::string &target_mode);
 };
+
+
+typedef std::shared_ptr<relationships> relationships_ptr;
 
 } // namespace xlsxwriter
 

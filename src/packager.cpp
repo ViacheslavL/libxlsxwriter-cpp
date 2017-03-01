@@ -74,8 +74,6 @@ packager::packager(const std::string& filename, const std::string& tmpdir)
     this->filename = filename;
     this->tmpdir = tmpdir;
 
-    buffer_size = LXW_ZIP_BUFFER_SIZE;
-
     /* Initialize the zip_fileinfo struct to Jan 1 1980 like Excel. */
     zipfile_info.tmz_date.tm_sec = 0;
     zipfile_info.tmz_date.tm_min = 0;
@@ -404,24 +402,26 @@ uint8_t packager::_write_theme_file()
  */
 uint8_t packager::_write_styles_file()
 {
-    lxw_styles *styles = lxw_styles_new();
-    lxw_hash_element *hash_element;
+    std::shared_ptr<xlsxwriter::styles> styles = std::make_shared<xlsxwriter::styles>();
     int err;
 
     /* Copy the unique and in-use formats from the workbook to the styles
      * xf_format list. */
-    LXW_FOREACH_ORDERED(hash_element, self->workbook->used_xf_formats) {
+    for (const auto& format : workbook->used_xf_formats) {
+        /*
         lxw_format *workbook_format = (lxw_format *) hash_element->value;
         lxw_format *style_format = lxw_format_new();
         memcpy(style_format, workbook_format, sizeof(lxw_format));
         STAILQ_INSERT_TAIL(styles->xf_formats, style_format, list_pointers);
+        */
+        styles->xf_formats.push_back(format);
     }
 
     styles->font_count = workbook->font_count;
     styles->border_count = workbook->border_count;
     styles->fill_count = workbook->fill_count;
     styles->num_format_count = workbook->num_format_count;
-    styles->xf_count = workbook->used_xf_formats->unique_count;
+    styles->xf_count = workbook->used_xf_formats.size();
 
     styles->file = lxw_tmpfile(tmpdir.c_str());
     if (!styles->file)
@@ -433,8 +433,6 @@ uint8_t packager::_write_styles_file()
     RETURN_ON_ERROR(err);
 
     fclose(styles->file);
-
-    lxw_styles_free(styles);
 
     return 0;
 }
@@ -471,13 +469,13 @@ uint8_t packager::_write_content_types_file()
     for (index = 1; index <= chart_count; index++) {
         lxw_snprintf(filename, LXW_FILENAME_LENGTH, "/xl/charts/chart%d.xml",
                      index);
-        lxw_ct_add_chart_name(content_types, filename);
+        content_types->add_chart_name(filename);
     }
 
-    for (index = 1; index <= self->drawing_count; index++) {
+    for (index = 1; index <= drawing_count; index++) {
         lxw_snprintf(filename, LXW_FILENAME_LENGTH,
                      "/xl/drawings/drawing%d.xml", index);
-        lxw_ct_add_drawing_name(content_types, filename);
+        content_types->add_drawing_name(filename);
     }
 
     if (workbook->sst->string_count)
@@ -528,7 +526,6 @@ uint8_t packager::_write_workbook_rels_file()
     RETURN_ON_ERROR(err);
 
     fclose(rels->file);
-    lxw_free_relationships(rels);
 
     return 0;
 }
@@ -551,7 +548,7 @@ uint8_t packager::_write_worksheet_rels_file()
             worksheet->external_drawing_links.empty())
             continue;
 
-        rel_tuple_ptr rels = std::make_shared<rel_tuple>();
+        relationships_ptr rels = std::make_shared<relationships>();
         rels->file = lxw_tmpfile(tmpdir.c_str());
         if (!rels->file)
             return LXW_ERROR_CREATING_TMPFILE;
@@ -621,28 +618,23 @@ uint8_t packager::_write_drawing_rels_file()
  */
 uint8_t packager::_write_root_rels_file()
 {
-    relationships *rels = lxw_relationships_new();
+    relationships_ptr rels = std::make_shared<relationships>();
     int err;
 
     rels->file = lxw_tmpfile(tmpdir.c_str());
     if (!rels->file)
         return LXW_ERROR_CREATING_TMPFILE;
 
-    lxw_add_document_relationship(rels, "/officeDocument", "xl/workbook.xml");
+    rels->add_document("/officeDocument", "xl/workbook.xml");
 
-    lxw_add_package_relationship(rels,
-                                 "/metadata/core-properties",
-                                 "docProps/core.xml");
+    rels->add_package("/metadata/core-properties", "docProps/core.xml");
 
-    lxw_add_document_relationship(rels,
-                                  "/extended-properties", "docProps/app.xml");
+    rels->add_document("/extended-properties", "docProps/app.xml");
 
     if (!workbook->custom_properties.empty())
-        lxw_add_document_relationship(rels,
-                                      "/custom-properties",
-                                      "docProps/custom.xml");
+        rels->add_document("/custom-properties", "docProps/custom.xml");
 
-    lxw_relationships_assemble_xml_file(rels);
+    rels->assemble_xml_file();
 
     err = _add_file_to_zip(rels->file, "_rels/.rels");
     RETURN_ON_ERROR(err);
@@ -662,6 +654,9 @@ uint8_t packager::_add_file_to_zip(FILE * file, const char *filename)
 {
     int16_t error = ZIP_OK;
     size_t size_read;
+    size_t buffer_size = LXW_ZIP_BUFFER_SIZE;
+    char buffer[LXW_ZIP_BUFFER_SIZE];
+    memset((void*)buffer, 0, LXW_ZIP_BUFFER_SIZE);
 
     error = zipOpenNewFileInZip4_64(zipfile,
                                     filename,

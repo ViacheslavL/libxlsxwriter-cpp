@@ -13,14 +13,17 @@
 
 #include "format.hpp"
 #include "xmlwriter.hpp"
+#include <vector>
 
 namespace xlsxwriter {
 
+class packager;
 /*
  * Struct to represent a styles.
  */
 struct styles : public xmlwriter{
 
+    friend class packager;
 public:
     void assemble_xml_file();
 
@@ -52,16 +55,14 @@ public:
     void _write_table_styles();
 
 private:
-
-    FILE *file;
     uint32_t font_count;
     uint32_t xf_count;
     uint32_t dxf_count;
     uint32_t num_format_count;
     uint32_t border_count;
     uint32_t fill_count;
-    lxw_formats *xf_formats;
-    lxw_formats *dxf_formats;
+    std::vector<format_ptr> xf_formats;
+    std::vector<format_ptr> dxf_formats;
 
 };
 

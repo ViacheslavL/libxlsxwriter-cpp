@@ -52,6 +52,7 @@
 #include "common.hpp"
 
 #include <map>
+#include <unordered_set>
 
 #define LXW_DEFINED_NAME_LENGTH 128
 
@@ -583,7 +584,7 @@ private:
     std::vector<defined_name_ptr> defined_names;
     lxw_sst *sst;
     doc_properties properties;
-    std::map<std::string, std::string> custom_properties;
+    std::list<custom_property_ptr> custom_properties;
 
     std::string filename;
     workbook_options options;
@@ -604,7 +605,8 @@ private:
     bool has_jpeg;
     bool has_bmp;
 
-    lxw_hash_table *used_xf_formats;
+    //lxw_hash_table *used_xf_formats;
+    std::unordered_set<std::shared_ptr<format>> used_xf_formats;
 
     /* Declarations required for unit testing. */
 #ifdef TESTING

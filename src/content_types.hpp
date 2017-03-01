@@ -21,11 +21,12 @@ namespace xlsxwriter {
 #define LXW_APP_PACKAGE  "application/vnd.openxmlformats-package."
 #define LXW_APP_DOCUMENT "application/vnd.openxmlformats-officedocument."
 
+class packager;
 /*
  * Struct to represent a content_types.
  */
 struct content_types : public xmlwriter {
-
+    friend class packager;
 public:
 
     content_types();

@@ -49,7 +49,7 @@ void relationships::_write_relationship(const std::string& type, const std::stri
         {"Target", target}
     };
 
-    if (target_mode)
+    if (!target_mode.empty())
         attributes.push_back(std::make_pair("TargetMode", target_mode));
 
     lxw_xml_empty_tag("Relationship", attributes);

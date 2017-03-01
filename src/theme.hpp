@@ -16,10 +16,12 @@
 
 namespace xlsxwriter {
 
+class packager;
 /*
  * Struct to represent a theme.
  */
 class theme : public xmlwriter {
+    friend class packager;
 public:
     void xml_declaration();
     void assemble_xml_file();

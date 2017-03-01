@@ -58,11 +58,11 @@ private:
     FILE *file;
     workbook_ptr workbook;
 
-    size_t buffer_size;
+    //size_t buffer_size;
     zipFile zipfile;
     zip_fileinfo zipfile_info;
     std::string filename;
-    std::string buffer;
+    //std::string buffer;
     std::string tmpdir;
 
     uint16_t chart_count;
