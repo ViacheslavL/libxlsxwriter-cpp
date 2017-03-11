@@ -884,7 +884,7 @@ worksheet::_xml_declaration()
 STATIC void
 worksheet::_write_worksheet()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char xmlns[] = "http://schemas.openxmlformats.org/"
         "spreadsheetml/2006/main";
@@ -905,7 +905,7 @@ worksheet::_write_worksheet()
 STATIC void
 worksheet::_write_dimension()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char ref[LXW_MAX_CELL_RANGE_LENGTH];
     lxw_row_t dim_rowmin = self->dim_rowmin;
@@ -942,7 +942,7 @@ worksheet::_write_dimension()
 STATIC void
 worksheet::_write_freeze_panes()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     lxw_selection *selection;
@@ -1091,7 +1091,7 @@ worksheet::_calculate_x_split_width(double x_split)
 STATIC void
 worksheet::_write_split_panes()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     lxw_selection *selection;
@@ -1230,7 +1230,7 @@ worksheet::_write_split_panes()
 STATIC void
 worksheet::_write_selection(lxw_selection *selection)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1287,7 +1287,7 @@ worksheet::_write_panes()
 STATIC void
 worksheet::_write_sheet_view()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1364,7 +1364,7 @@ worksheet::_write_sheet_views()
 STATIC void
 worksheet::_write_sheet_format_pr()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1438,7 +1438,7 @@ worksheet::_write_optimized_sheet_data()
 STATIC void
 worksheet::_write_page_margins()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     double left = self->margin_left;
     double right = self->margin_right;
@@ -1480,7 +1480,7 @@ worksheet::_write_page_margins()
 STATIC void
 worksheet::_write_page_setup()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1539,7 +1539,7 @@ worksheet::_write_page_setup()
 STATIC void
 worksheet::_write_print_options()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     if (!self->print_options_changed)
         return;
@@ -1577,7 +1577,7 @@ worksheet::_write_print_options()
 STATIC void
 _write_row(lxw_row *row, char *spans)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     int32_t xf_index = 0;
     double height;
@@ -2461,7 +2461,7 @@ _write_formula_num_cell(lxw_cell *cell)
 STATIC void
 _write_array_formula_num_cell(lxw_cell *cell)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char data[LXW_ATTR_32];
 
@@ -2539,7 +2539,7 @@ _calculate_spans(struct lxw_row *row, char *span, int32_t *block_num)
 STATIC void
 _write_cell(lxw_cell *cell, lxw_format *row_format)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char range[LXW_MAX_CELL_NAME_LENGTH] = { 0 };
     lxw_row_t row_num = cell->row_num;
@@ -2693,7 +2693,7 @@ lxw_worksheet_write_single_row()
 STATIC void
 worksheet::_write_col_info(lxw_col_options *options)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     double width = options->width;
@@ -2786,7 +2786,7 @@ worksheet::_write_merge_cell(
                             lxw_merged_range *merged_range)
 {
 
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char ref[LXW_MAX_CELL_RANGE_LENGTH];
 
@@ -2809,7 +2809,7 @@ worksheet::_write_merge_cell(
 STATIC void
 worksheet::_write_merge_cells()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     lxw_merged_range *merged_range;
 
@@ -2873,7 +2873,7 @@ worksheet::_write_header_footer()
 STATIC void
 worksheet::_write_page_set_up_pr()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     if (!self->fit_page)
@@ -2894,7 +2894,7 @@ worksheet::_write_page_set_up_pr()
 STATIC void
 worksheet::_write_tab_color()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char rgb_str[LXW_ATTR_32];
 
@@ -2918,7 +2918,7 @@ worksheet::_write_tab_color()
 STATIC void
 worksheet::_write_sheet_pr()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     if (!self->fit_page
@@ -2958,7 +2958,7 @@ worksheet::_write_sheet_pr()
 STATIC void
 worksheet::_write_brk(uint32_t id, uint32_t max)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -2977,7 +2977,7 @@ worksheet::_write_brk(uint32_t id, uint32_t max)
 STATIC void
 worksheet::_write_row_breaks()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     uint16_t count = self->hbreaks_count;
     uint16_t i;
@@ -3005,7 +3005,7 @@ worksheet::_write_row_breaks()
 STATIC void
 worksheet::_write_col_breaks()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     uint16_t count = self->vbreaks_count;
     uint16_t i;
@@ -3033,7 +3033,7 @@ worksheet::_write_col_breaks()
 STATIC void
 worksheet::_write_auto_filter()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char range[LXW_MAX_CELL_RANGE_LENGTH];
 
@@ -3061,7 +3061,7 @@ worksheet::_write_hyperlink_external(lxw_row_t row_num,
                                     lxw_col_t col_num, const char *location,
                                     const char *tooltip, uint16_t id)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char ref[LXW_MAX_CELL_NAME_LENGTH];
     char r_id[LXW_MAX_ATTRIBUTE_LENGTH];
@@ -3093,7 +3093,7 @@ worksheet::_write_hyperlink_internal(lxw_row_t row_num,
                                     lxw_col_t col_num, const char *location,
                                     const char *display, const char *tooltip)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char ref[LXW_MAX_CELL_NAME_LENGTH];
 
@@ -3197,7 +3197,7 @@ mem_error:
 STATIC void
 worksheet::_write_sheet_protection()
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     struct lxw_protection *protect = &self->protection;
@@ -3272,7 +3272,7 @@ worksheet::_write_sheet_protection()
 STATIC void
 _write_drawing(uint16_t id)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char r_id[LXW_MAX_ATTRIBUTE_LENGTH];
 

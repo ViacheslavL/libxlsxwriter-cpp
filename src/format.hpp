@@ -375,6 +375,8 @@ struct lxw_fill {
 
 };
 
+class styles;
+
 /**
  * @brief Struct to represent the formatting properties of an Excel format.
  *
@@ -400,6 +402,7 @@ struct lxw_fill {
  *
  */
 class format {
+    friend class styles;
 public:
     format();
     int32_t get_xf_index();

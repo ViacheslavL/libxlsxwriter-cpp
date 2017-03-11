@@ -17,54 +17,6 @@
 
 namespace xlsxwriter {
 
-/*****************************************************************************
- *
- * Private functions.
- *
- ****************************************************************************/
-
-/*
- * Create a new styles object.
- */
-lxw_styles *
-lxw_styles_new()
-{
-    lxw_styles *styles = calloc(1, sizeof(lxw_styles));
-    GOTO_LABEL_ON_MEM_ERROR(styles, mem_error);
-
-    styles->xf_formats = calloc(1, sizeof(struct lxw_formats));
-    GOTO_LABEL_ON_MEM_ERROR(styles->xf_formats, mem_error);
-
-    STAILQ_INIT(styles->xf_formats);
-
-    return styles;
-
-mem_error:
-    lxw_styles_free(styles);
-    return NULL;
-}
-
-/*
- * Free a styles object.
- */
-void
-lxw_styles_free(lxw_styles *styles)
-{
-    lxw_format *format;
-
-    if (!styles)
-        return;
-
-    /* Free the formats in the styles. */
-    while (!STAILQ_EMPTY(styles->xf_formats)) {
-        format = STAILQ_FIRST(styles->xf_formats);
-        STAILQ_REMOVE_HEAD(styles->xf_formats, list_pointers);
-        free(format);
-    }
-
-    free(styles->xf_formats);
-    free(styles);
-}
 
 /*****************************************************************************
  *
@@ -83,278 +35,213 @@ void styles::_xml_declaration()
 /*
  * Write the <styleSheet> element.
  */
-STATIC void
-_write_style_sheet()
+void styles::_write_style_sheet()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("xmlns",
-                            "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+    xml_attribute_list attributes = {
+        {"xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    };
 
-    lxw_xml_start_tag("styleSheet", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_start_tag("styleSheet", attributes);
 }
 
 /*
  * Write the <numFmt> element.
  */
-STATIC void
-_write_num_fmt(uint16_t num_fmt_id, char *format_code)
+void styles::_write_num_fmt(uint16_t num_fmt_id, std::string& format_code)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"numFmtId", std::to_string(num_fmt_id)},
+        {"formatCode", format_code}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("numFmtId", num_fmt_id);
-    LXW_PUSH_ATTRIBUTES_STR("formatCode", format_code);
-
-    lxw_xml_empty_tag("numFmt", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("numFmt", attributes);
 }
 
 /*
  * Write the <numFmts> element.
  */
-STATIC void
-_write_num_fmts()
+void styles::_write_num_fmts()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_format *format;
-
-    if (!self->num_format_count)
+    if (num_format_count == 0)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", self->num_format_count);
+    xml_attribute_list attributes = {
+        {"count", std::to_string(num_format_count)}
+    };
 
-    lxw_xml_start_tag("numFmts", &attributes);
+    lxw_xml_start_tag("numFmts", attributes);
 
     /* Write the numFmts elements. */
-    STAILQ_FOREACH(format, self->xf_formats, list_pointers) {
+    for (const auto& format : xf_formats) {
 
         /* Ignore built-in number formats, i.e., < 164. */
         if (format->num_format_index < 164)
             continue;
 
-        _write_num_fmt(self, format->num_format_index, format->num_format);
+        _write_num_fmt(format->num_format_index, format->num_format);
     }
 
     lxw_xml_end_tag("numFmts");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <sz> element.
  */
-STATIC void
-_write_font_size(uint16_t font_size)
+void styles::_write_font_size(uint16_t font_size)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(font_size)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", font_size);
-
-    lxw_xml_empty_tag("sz", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("sz", attributes);
 }
 
 /*
  * Write the <color> element for themes.
  */
-STATIC void
-_write_font_color_theme(uint8_t theme)
+void styles::_write_font_color_theme(uint8_t theme)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"theme", std::to_string(theme)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("theme", theme);
-
-    lxw_xml_empty_tag("color", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("color", attributes);
 }
 
 /*
  * Write the <color> element for RGB colors.
  */
-STATIC void
-_write_font_color_rgb(int32_t rgb)
+void styles::_write_font_color_rgb(int32_t rgb)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
     char rgb_str[LXW_ATTR_32];
 
     lxw_snprintf(rgb_str, LXW_ATTR_32, "FF%06X", rgb & LXW_COLOR_MASK);
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("rgb", rgb_str);
+    xml_attribute_list attributes = {
+        {"rgb", rgb_str}
+    };
 
-    lxw_xml_empty_tag("color", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("color", attributes);
 }
 
 /*
  * Write the <name> element.
  */
-STATIC void
-_write_font_name(const char *font_name)
+void styles::_write_font_name(const std::string& font_name)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", (font_name.empty() ? LXW_DEFAULT_FONT_NAME : font_name)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
+    lxw_xml_empty_tag("name", attributes);
 
-    if (*font_name)
-        LXW_PUSH_ATTRIBUTES_STR("val", font_name);
-    else
-        LXW_PUSH_ATTRIBUTES_STR("val", LXW_DEFAULT_FONT_NAME);
-
-    lxw_xml_empty_tag("name", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <family> element.
  */
-STATIC void
-_write_font_family(uint8_t font_family)
+void styles::_write_font_family(uint8_t font_family)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", std::to_string(font_family)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("val", font_family);
-
-    lxw_xml_empty_tag("family", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("family", attributes);
 }
 
 /*
  * Write the <scheme> element.
  */
-STATIC void
-_write_font_scheme(const char *font_scheme)
+void styles::_write_font_scheme(const std::string& font_scheme)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", font_scheme.empty() ? "minor" : font_scheme}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-
-    if (*font_scheme)
-        LXW_PUSH_ATTRIBUTES_STR("val", font_scheme);
-    else
-        LXW_PUSH_ATTRIBUTES_STR("val", "minor");
-
-    lxw_xml_empty_tag("scheme", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("scheme", attributes);
 }
 
 /*
  * Write the underline font element.
  */
-STATIC void
-_write_font_underline(uint8_t underline)
+void styles::_write_font_underline(uint8_t underline)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     /* Handle the underline variants. */
     if (underline == LXW_UNDERLINE_DOUBLE)
-        LXW_PUSH_ATTRIBUTES_STR("val", "double");
+        attributes.push_back({"val", "double"});
     else if (underline == LXW_UNDERLINE_SINGLE_ACCOUNTING)
-        LXW_PUSH_ATTRIBUTES_STR("val", "singleAccounting");
+        attributes.push_back({"val", "singleAccounting"});
     else if (underline == LXW_UNDERLINE_DOUBLE_ACCOUNTING)
-        LXW_PUSH_ATTRIBUTES_STR("val", "doubleAccounting");
+        attributes.push_back({"val", "doubleAccounting"});
     /* Default to single underline. */
 
-    lxw_xml_empty_tag("u", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
-
+    lxw_xml_empty_tag("u", attributes);
 }
 
 /*
  * Write the <vertAlign> font sub-element.
  */
-STATIC void
-_write_vert_align(const char *align)
+void styles::_write_vert_align(const std::string& align)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"val", align}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("val", align);
-
-    lxw_xml_empty_tag("vertAlign", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("vertAlign", attributes);
 }
 
 /*
  * Write the <font> element.
  */
-STATIC void
-_write_font(lxw_format *format)
+void styles::_write_font(const format_ptr& format)
 {
-    lxw_xml_start_tag("font", NULL);
+    lxw_xml_start_tag("font");
 
     if (format->bold)
-        lxw_xml_empty_tag("b", NULL);
+        lxw_xml_empty_tag("b");
 
     if (format->italic)
-        lxw_xml_empty_tag("i", NULL);
+        lxw_xml_empty_tag("i");
 
     if (format->font_strikeout)
-        lxw_xml_empty_tag("strike", NULL);
+        lxw_xml_empty_tag("strike");
 
     if (format->font_outline)
-        lxw_xml_empty_tag("outline", NULL);
+        lxw_xml_empty_tag("outline");
 
     if (format->font_shadow)
-        lxw_xml_empty_tag("shadow", NULL);
+        lxw_xml_empty_tag("shadow");
 
     if (format->underline)
-        _write_font_underline(self, format->underline);
+        _write_font_underline(format->underline);
 
     if (format->font_script == LXW_FONT_SUPERSCRIPT)
-        _write_vert_align(self, "superscript");
+        _write_vert_align("superscript");
 
     if (format->font_script == LXW_FONT_SUBSCRIPT)
-        _write_vert_align(self, "subscript");
+        _write_vert_align("subscript");
 
     if (format->font_size)
-        _write_font_size(self, format->font_size);
+        _write_font_size(format->font_size);
 
     if (format->theme)
-        _write_font_color_theme(self, format->theme);
+        _write_font_color_theme(format->theme);
     else if (format->font_color != LXW_COLOR_UNSET)
-        _write_font_color_rgb(self, format->font_color);
+        _write_font_color_rgb(format->font_color);
     else
-        _write_font_color_theme(self, LXW_DEFAULT_FONT_THEME);
+        _write_font_color_theme(LXW_DEFAULT_FONT_THEME);
 
-    _write_font_name(self, format->font_name);
-    _write_font_family(self, format->font_family);
+    _write_font_name(format->font_name);
+    _write_font_family(format->font_family);
 
     /* Only write the scheme element for the default font type if it
      * is a hyperlink. */
-    if ((!*format->font_name
-         || strcmp(LXW_DEFAULT_FONT_NAME, format->font_name) == 0)
+    if ((format->font_name.empty()
+         || LXW_DEFAULT_FONT_NAME == format->font_name)
         && !format->hyperlink) {
-        _write_font_scheme(self, format->font_scheme);
+        _write_font_scheme(format->font_scheme);
     }
 
     lxw_xml_end_tag("font");
@@ -363,106 +250,82 @@ _write_font(lxw_format *format)
 /*
  * Write the <fonts> element.
  */
-STATIC void
-_write_fonts()
+void styles::_write_fonts()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_format *format;
+    xml_attribute_list attributes = {
+        {"count", std::to_string(font_count)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", self->font_count);
+    lxw_xml_start_tag("fonts", attributes);
 
-    lxw_xml_start_tag("fonts", &attributes);
-
-    STAILQ_FOREACH(format, self->xf_formats, list_pointers) {
+    for (const auto& format : xf_formats) {
         if (format->has_font)
-            _write_font(self, format);
+            _write_font(format);
     }
 
     lxw_xml_end_tag("fonts");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the default <fill> element.
  */
-STATIC void
-_write_default_fill(const char *pattern)
+void styles::_write_default_fill(const std::string& pattern)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"patternType", pattern}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("patternType", pattern);
-
-    lxw_xml_start_tag("fill", NULL);
-    lxw_xml_empty_tag("patternFill", &attributes);
+    lxw_xml_start_tag("fill");
+    lxw_xml_empty_tag("patternFill", attributes);
     lxw_xml_end_tag("fill");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <fgColor> element.
  */
-STATIC void
-_write_fg_color(lxw_color_t color)
+void styles::_write_fg_color(lxw_color_t color)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+
     char rgb_str[LXW_ATTR_32];
-
-    LXW_INIT_ATTRIBUTES();
-
     lxw_snprintf(rgb_str, LXW_ATTR_32, "FF%06X", color & LXW_COLOR_MASK);
-    LXW_PUSH_ATTRIBUTES_STR("rgb", rgb_str);
+    xml_attribute_list attributes = {
+        {"rgb", rgb_str}
+    };
 
-    lxw_xml_empty_tag("fgColor", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("fgColor", attributes);
 }
 
 /*
  * Write the <bgColor> element.
  */
-STATIC void
-_write_bg_color(lxw_color_t color)
+void styles::_write_bg_color(lxw_color_t color)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
     char rgb_str[LXW_ATTR_32];
 
-    LXW_INIT_ATTRIBUTES();
-
     if (color == LXW_COLOR_UNSET) {
-        LXW_PUSH_ATTRIBUTES_STR("indexed", "64");
+        attributes.push_back({"indexed", "64"});
     }
     else {
         lxw_snprintf(rgb_str, LXW_ATTR_32, "FF%06X", color & LXW_COLOR_MASK);
-        LXW_PUSH_ATTRIBUTES_STR("rgb", rgb_str);
+        attributes.push_back({"rgb", rgb_str});
     }
 
-    lxw_xml_empty_tag("bgColor", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("bgColor", attributes);
 }
 
 /*
  * Write the <fill> element.
  */
-STATIC void
-_write_fill(lxw_format *format)
+void styles::_write_fill(const format_ptr& format)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
 
     uint8_t pattern = format->pattern;
     lxw_color_t bg_color = format->bg_color;
     lxw_color_t fg_color = format->fg_color;
 
-    char *patterns[] = {
+    static std::vector<std::string> patterns = {
         "none",
         "solid",
         "mediumGray",
@@ -484,91 +347,71 @@ _write_fill(lxw_format *format)
         "gray0625",
     };
 
-    LXW_INIT_ATTRIBUTES();
-
-    lxw_xml_start_tag("fill", NULL);
+    lxw_xml_start_tag("fill");
 
     if (pattern)
-        LXW_PUSH_ATTRIBUTES_STR("patternType", patterns[pattern]);
+        attributes.push_back({"patternType", patterns[pattern]});
 
-    lxw_xml_start_tag("patternFill", &attributes);
+    lxw_xml_start_tag("patternFill", attributes);
 
     if (fg_color != LXW_COLOR_UNSET)
-        _write_fg_color(self, fg_color);
+        _write_fg_color(fg_color);
 
-    _write_bg_color(self, bg_color);
+    _write_bg_color(bg_color);
 
     lxw_xml_end_tag("patternFill");
     lxw_xml_end_tag("fill");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <fills> element.
  */
-STATIC void
-_write_fills()
+void styles::_write_fills()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_format *format;
+    xml_attribute_list attributes = {
+        {"count", std::to_string(fill_count)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", self->fill_count);
-
-    lxw_xml_start_tag("fills", &attributes);
+    lxw_xml_start_tag("fills", attributes);
 
     /* Write the default fills. */
-    _write_default_fill(self, "none");
-    _write_default_fill(self, "gray125");
+    _write_default_fill("none");
+    _write_default_fill("gray125");
 
-    STAILQ_FOREACH(format, self->xf_formats, list_pointers) {
+    for (const auto& format : xf_formats) {
         if (format->has_fill)
-            _write_fill(self, format);
+            _write_fill(format);
     }
 
     lxw_xml_end_tag("fills");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the border <color> element.
  */
-STATIC void
-_write_border_color(lxw_color_t color)
+void styles::_write_border_color(lxw_color_t color)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
     char rgb_str[LXW_ATTR_32];
 
-    LXW_INIT_ATTRIBUTES();
 
     if (color != LXW_COLOR_UNSET) {
         lxw_snprintf(rgb_str, LXW_ATTR_32, "FF%06X", color & LXW_COLOR_MASK);
-        LXW_PUSH_ATTRIBUTES_STR("rgb", rgb_str);
+        attributes.push_back({"rgb", rgb_str});
     }
     else {
-        LXW_PUSH_ATTRIBUTES_STR("auto", "1");
+        attributes.push_back({"auto", "1"});
     }
 
-    lxw_xml_empty_tag("color", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("color", attributes);
 }
 
 /*
  * Write the <border> sub elements such as <right>, <top>, etc.
  */
-STATIC void
-_write_sub_border(const char *type, uint8_t style,
-                  lxw_color_t color)
+void styles::_write_sub_border(const std::string& type, uint8_t style, lxw_color_t color)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    char *border_styles[] = {
+    static const std::vector<std::string> border_styles = {
         "none",
         "thin",
         "medium",
@@ -586,43 +429,38 @@ _write_sub_border(const char *type, uint8_t style,
     };
 
     if (!style) {
-        lxw_xml_empty_tag(type, NULL);
+        lxw_xml_empty_tag(type);
         return;
     }
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("style", border_styles[style]);
+    xml_attribute_list attributes = {
+        {"style", border_styles[style]}
+    };
 
-    lxw_xml_start_tag(type, &attributes);
+    lxw_xml_start_tag(type, attributes);
 
-    _write_border_color(self, color);
+    _write_border_color(color);
 
     lxw_xml_end_tag(type);
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <border> element.
  */
-STATIC void
-_write_border(lxw_format *format)
+void styles::_write_border(const format_ptr& format)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     /* Add attributes for diagonal borders. */
     if (format->diag_type == LXW_DIAGONAL_BORDER_UP) {
-        LXW_PUSH_ATTRIBUTES_STR("diagonalUp", "1");
+        attributes.push_back({"diagonalUp", "1"});
     }
     else if (format->diag_type == LXW_DIAGONAL_BORDER_DOWN) {
-        LXW_PUSH_ATTRIBUTES_STR("diagonalDown", "1");
+        attributes.push_back({"diagonalDown", "1"});
     }
     else if (format->diag_type == LXW_DIAGONAL_BORDER_UP_DOWN) {
-        LXW_PUSH_ATTRIBUTES_STR("diagonalUp", "1");
-        LXW_PUSH_ATTRIBUTES_STR("diagonalDown", "1");
+        attributes.push_back({"diagonalUp", "1"});
+        attributes.push_back({"diagonalDown", "1"});
     }
 
     /* Ensure that a default diag border is set if the diag type is set. */
@@ -631,91 +469,71 @@ _write_border(lxw_format *format)
     }
 
     /* Write the start border tag. */
-    lxw_xml_start_tag("border", &attributes);
+    lxw_xml_start_tag("border", attributes);
 
     /* Write the <border> sub elements. */
-    _write_sub_border(self, "left", format->left, format->left_color);
-    _write_sub_border(self, "right", format->right, format->right_color);
-    _write_sub_border(self, "top", format->top, format->top_color);
-    _write_sub_border(self, "bottom", format->bottom, format->bottom_color);
-    _write_sub_border(self,
-                      "diagonal", format->diag_border, format->diag_color);
+    _write_sub_border("left", format->left, format->left_color);
+    _write_sub_border("right", format->right, format->right_color);
+    _write_sub_border("top", format->top, format->top_color);
+    _write_sub_border("bottom", format->bottom, format->bottom_color);
+    _write_sub_border("diagonal", format->diag_border, format->diag_color);
 
     lxw_xml_end_tag("border");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <borders> element.
  */
-STATIC void
-_write_borders()
+void styles::_write_borders()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_format *format;
+    xml_attribute_list attributes = {
+        {"count", std::to_string(border_count)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", self->border_count);
+    lxw_xml_start_tag("borders", attributes);
 
-    lxw_xml_start_tag("borders", &attributes);
-
-    STAILQ_FOREACH(format, self->xf_formats, list_pointers) {
+    for (const auto& format : xf_formats) {
         if (format->has_border)
-            _write_border(self, format);
+            _write_border(format);
     }
 
     lxw_xml_end_tag("borders");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <xf> element for styles.
  */
-STATIC void
-_write_style_xf()
+void styles::_write_style_xf()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"numFmtId", "0"},
+        {"fontId", "0"},
+        {"fillId", "0"},
+        {"borderId", "0"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("numFmtId", "0");
-    LXW_PUSH_ATTRIBUTES_STR("fontId", "0");
-    LXW_PUSH_ATTRIBUTES_STR("fillId", "0");
-    LXW_PUSH_ATTRIBUTES_STR("borderId", "0");
-
-    lxw_xml_empty_tag("xf", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("xf", attributes);
 }
 
 /*
  * Write the <cellStyleXfs> element.
  */
-STATIC void
-_write_cell_style_xfs()
+void styles::_write_cell_style_xfs()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"count", "1"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("count", "1");
-
-    lxw_xml_start_tag("cellStyleXfs", &attributes);
-    _write_style_xf(self);
+    lxw_xml_start_tag("cellStyleXfs", attributes);
+    _write_style_xf();
     lxw_xml_end_tag("cellStyleXfs");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Check if a format struct has alignment properties set and the
  * "applyAlignment" attribute should be set.
  */
-STATIC uint8_t
-_apply_alignment(lxw_format *format)
+uint8_t styles::_apply_alignment(const format_ptr& format)
 {
     return format->text_h_align != LXW_ALIGN_NONE
         || format->text_v_align != LXW_ALIGN_NONE
@@ -729,8 +547,7 @@ _apply_alignment(lxw_format *format)
  * Check if a format struct has alignment properties set apart from the
  * LXW_ALIGN_VERTICAL_BOTTOM which Excel treats as a default.
  */
-STATIC uint8_t
-_has_alignment(lxw_format *format)
+uint8_t styles::_has_alignment(const format_ptr& format)
 {
     return format->text_h_align != LXW_ALIGN_NONE
         || !(format->text_v_align == LXW_ALIGN_NONE ||
@@ -744,14 +561,10 @@ _has_alignment(lxw_format *format)
 /*
  * Write the <alignment> element.
  */
-STATIC void
-_write_alignment(lxw_format *format)
+void styles::_write_alignment(const format_ptr& format)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes;
     int16_t rotation = format->rotation;
-
-    LXW_INIT_ATTRIBUTES();
 
     /* Indent is only allowed for horizontal left, right and distributed. */
     /* If it is defined for any other alignment or no alignment has been  */
@@ -783,43 +596,43 @@ _write_alignment(lxw_format *format)
         format->just_distrib = 0;
 
     if (format->text_h_align == LXW_ALIGN_LEFT)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "left");
+        attributes.push_back({"horizontal", "left"});
 
     if (format->text_h_align == LXW_ALIGN_CENTER)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "center");
+        attributes.push_back({"horizontal", "center"});
 
     if (format->text_h_align == LXW_ALIGN_RIGHT)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "right");
+        attributes.push_back({"horizontal", "right"});
 
     if (format->text_h_align == LXW_ALIGN_FILL)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "fill");
+        attributes.push_back({"horizontal", "fill"});
 
     if (format->text_h_align == LXW_ALIGN_JUSTIFY)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "justify");
+        attributes.push_back({"horizontal", "justify"});
 
     if (format->text_h_align == LXW_ALIGN_CENTER_ACROSS)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "centerContinuous");
+        attributes.push_back({"horizontal", "centerContinuous"});
 
     if (format->text_h_align == LXW_ALIGN_DISTRIBUTED)
-        LXW_PUSH_ATTRIBUTES_STR("horizontal", "distributed");
+        attributes.push_back({"horizontal", "distributed"});
 
     if (format->just_distrib)
-        LXW_PUSH_ATTRIBUTES_STR("justifyLastLine", "1");
+        attributes.push_back({"justifyLastLine", "1"});
 
     if (format->text_v_align == LXW_ALIGN_VERTICAL_TOP)
-        LXW_PUSH_ATTRIBUTES_STR("vertical", "top");
+        attributes.push_back({"vertical", "top"});
 
     if (format->text_v_align == LXW_ALIGN_VERTICAL_CENTER)
-        LXW_PUSH_ATTRIBUTES_STR("vertical", "center");
+        attributes.push_back({"vertical", "center"});
 
     if (format->text_v_align == LXW_ALIGN_VERTICAL_JUSTIFY)
-        LXW_PUSH_ATTRIBUTES_STR("vertical", "justify");
+        attributes.push_back({"vertical", "justify"});
 
     if (format->text_v_align == LXW_ALIGN_VERTICAL_DISTRIBUTED)
-        LXW_PUSH_ATTRIBUTES_STR("vertical", "distributed");
+        attributes.push_back({"vertical", "distributed"});
 
     if (format->indent)
-        LXW_PUSH_ATTRIBUTES_INT("indent", format->indent);
+        attributes.push_back({"indent", std::to_string(format->indent)});
 
     /* Map rotation to Excel values. */
     if (rotation) {
@@ -828,204 +641,168 @@ _write_alignment(lxw_format *format)
         else if (rotation < 0)
             rotation = -rotation + 90;
 
-        LXW_PUSH_ATTRIBUTES_INT("textRotation", rotation);
+        attributes.push_back({"textRotation", std::to_string(rotation)});
     }
 
     if (format->text_wrap)
-        LXW_PUSH_ATTRIBUTES_STR("wrapText", "1");
+        attributes.push_back({"wrapText", "1"});
 
     if (format->shrink)
-        LXW_PUSH_ATTRIBUTES_STR("shrinkToFit", "1");
+        attributes.push_back({"shrinkToFit", "1"});
 
     if (format->reading_order == 1)
-        LXW_PUSH_ATTRIBUTES_STR("readingOrder", "1");
+        attributes.push_back({"readingOrder", "1"});
 
     if (format->reading_order == 2)
-        LXW_PUSH_ATTRIBUTES_STR("readingOrder", "2");
+        attributes.push_back({"readingOrder", "2"});
 
-    if (!STAILQ_EMPTY(&attributes))
-        lxw_xml_empty_tag("alignment", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    if (attributes.empty())
+        lxw_xml_empty_tag("alignment", attributes);
 }
 
 /*
  * Write the <protection> element.
  */
-STATIC void
-_write_protection(lxw_format *format)
+void styles::_write_protection(const format_ptr& format)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-
-    LXW_INIT_ATTRIBUTES();
+    xml_attribute_list attributes;
 
     if (!format->locked)
-        LXW_PUSH_ATTRIBUTES_STR("locked", "0");
+        attributes.push_back({"locked", "0"});
 
     if (format->hidden)
-        LXW_PUSH_ATTRIBUTES_STR("hidden", "1");
+        attributes.push_back({"hidden", "1"});
 
-    lxw_xml_empty_tag("protection", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("protection", attributes);
 }
 
 /*
  * Write the <xf> element.
  */
-STATIC void
-_write_xf(lxw_format *format)
+void styles::_write_xf(const format_ptr& format)
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+
     uint8_t has_protection = (!format->locked) | format->hidden;
     uint8_t has_alignment = _has_alignment(format);
     uint8_t apply_alignment = _apply_alignment(format);
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("numFmtId", format->num_format_index);
-    LXW_PUSH_ATTRIBUTES_INT("fontId", format->font_index);
-    LXW_PUSH_ATTRIBUTES_INT("fillId", format->fill_index);
-    LXW_PUSH_ATTRIBUTES_INT("borderId", format->border_index);
-    LXW_PUSH_ATTRIBUTES_STR("xfId", "0");
+    xml_attribute_list attributes = {
+        {"numFmtId", std::to_string(format->num_format_index)},
+        {"fontId", std::to_string(format->font_index)},
+        {"fillId", std::to_string(format->fill_index)},
+        {"borderId", std::to_string(format->border_index)},
+        {"xfId", "0"}
+    };
 
     if (format->num_format_index > 0)
-        LXW_PUSH_ATTRIBUTES_STR("applyNumberFormat", "1");
+        attributes.push_back({"applyNumberFormat", "1"});
 
     /* Add applyFont attribute if XF format uses a font element. */
     if (format->font_index > 0)
-        LXW_PUSH_ATTRIBUTES_STR("applyFont", "1");
+        attributes.push_back({"applyFont", "1"});
 
     /* Add applyFill attribute if XF format uses a fill element. */
     if (format->fill_index > 0)
-        LXW_PUSH_ATTRIBUTES_STR("applyFill", "1");
+        attributes.push_back({"applyFill", "1"});
 
     /* Add applyBorder attribute if XF format uses a border element. */
     if (format->border_index > 0)
-        LXW_PUSH_ATTRIBUTES_STR("applyBorder", "1");
+        attributes.push_back({"applyBorder", "1"});
 
     /* We can also have applyAlignment without a sub-element. */
     if (apply_alignment)
-        LXW_PUSH_ATTRIBUTES_STR("applyAlignment", "1");
+        attributes.push_back({"applyAlignment", "1"});
 
     if (has_protection)
-        LXW_PUSH_ATTRIBUTES_STR("applyProtection", "1");
+        attributes.push_back({"applyProtection", "1"});
 
     /* Write XF with sub-elements if required. */
     if (has_alignment || has_protection) {
-        lxw_xml_start_tag("xf", &attributes);
+        lxw_xml_start_tag("xf", attributes);
 
         if (has_alignment)
-            _write_alignment(self, format);
+            _write_alignment(format);
 
         if (has_protection)
-            _write_protection(self, format);
+            _write_protection(format);
 
         lxw_xml_end_tag("xf");
     }
     else {
-        lxw_xml_empty_tag("xf", &attributes);
+        lxw_xml_empty_tag("xf", attributes);
     }
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <cellXfs> element.
  */
-STATIC void
-_write_cell_xfs()
+void styles::_write_cell_xfs()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    lxw_format *format;
+    xml_attribute_list attributes {
+        {"count", std::to_string(xf_count)}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", self->xf_count);
+    lxw_xml_start_tag("cellXfs", attributes);
 
-    lxw_xml_start_tag("cellXfs", &attributes);
-
-    STAILQ_FOREACH(format, self->xf_formats, list_pointers) {
-        _write_xf(self, format);
+    for (const auto& format : xf_formats) {
+        _write_xf(format);
     }
 
     lxw_xml_end_tag("cellXfs");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <cellStyle> element.
  */
-STATIC void
-_write_cell_style()
+void styles::_write_cell_style()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        { "name", "Normal"},
+        {"xfId", "0"},
+        {"builtinId", "0"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("name", "Normal");
-    LXW_PUSH_ATTRIBUTES_STR("xfId", "0");
-    LXW_PUSH_ATTRIBUTES_STR("builtinId", "0");
-
-    lxw_xml_empty_tag("cellStyle", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("cellStyle", attributes);
 }
 
 /*
  * Write the <cellStyles> element.
  */
-STATIC void
-_write_cell_styles()
+void styles::_write_cell_styles()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("count", "1");
+    xml_attribute_list attributes = {
+        {"count", "1"}
+    };
 
-    lxw_xml_start_tag("cellStyles", &attributes);
-    _write_cell_style(self);
+    lxw_xml_start_tag("cellStyles", attributes);
+    _write_cell_style();
     lxw_xml_end_tag("cellStyles");
-
-    LXW_FREE_ATTRIBUTES();
 }
 
 /*
  * Write the <dxfs> element.
  */
-STATIC void
-_write_dxfs()
+void styles::_write_dxfs()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"count", "0"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("count", "0");
-
-    lxw_xml_empty_tag("dxfs", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("dxfs", attributes);
 }
 
 /*
  * Write the <tableStyles> element.
  */
-STATIC void
-_write_table_styles()
+void styles::_write_table_styles()
 {
-    struct xml_attribute_list attributes;
-    struct xml_attribute *attribute;
+    xml_attribute_list attributes = {
+        {"count", "0"},
+        {"defaultTableStyle", "TableStyleMedium9"},
+        {"defaultPivotStyle", "PivotStyleLight16"}
+    };
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("count", "0");
-    LXW_PUSH_ATTRIBUTES_STR("defaultTableStyle", "TableStyleMedium9");
-    LXW_PUSH_ATTRIBUTES_STR("defaultPivotStyle", "PivotStyleLight16");
-
-    lxw_xml_empty_tag("tableStyles", &attributes);
-
-    LXW_FREE_ATTRIBUTES();
+    lxw_xml_empty_tag("tableStyles", attributes);
 }
 
 /*****************************************************************************

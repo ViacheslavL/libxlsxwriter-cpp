@@ -36,18 +36,18 @@ public:
     void _write_style_sheet();
     void _write_font_size(uint16_t font_size);
     void _write_font_color_theme(uint8_t theme);
-    void _write_font_name(const char *font_name);
+    void _write_font_name(const std::string& font_name);
     void _write_font_family(uint8_t font_family);
-    void _write_font_scheme(const char *font_scheme);
-    void _write_font(format *format);
+    void _write_font_scheme(const std::string& font_scheme);
+    void _write_font(const format_ptr& format);
     void _write_fonts();
-    void _write_default_fill(const char *pattern);
+    void _write_default_fill(const std::string& pattern);
     void _write_fills();
-    void _write_border(format *format);
+    void _write_border(const format_ptr& format);
     void _write_borders();
     void _write_style_xf();
     void _write_cell_style_xfs();
-    void _write_xf(format *format);
+    void _write_xf(const format_ptr& format);
     void _write_cell_xfs();
     void _write_cell_style();
     void _write_cell_styles();
@@ -64,6 +64,20 @@ private:
     std::vector<format_ptr> xf_formats;
     std::vector<format_ptr> dxf_formats;
 
+    void _write_num_fmt(uint16_t num_fmt_id, std::string &format_code);
+    void _write_num_fmts();
+    void _write_font_color_rgb(int32_t rgb);
+    uint8_t _has_alignment(const format_ptr &format);
+    void _write_alignment(const format_ptr &format);
+    void _write_vert_align(const std::string &align);
+    void _write_font_underline(uint8_t underline);
+    uint8_t _apply_alignment(const format_ptr &format);
+    void _write_protection(const format_ptr &format);
+    void _write_fg_color(lxw_color_t color);
+    void _write_sub_border(const std::string &type, uint8_t style, lxw_color_t color);
+    void _write_fill(const format_ptr &format);
+    void _write_bg_color(lxw_color_t color);
+    void _write_border_color(lxw_color_t color);
 };
 
 

@@ -1045,7 +1045,7 @@ _workbook_xml_declaration(lxw_workbook *self)
 STATIC void
 _write_workbook(lxw_workbook *self)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char xmlns[] = "http://schemas.openxmlformats.org"
         "/spreadsheetml/2006/main";
@@ -1067,7 +1067,7 @@ _write_workbook(lxw_workbook *self)
 STATIC void
 _write_file_version(lxw_workbook *self)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1087,7 +1087,7 @@ _write_file_version(lxw_workbook *self)
 STATIC void
 _write_workbook_pr(lxw_workbook *self)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1104,7 +1104,7 @@ _write_workbook_pr(lxw_workbook *self)
 STATIC void
 _write_workbook_view(lxw_workbook *self)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1144,7 +1144,7 @@ STATIC void
 _write_sheet(lxw_workbook *self, const char *name, uint32_t sheet_id,
              uint8_t hidden)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
     char r_id[LXW_MAX_ATTRIBUTE_LENGTH] = "rId1";
 
@@ -1188,7 +1188,7 @@ _write_sheets(lxw_workbook *self)
 STATIC void
 _write_calc_pr(lxw_workbook *self)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();
@@ -1206,7 +1206,7 @@ _write_calc_pr(lxw_workbook *self)
 STATIC void
 _write_defined_name(lxw_workbook *self, lxw_defined_name *defined_name)
 {
-    struct xml_attribute_list attributes;
+    xml_attribute_list attributes;
     struct xml_attribute *attribute;
 
     LXW_INIT_ATTRIBUTES();

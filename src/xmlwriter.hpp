@@ -110,7 +110,7 @@ protected:
      * @param tag        The XML tag to write.
      * @param attributes An optional list of attributes to add to the tag.
      */
-    void lxw_xml_start_tag(const char *tag,
+    void lxw_xml_start_tag(const std::string& tag,
                            const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
     /**
@@ -128,7 +128,7 @@ protected:
      * @param xmlfile    A FILE pointer to the output XML file.
      * @param tag        The XML tag to write.
      */
-    void lxw_xml_end_tag(const char *tag);
+    void lxw_xml_end_tag(const std::string& tag);
 
     /**
      * Write an XML empty tag with optional attributes.
@@ -136,7 +136,7 @@ protected:
      * @param tag        The XML tag to write.
      * @param attributes An optional list of attributes to add to the tag.
      */
-    void lxw_xml_empty_tag(const char *tag, const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
+    void lxw_xml_empty_tag(const std::string& tag, const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
     /**
      * Write an XML empty tag with optional un-encoded attributes.
