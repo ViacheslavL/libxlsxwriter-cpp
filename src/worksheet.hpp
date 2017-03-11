@@ -140,7 +140,7 @@ struct lxw_col_options {
     lxw_col_t firstcol;
     lxw_col_t lastcol;
     double width;
-    lxw_format *format;
+    format_ptr format;
     uint8_t hidden;
     uint8_t level;
     uint8_t collapsed;
@@ -1159,8 +1159,8 @@ public:
      * `insert_image()` above.
      */
     lxw_error insert_image_opt(lxw_row_t row, lxw_col_t col,
-                               const std::string filename,
-                               const image_options& options);
+                               const std::string& filename,
+                               const image_options_ptr& options = nullptr);
     /**
      * @brief Insert a chart object into a worksheet.
      *
@@ -1231,7 +1231,7 @@ public:
      */
     lxw_error insert_chart_opt(lxw_row_t row, lxw_col_t col,
                                const chart_ptr& chart,
-                               const image_options& user_options);
+                               const image_options_ptr& user_options);
 
     /**
      * @brief Merge a range of cells.
@@ -2237,13 +2237,13 @@ public:
      * top left, to right-to-left, with the `A1` cell in the top right.
      *
      * @code
-     *     worksheet->right_to_left();
+     *     worksheet->get_right_to_left();
      * @endcode
      *
      * This is useful when creating Arabic, Hebrew or other near or far eastern
      * worksheets that use right-to-left as the default direction.
      */
-    void right_to_left();
+    void get_right_to_left();
 
     /**
      * @brief Hide zero values in worksheet cells.
@@ -2255,7 +2255,7 @@ public:
      *     worksheet->hide_zero();
      * @endcode
      */
-    void worksheet_hide_zero();
+    void hide_zero();
 
     /**
      * @brief Set the color of the worksheet tab.
@@ -2394,6 +2394,7 @@ public:
 
     lxw_row *find_row(lxw_row_t row_num);
     lxw_cell *find_cell(lxw_row *row, lxw_col_t col_num);
+
 private:
     FILE *optimize_tmpfile;
     lxw_table_rows *table;
@@ -2457,7 +2458,7 @@ private:
     uint8_t print_gridlines;
     uint8_t print_headers;
     uint8_t print_options_changed;
-    uint8_t right_to_left_;
+    uint8_t right_to_left;
     uint8_t screen_gridlines;
     uint8_t show_zeros;
     uint8_t vba_codename;
@@ -2518,7 +2519,7 @@ private:
     void _write_page_margins();
     void _write_page_setup();
     void _write_col_info(lxw_col_options *options);
-    void _write_row(lxw_row *row, char *spans);
+    void _write_row(lxw_row *row, const std::string& spans);
     lxw_row *_get_row_list(struct lxw_table_rows *table,
                                   lxw_row_t row_num);
 
@@ -2533,6 +2534,10 @@ private:
     void _write_sheet_pr();
     void _write_tab_color();
     void _write_sheet_protection();
+    void _write_optimized_sheet_data();
+    uint32_t _calculate_x_split_width(double x_split) const;
+    void _write_cell(lxw_cell *cell, const format_ptr &row_format);
+    void _write_rows();
 };
 
 typedef std::shared_ptr<worksheet> worksheet_ptr;

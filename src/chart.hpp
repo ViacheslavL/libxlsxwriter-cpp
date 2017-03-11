@@ -252,6 +252,7 @@ struct lxw_marker {
 };
 
 class workbook;
+class worksheet;
 
 /**
  * @brief Struct to represent an Excel chart data series.
@@ -263,6 +264,7 @@ class workbook;
 struct chart_series {
     friend class chart;
     friend class workbook;
+    friend class worksheet;
 public:
 
     chart_series();
@@ -489,6 +491,7 @@ struct series_options {
 
 class packager;
 class workbook;
+class worksheet;
 
 /**
  * @brief Class to represent an Excel chart.
@@ -499,6 +502,7 @@ class workbook;
 class chart : public xmlwriter {
     friend class packager;
     friend class workbook;
+    friend class worksheet;
 public:
 
     chart(uint8_t type);
