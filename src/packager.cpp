@@ -251,18 +251,18 @@ uint8_t packager::_write_drawing_files()
  */
 uint8_t packager::_write_shared_strings_file()
 {
-    lxw_sst *sst = workbook->sst;
+    xlsxwriter::sst *sst = workbook->sst.get();
     int err;
 
     /* Skip the sharedStrings file if there are no shared strings. */
-    if (!sst->string_count)
+    if (sst->string_count == 0)
         return 0;
 
     sst->file = lxw_tmpfile(tmpdir.c_str());
     if (!sst->file)
         return LXW_ERROR_CREATING_TMPFILE;
 
-    lxw_sst_assemble_xml_file(sst);
+    sst->assemble_xml_file();
 
     err = _add_file_to_zip(sst->file, "xl/sharedStrings.xml");
     RETURN_ON_ERROR(err);

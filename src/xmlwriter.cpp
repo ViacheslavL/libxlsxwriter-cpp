@@ -161,7 +161,7 @@ char * xlsxwriter::_escape_attributes(struct xml_attribute *attribute)
  * Note, this is different from _escape_attributes()
  * in that double quotes are not escaped by Excel.
  */
-char * xlsxwriter::lxw_escape_data(const char *data)
+std::string xlsxwriter::lxw_escape_data(const std::string& data)
 {
     size_t encoded_len = (strlen(data) * 5 + 1);
 
@@ -196,7 +196,7 @@ char * xlsxwriter::lxw_escape_data(const char *data)
 /*
  * Escape control characters in strings with with _xHHHH_.
  */
-char * xlsxwriter::lxw_escape_control_characters(const char *string)
+std::string xlsxwriter::lxw_escape_control_characters(const char *string)
 {
     size_t escape_len = sizeof("_xHHHH_") - 1;
     size_t encoded_len = (strlen(string) * escape_len + 1);

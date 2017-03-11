@@ -310,6 +310,8 @@ struct lxw_protection {
     char hash[5];
 };
 
+class worksheet;
+
 /*
  * Worksheet initialization data.
  */
@@ -317,9 +319,9 @@ struct lxw_worksheet_init_data {
     uint32_t index;
     uint8_t hidden;
     uint8_t optimize;
-    uint16_t *active_sheet;
-    uint16_t *first_sheet;
-    lxw_sst *sst;
+    worksheet *active_sheet;
+    worksheet *first_sheet;
+    sst_ptr *sst;
     std::string name;
     std::string quoted_name;
     std::string tmpdir;
@@ -2403,7 +2405,7 @@ private:
     lxw_col_t dim_colmin;
     lxw_col_t dim_colmax;
 
-    lxw_sst *sst;
+    sst_ptr sst;
     std::string name;
     std::string quoted_name;
     std::string tmpdir;

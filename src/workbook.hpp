@@ -582,7 +582,7 @@ private:
     std::vector<chart_ptr> ordered_charts;
     std::vector<format_ptr> formats;
     std::vector<defined_name_ptr> defined_names;
-    lxw_sst *sst;
+    sst_ptr sst;
     doc_properties properties;
     std::list<custom_property_ptr> custom_properties;
 

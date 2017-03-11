@@ -159,9 +159,9 @@ protected:
                               const std::string& data,
                               const std::list<std::pair<std::string, std::string>>& attributes = xml_attribute_list());
 
-    char *lxw_escape_control_characters(const char *string);
+    std::string lxw_escape_control_characters(const std::string& string);
 
-    char *lxw_escape_data(const char *data);
+    std::string lxw_escape_data(const std::string& data);
 
     FILE* file;
 };
