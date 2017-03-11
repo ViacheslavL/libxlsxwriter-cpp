@@ -376,6 +376,7 @@ struct lxw_fill {
 };
 
 class styles;
+class workbook;
 
 /**
  * @brief Struct to represent the formatting properties of an Excel format.
@@ -401,8 +402,9 @@ class styles;
  * @endcode
  *
  */
-class format {
+class format : public std::enable_shared_from_this<format>{
     friend class styles;
+    friend class workbook;
 public:
     format();
     int32_t get_xf_index();
@@ -1105,7 +1107,7 @@ private:
 
     FILE *file;
 
-    lxw_hash_table *xf_format_indices;
+    hash_table<std::shared_ptr<format>, std::shared_ptr<format>> *xf_format_indices;
     uint16_t *num_xf_formats;
 
     int32_t xf_index;

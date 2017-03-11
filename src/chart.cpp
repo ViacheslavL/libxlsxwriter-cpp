@@ -91,7 +91,7 @@ chart::chart(uint8_t type)
 
     y2_axis = std::make_shared<chart_axis>();
 
-    title.range = new series_range{};
+    title.range = std::make_shared<series_range>();
 
     this->type = type;
     style_id = 2;
@@ -164,7 +164,7 @@ void chart::_add_axis_ids(bool primary)
 /*
  * Utility function to set a chart range.
  */
-void chart::set_range(series_range *range, const std::string& sheetname,
+void chart::set_range(const series_range_ptr& range, const std::string& sheetname,
                  lxw_row_t first_row, lxw_col_t first_col,
                  lxw_row_t last_row, lxw_col_t last_col)
 {
@@ -583,7 +583,7 @@ void chart::_write_num_pt(uint16_t index, const std::shared_ptr<series_data_poin
 /*
  * Write the <c:numCache> element.
  */
-void chart::_write_num_cache(series_range *range)
+void chart::_write_num_cache(const series_range_ptr& range)
 {
     uint16_t index = 0;
 
@@ -607,7 +607,7 @@ void chart::_write_num_cache(series_range *range)
 /*
  * Write the <c:strCache> element.
  */
-void chart::_write_str_cache(series_range *range)
+void chart::_write_str_cache(const series_range_ptr& range)
 {
     lxw_series_data_point *data_point;
     uint16_t index = 0;
@@ -629,7 +629,7 @@ void chart::_write_str_cache(series_range *range)
 /*
  * Write the <c:numRef> element.
  */
-void chart::_write_num_ref(series_range *range)
+void chart::_write_num_ref(const series_range_ptr& range)
 {
     lxw_xml_start_tag("c:numRef");
 
@@ -647,7 +647,7 @@ void chart::_write_num_ref(series_range *range)
 /*
  * Write the <c:strRef> element.
  */
-void chart::_write_str_ref(series_range *range)
+void chart::_write_str_ref(const series_range_ptr& range)
 {
     lxw_xml_start_tag("c:strRef");
 
@@ -665,7 +665,7 @@ void chart::_write_str_ref(series_range *range)
 /*
  * Write the cached data elements.
  */
-void chart::_write_data_cache(series_range *range, bool has_string_cache)
+void chart::_write_data_cache(const series_range_ptr& range, bool has_string_cache)
 {
     if (has_string_cache) {
         /* Write the c:strRef element. */
@@ -1931,7 +1931,7 @@ void chart::set_y2_axis(const std::shared_ptr<chart_axis>& axis)
 std::shared_ptr<chart_series> chart::add_series(const std::string& categories, const std::string&  values, const series_options& options)
 {
     std::shared_ptr<chart_series> series = std::make_shared<chart_series>();
-    series->title.range = new series_range{};
+    series->title.range = std::make_shared<series_range>();
 
     series->marker.marker_type = LXW_MARKER_NONE;
 

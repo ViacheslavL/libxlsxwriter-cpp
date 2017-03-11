@@ -215,10 +215,7 @@ lxw_fill * format::get_fill_key()
  */
 int32_t format::get_xf_index()
 {
-    format *format_key;
-    format *existing_format;
-    lxw_hash_element *hash_element;
-    lxw_hash_table *formats_hash_table = xf_format_indices;
+    hash_table<format_ptr, format_ptr> *formats_hash_table = xf_format_indices;
     int32_t index;
 
     /* Note: The formats_hash_table/xf_format_indices contains the unique and
@@ -233,29 +230,25 @@ int32_t format::get_xf_index()
     /* Otherwise, the format doesn't have an index number so we assign one.
      * First generate a unique key to identify the format in the hash table.
      */
-    format_key = _get_format_key();
+    format_ptr format_key(_get_format_key());
 
     /* Return the default format index if the key generation failed. */
     if (!format_key)
         return 0;
 
     /* Look up the format in the hash table. */
-    hash_element =
-        lxw_hash_key_exists(formats_hash_table, format_key,
-                            sizeof(format));
+    auto result = formats_hash_table->exists(format_key);
 
-    if (hash_element) {
+    if (!result.second) {
         /* Format matches existing format with an index. */
-        delete format_key;
-        existing_format = (format*)hash_element->value;
+        format_ptr existing_format = result.first.first;
         return existing_format->xf_index;
     }
     else {
         /* New format requiring an index. */
-        index = formats_hash_table->unique_count;
+        index = formats_hash_table->order_list.size();
         xf_index = index;
-        lxw_insert_hash_element(formats_hash_table, format_key, this,
-                                sizeof(format));
+        formats_hash_table->insert(format_key, shared_from_this());
         return index;
     }
 }

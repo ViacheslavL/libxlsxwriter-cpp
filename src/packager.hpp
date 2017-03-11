@@ -56,7 +56,7 @@ public:
 private:
 
     FILE *file;
-    workbook_ptr workbook;
+    xlsxwriter::workbook* workbook;
 
     //size_t buffer_size;
     zipFile zipfile;

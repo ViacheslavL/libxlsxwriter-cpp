@@ -76,6 +76,8 @@ typedef struct lxw_worksheet_name {
 
 /* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
  * warnings and to avoid portability issues with the _unused attribute. */
+
+/*
 #define LXW_RB_GENERATE_NAMES(name, type, field, cmp)     \
     RB_GENERATE_INSERT_COLOR(name, type, field, static)   \
     RB_GENERATE_REMOVE_COLOR(name, type, field, static)   \
@@ -84,8 +86,8 @@ typedef struct lxw_worksheet_name {
     RB_GENERATE_FIND(name, type, field, cmp, static)      \
     RB_GENERATE_NEXT(name, type, field, static)           \
     RB_GENERATE_MINMAX(name, type, field, static)         \
-    /* Add unused struct to allow adding a semicolon */   \
-    struct lxw_rb_generate_names{int unused;}
+    /* Add unused struct to allow adding a semicolon */   /*\
+    struct lxw_rb_generate_names{int unused;}*/
 
 /* Struct to represent a defined name. */
 struct defined_name {
@@ -96,9 +98,6 @@ struct defined_name {
     std::string formula;
     std::string normalised_name;
     std::string normalised_sheetname;
-
-    /* List pointers for queue.h. */
-    TAILQ_ENTRY (lxw_defined_name) list_pointers;
 };
 
 typedef std::shared_ptr<defined_name> defined_name_ptr;
@@ -569,11 +568,10 @@ public:
      */
     lxw_error define_name(const std::string& name, const std::string& formula);
 
-    worksheet_ptr get_worksheet_by_name(const std::string& name);
+    worksheet *get_worksheet_by_name(const std::string &name);
 
     void assemble_xml_file();
     void set_default_xf_indices();
-
 private:
     FILE *file;
     std::vector<worksheet_ptr> worksheets;
@@ -605,11 +603,12 @@ private:
     bool has_jpeg;
     bool has_bmp;
 
-    //lxw_hash_table *used_xf_formats;
-    std::unordered_set<std::shared_ptr<format>> used_xf_formats;
+    hash_table<format_ptr, format_ptr> used_xf_formats;
+    //std::unordered_set<std::shared_ptr<format>> used_xf_formats;
+    //std::vector<std::shared_ptr<format>> ordered_used_xf_formats;
 
     /* Declarations required for unit testing. */
-#ifdef TESTING
+//#ifdef TESTING
 
     void _xml_declaration();
     void _write_workbook();
@@ -621,7 +620,7 @@ private:
     void _write_sheets();
     void _write_calc_pr();
 
-    void _write_defined_name(lxw_defined_name *define_name);
+    void _write_defined_name(const defined_name_ptr& define_name);
     void _write_defined_names();
 
     lxw_error _store_defined_name(const std::string& name,
@@ -629,8 +628,22 @@ private:
                                   const std::string& formula, int16_t index,
                                   bool hidden);
 
-#endif /* TESTING */
+//#endif /* TESTING */
 
+    void _prepare_workbook();
+    void _prepare_num_formats();
+    void _prepare_fills();
+    void _prepare_borders();
+    void _prepare_fonts();
+    lxw_error _store_defined_name(const std::string &name, const std::string &app_name, const std::string &formula, int16_t index, uint8_t hidden);
+    void _populate_range_data_cache(const series_range_ptr &range);
+    void _populate_range_dimensions(const series_range_ptr &range);
+    void _populate_range(const series_range_ptr &range);
+    void _add_chart_cache_data();
+    void _prepare_drawings();
+    void _prepare_defined_names();
+    void _write_sheet(const std::string &name, uint32_t sheet_id, uint8_t hidden);
+    void workbook_new_opt(const workbook_options &options);
 };
 
 typedef std::shared_ptr<workbook> workbook_ptr;

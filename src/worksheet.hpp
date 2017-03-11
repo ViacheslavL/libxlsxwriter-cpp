@@ -238,10 +238,12 @@ struct image_options {
     std::string extension;
     double x_dpi;
     double y_dpi;
-    lxw_chart *chart;
+    chart_ptr chart;
 
     STAILQ_ENTRY (lxw_image_options) list_pointers;
 };
+
+typedef std::shared_ptr<image_options> image_options_ptr;
 
 /**
  * @brief Header and footer options.
@@ -319,9 +321,9 @@ struct lxw_worksheet_init_data {
     uint32_t index;
     uint8_t hidden;
     uint8_t optimize;
-    worksheet *active_sheet;
-    worksheet *first_sheet;
-    sst_ptr *sst;
+    uint16_t *active_sheet;
+    uint16_t *first_sheet;
+    sst_ptr sst;
     std::string name;
     std::string quoted_name;
     std::string tmpdir;
@@ -332,14 +334,14 @@ struct lxw_worksheet_init_data {
 typedef struct lxw_row {
     lxw_row_t row_num;
     double height;
-    lxw_format *format;
+    xlsxwriter::format *format;
     uint8_t hidden;
     uint8_t level;
     uint8_t collapsed;
     uint8_t row_changed;
     uint8_t data_changed;
     uint8_t height_changed;
-    struct lxw_table_cells *cells;
+    lxw_table_cells *cells;
 
     /* tree management pointers for tree.h. */
     RB_ENTRY (lxw_row) tree_pointers;
@@ -368,6 +370,7 @@ typedef struct lxw_cell {
 } lxw_cell;
 
 class packager;
+class workbook;
 
 /**
  * @class worksheet The Worksheet object
@@ -406,8 +409,9 @@ class packager;
  */
 class worksheet : public xmlwriter{
     friend class xlsxwriter::packager;
-
+    friend class xlsxwriter::workbook;
 public:
+    worksheet(lxw_worksheet_init_data *init_data);
     /**
      * @brief Write a number to a worksheet cell.
      *
@@ -2383,10 +2387,10 @@ public:
     void write_single_row();
 
     void prepare_image(uint16_t image_ref_id, uint16_t drawing_id,
-                       image_options *image_data);
+                       const image_options_ptr& image_data);
 
     void prepare_chart(uint16_t chart_ref_id, uint16_t drawing_id,
-                       image_options *image_data);
+                       const image_options_ptr& image_data);
 
     lxw_row *find_row(lxw_row_t row_num);
     lxw_cell *find_cell(lxw_row *row, lxw_col_t col_num);
@@ -2398,7 +2402,7 @@ private:
     lxw_merged_ranges *merged_ranges;
     lxw_selections *selections;
     std::vector<std::shared_ptr<image_options>> image_data;
-    lxw_chart_data *chart_data;
+    std::vector<std::shared_ptr<image_options>> chart_data;
 
     lxw_row_t dim_rowmin;
     lxw_row_t dim_rowmax;
@@ -2480,7 +2484,7 @@ private:
     std::string footer;
 
     lxw_repeat_rows repeat_rows_;
-    lxw_repeat_cols repeat_cols;
+    lxw_repeat_cols repeat_cols_;
     lxw_print_area print_area_;
     lxw_autofilter autofilter_;
 

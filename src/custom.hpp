@@ -36,7 +36,7 @@ private:
 
     const std::list<custom_property_ptr>& custom_properties;
     uint32_t pid;
-    void _chart_write_vt_lpwstr(char *value);
+    void _chart_write_vt_lpwstr(const char *value);
     void _chart_write_vt_r_8(double value);
     void _write_vt_i_4(int32_t value);
     void _write_vt_filetime(lxw_datetime *datetime);

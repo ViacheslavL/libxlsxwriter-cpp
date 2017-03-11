@@ -220,6 +220,8 @@ struct series_range {
     std::vector<std::shared_ptr<series_data_point>> data_cache;
 };
 
+typedef std::shared_ptr<series_range> series_range_ptr;
+
 struct lxw_chart_font {
 
     uint8_t bold;
@@ -238,7 +240,7 @@ struct lxw_chart_title {
 
     /* We use a range to hold the title formula properties even though it
      * will only have 1 point in order to re-use similar functions.*/
-    series_range *range;
+    series_range_ptr range;
 
     series_data_point data_point;
 
@@ -249,6 +251,8 @@ struct lxw_marker {
     lxw_shape_properties properties;
 };
 
+class workbook;
+
 /**
  * @brief Struct to represent an Excel chart data series.
  *
@@ -258,6 +262,7 @@ struct lxw_marker {
  */
 struct chart_series {
     friend class chart;
+    friend class workbook;
 public:
 
     chart_series();
@@ -366,8 +371,8 @@ public:
     void set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col);
 private:
 
-    series_range *categories;
-    series_range *values;
+    series_range_ptr categories;
+    series_range_ptr values;
     lxw_chart_title title;
     lxw_shape_properties properties;
     lxw_marker marker;
@@ -388,6 +393,7 @@ typedef std::shared_ptr<chart_series> chart_series_ptr;
  */
 struct chart_axis{
     friend class chart;
+    friend class workbook;
 public:
 
     chart_axis();
@@ -482,6 +488,7 @@ struct series_options {
 };
 
 class packager;
+class workbook;
 
 /**
  * @brief Class to represent an Excel chart.
@@ -491,6 +498,7 @@ class packager;
  */
 class chart : public xmlwriter {
     friend class packager;
+    friend class workbook;
 public:
 
     chart(uint8_t type);
@@ -673,7 +681,7 @@ public:
     void set_rotation(uint16_t rotation);
     void set_hole_size(uint8_t size);
 
-    static void set_range(series_range *range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
+    static void set_range(const series_range_ptr& range, const std::string &sheetname, lxw_row_t first_row, lxw_col_t first_col, lxw_row_t last_row, lxw_col_t last_col);
 
     void set_y2_axis(const std::shared_ptr<chart_axis> &axis);
 
@@ -737,9 +745,6 @@ protected:
 
     std::vector<chart_series_ptr> series_list;
 
-    STAILQ_ENTRY (lxw_chart) ordered_list_pointers;
-    STAILQ_ENTRY (lxw_chart) list_pointers;
-
     void _write_chart_space();
     void _write_lang();
     void _write_layout();
@@ -769,11 +774,11 @@ protected:
     void _write_f(const std::string &formula);
     void _write_num_pt(uint16_t index, const std::shared_ptr<series_data_point>& data_point);
     void _write_format_code();
-    void _write_num_cache(series_range *range);
-    void _write_str_cache(series_range *range);
-    void _write_num_ref(series_range *range);
-    void _write_data_cache(series_range *range, bool has_string_cache);
-    void _write_str_ref(series_range *range);
+    void _write_num_cache(const series_range_ptr&range);
+    void _write_str_cache(const series_range_ptr& range);
+    void _write_num_ref(const series_range_ptr& range);
+    void _write_data_cache(const series_range_ptr& range, bool has_string_cache);
+    void _write_str_ref(const series_range_ptr& range);
     void _write_tx_value(const std::string &name);
     void _write_tx_formula(lxw_chart_title *title);
     void _write_tx_pr(lxw_chart_title *title);
@@ -846,6 +851,8 @@ protected:
 typedef std::shared_ptr<chart> chart_ptr;
 
 class chart_area : public chart {
+public:
+    chart_area(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -853,6 +860,8 @@ protected:
 };
 
 class chart_bar : public chart {
+public:
+    chart_bar(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -860,6 +869,8 @@ protected:
 };
 
 class chart_column : public chart {
+public:
+    chart_column(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -867,6 +878,8 @@ protected:
 };
 
 class chart_line : public chart {
+public:
+    chart_line(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -874,6 +887,8 @@ protected:
 };
 
 class chart_pie : public chart {
+public:
+    chart_pie(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -881,6 +896,8 @@ protected:
 };
 
 class chart_scatter: public chart {
+public:
+    chart_scatter(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -888,6 +905,8 @@ protected:
 };
 
 class chart_radar : public chart {
+public:
+    chart_radar(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();
@@ -895,6 +914,8 @@ protected:
 };
 
 class chart_doughtnut : public chart_pie {
+public:
+    chart_doughtnut(uint8_t t) : chart_pie(t) {}
 protected:
     void write_chart_type(bool);
     void write_plot_area();

@@ -4923,10 +4923,8 @@ worksheet::insert_image(
 /*
  * Insert an chart into the worksheet.
  */
-lxw_error
-worksheet::insert_chart_opt(
-                           lxw_row_t row_num, lxw_col_t col_num,
-                           lxw_chart *chart, lxw_image_options *user_options)
+lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num,
+                           lxw_chart *chart, image_options *user_options)
 {
     lxw_image_options *options;
     lxw_chart_series *series;
@@ -4953,8 +4951,8 @@ worksheet::insert_chart_opt(
     }
 
     /* Check that the chart has a 'values' series. */
-    STAILQ_FOREACH(series, chart->series_list, list_pointers) {
-        if (!series->values->formula && !series->values->sheetname) {
+    for (const auto& series : chart->series_list) {
+        if (series->values->formula.empty() && series->values->sheetname.empty()) {
             LXW_WARN("worksheet_insert_chart()/_opt(): chart must have a "
                      "'values' series.");
 

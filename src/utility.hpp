@@ -82,11 +82,6 @@ namespace xlsxwriter {
     lxw_name_to_row(range), lxw_name_to_col(range), \
     lxw_name_to_row_2(range), lxw_name_to_col_2(range)
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
 
 /**
  * @brief Converts a libxlsxwriter error number to a string.
@@ -147,9 +142,9 @@ uint16_t lxw_name_to_col_2(const std::string& col_str);
 
 double lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904);
 
-void lxw_str_tolower(char *str);
+void lxw_str_tolower(std::string& str);
 
-FILE *lxw_tmpfile(char *tmpdir);
+FILE *lxw_tmpfile(const char *tmpdir);
 
 } // namespace xlsxwriter
 

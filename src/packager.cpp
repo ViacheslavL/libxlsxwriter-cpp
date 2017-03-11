@@ -407,21 +407,21 @@ uint8_t packager::_write_styles_file()
 
     /* Copy the unique and in-use formats from the workbook to the styles
      * xf_format list. */
-    for (const auto& format : workbook->used_xf_formats) {
+    for (const auto& pair : workbook->used_xf_formats.order_list) {
         /*
         lxw_format *workbook_format = (lxw_format *) hash_element->value;
         lxw_format *style_format = lxw_format_new();
         memcpy(style_format, workbook_format, sizeof(lxw_format));
         STAILQ_INSERT_TAIL(styles->xf_formats, style_format, list_pointers);
         */
-        styles->xf_formats.push_back(format);
+        styles->xf_formats.push_back(pair.first);
     }
 
     styles->font_count = workbook->font_count;
     styles->border_count = workbook->border_count;
     styles->fill_count = workbook->fill_count;
     styles->num_format_count = workbook->num_format_count;
-    styles->xf_count = workbook->used_xf_formats.size();
+    styles->xf_count = workbook->used_xf_formats.order_list.size();
 
     styles->file = lxw_tmpfile(tmpdir.c_str());
     if (!styles->file)

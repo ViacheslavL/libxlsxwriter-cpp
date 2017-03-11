@@ -369,11 +369,9 @@ lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904)
 
 /* Simple tolower() for strings. */
 void
-lxw_str_tolower(char *str)
+lxw_str_tolower(std::string& str)
 {
-    int i;
-
-    for (i = 0; str[i]; i++)
+    for (int i = 0; i < str.size(); ++i)
         str[i] = tolower(str[i]);
 }
 

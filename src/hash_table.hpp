@@ -11,6 +11,8 @@
 #define __LXW_HASH_TABLE_H__
 
 #include "common.hpp"
+#include <list>
+#include <unordered_map>
 
 /* Macro to loop over hash table elements in insertion order. */
 #define LXW_FOREACH_ORDERED(elem, hash_table) \
@@ -48,12 +50,6 @@ typedef struct lxw_hash_element {
 } lxw_hash_element;
 
 
- /* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
 lxw_hash_element *lxw_hash_key_exists(lxw_hash_table *lxw_hash, void *key,
                                       size_t key_len);
 lxw_hash_element *lxw_insert_hash_element(lxw_hash_table *lxw_hash, void *key,
@@ -62,15 +58,31 @@ lxw_hash_table *lxw_hash_new(uint32_t num_buckets, uint8_t free_key,
                              uint8_t free_value);
 void lxw_hash_free(lxw_hash_table *lxw_hash);
 
-/* Declarations required for unit testing. */
-#ifdef TESTING
+namespace xlsxwriter {
 
-#endif
+template <class K, class V>
+class hash_table {
+public:
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
+    std::pair<std::pair<K, V>, bool > exists(const K& key) {
+        auto it = storage.find(key);
+        if (it != storage.end())
+            return std::make_pair(*it, true);
+        else
+            return std::make_pair(std::pair<K, V>(), false);
+    }
+
+    std::pair<std::pair<K, V>, bool > insert(const K& key, const V& val) {
+        auto res = storage.insert(std::make_pair(key, val));
+        if (res.second)
+            order_list.push_back(std::make_pair(key, val));
+        return std::make_pair(*res.first, res.second);
+    }
+
+    std::list<std::pair<K, V>> order_list;
+    std::unordered_map<K, V> storage;
+};
+
 }
-#endif
-/* *INDENT-ON* */
 
 #endif /* __LXW_HASH_TABLE_H__ */

@@ -40,7 +40,7 @@ void custom::_xml_declaration()
 /*
  * Write the <vt:lpwstr> element.
  */
-void custom::_chart_write_vt_lpwstr(char *value)
+void custom::_chart_write_vt_lpwstr(const char *value)
 {
     lxw_xml_data_element("vt:lpwstr", value);
 }
@@ -113,7 +113,7 @@ void custom::_chart_write_custom_property(const custom_property_ptr& custom_prop
 
     if (custom_property->type == LXW_CUSTOM_STRING) {
         /* Write the vt:lpwstr element. */
-        _chart_write_vt_lpwstr(custom_property->u.string);
+        _chart_write_vt_lpwstr(custom_property->u.string.c_str());
     }
     else if (custom_property->type == LXW_CUSTOM_DOUBLE) {
         /* Write the vt:r8 element. */
