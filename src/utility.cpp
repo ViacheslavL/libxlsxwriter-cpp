@@ -7,15 +7,18 @@
  *
  */
 
+#include <vector>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "xlsxwriter/utility.h"
+#include "utility.hpp"
 #include "xlsxwriter/third_party/tmpfileplus.h"
 
-char *error_strings[LXW_MAX_ERRNO + 1] = {
+namespace xlsxwriter {
+
+static const std::vector<std::string> error_strings = {
     "No error.",
     "Memory error, failed to malloc() required memory.",
     "Error creating output xlsx file. Usually a permissions error.",
@@ -35,8 +38,7 @@ char *error_strings[LXW_MAX_ERRNO + 1] = {
     "Unknown error number."
 };
 
-char *
-lxw_strerror(lxw_error error_num)
+const std::string& lxw_strerror(lxw_error error_num)
 {
     if (error_num > LXW_MAX_ERRNO)
         error_num = LXW_MAX_ERRNO;
@@ -48,11 +50,13 @@ lxw_strerror(lxw_error error_num)
  * Convert Excel A-XFD style column name to zero based number.
  */
 void
-lxw_col_to_name(char *col_name, lxw_col_t col_num, uint8_t absolute)
+lxw_col_to_name(std::string& col_name, lxw_col_t col_num, uint8_t absolute)
 {
     uint8_t pos = 0;
     size_t len;
-    uint8_t i;
+    size_t symbols_added = 0;
+
+    size_t initial_length = col_name.size();
 
     /* Change from 0 index to 1 index. */
     col_num++;
@@ -67,43 +71,36 @@ lxw_col_to_name(char *col_name, lxw_col_t col_num, uint8_t absolute)
             remainder = 26;
 
         /* Convert the remainder value to a character. */
-        col_name[pos++] = 'A' + remainder - 1;
-        col_name[pos] = '\0';
+        col_name.push_back('A' + remainder - 1);
+        symbols_added++;
 
         /* Get the next order of magnitude. */
         col_num = (col_num - 1) / 26;
     }
 
     if (absolute) {
-        col_name[pos] = '$';
-        col_name[pos + 1] = '\0';
+        col_name.push_back('$');
+        symbols_added++;
     }
 
     /* Reverse the column name string. */
-    len = strlen(col_name);
-    for (i = 0; i < (len / 2); i++) {
-        char tmp = col_name[i];
-        col_name[i] = col_name[len - i - 1];
-        col_name[len - i - 1] = tmp;
+    len = symbols_added;
+    for (size_t i = 0; i < (len / 2); ++i) {
+        char tmp = col_name[i + initial_length];
+        col_name[i + initial_length] = col_name[len - i - 1 + initial_length];
+        col_name[len - i - 1 + initial_length] = tmp;
     }
 }
 
 /*
  * Convert zero indexed row and column to an Excel style A1 cell reference.
  */
-void
-lxw_rowcol_to_cell(char *cell_name, lxw_row_t row, lxw_col_t col)
+void lxw_rowcol_to_cell(std::string& cell_name, lxw_row_t row, lxw_col_t col)
 {
-    size_t pos;
-
     /* Add the column to the cell. */
     lxw_col_to_name(cell_name, col, 0);
 
-    /* Get the end of the cell. */
-    pos = strlen(cell_name);
-
-    /* Add the row to the cell. */
-    lxw_snprintf(&cell_name[pos], LXW_MAX_ROW_NAME_LENGTH, "%d", ++row);
+    cell_name.append(std::to_string(++row));
 }
 
 /*
@@ -111,22 +108,17 @@ lxw_rowcol_to_cell(char *cell_name, lxw_row_t row, lxw_col_t col)
  * an absolute reference.
  */
 void
-lxw_rowcol_to_cell_abs(char *cell_name, lxw_row_t row, lxw_col_t col,
+lxw_rowcol_to_cell_abs(std::string& cell_name, lxw_row_t row, lxw_col_t col,
                        uint8_t abs_row, uint8_t abs_col)
 {
-    size_t pos;
-
     /* Add the column to the cell. */
     lxw_col_to_name(cell_name, col, abs_col);
 
-    /* Get the end of the cell. */
-    pos = strlen(cell_name);
-
     if (abs_row)
-        cell_name[pos++] = '$';
+        cell_name.push_back('$');
 
     /* Add the row to the cell. */
-    lxw_snprintf(&cell_name[pos], LXW_MAX_ROW_NAME_LENGTH, "%d", ++row);
+    cell_name.append(std::to_string(++row));
 }
 
 /*
@@ -134,11 +126,10 @@ lxw_rowcol_to_cell_abs(char *cell_name, lxw_row_t row, lxw_col_t col,
  * range reference.
  */
 void
-lxw_rowcol_to_range(char *range,
+lxw_rowcol_to_range(std::string& range,
                     lxw_row_t first_row, lxw_col_t first_col,
                     lxw_row_t last_row, lxw_col_t last_col)
 {
-    size_t pos;
 
     /* Add the first cell to the range. */
     lxw_rowcol_to_cell(range, first_row, first_col);
@@ -147,14 +138,11 @@ lxw_rowcol_to_range(char *range,
     if (first_row == last_row && first_col == last_col)
         return;
 
-    /* Get the end of the cell. */
-    pos = strlen(range);
-
     /* Add the range separator. */
-    range[pos++] = ':';
+    range.push_back(':');
 
     /* Add the first cell to the range. */
-    lxw_rowcol_to_cell(&range[pos], last_row, last_col);
+    lxw_rowcol_to_cell(range, last_row, last_col);
 }
 
 /*
@@ -162,12 +150,10 @@ lxw_rowcol_to_range(char *range,
  * range reference with absolute values.
  */
 void
-lxw_rowcol_to_range_abs(char *range,
+lxw_rowcol_to_range_abs(std::string& range,
                         lxw_row_t first_row, lxw_col_t first_col,
                         lxw_row_t last_row, lxw_col_t last_col)
 {
-    size_t pos;
-
     /* Add the first cell to the range. */
     lxw_rowcol_to_cell_abs(range, first_row, first_col, 1, 1);
 
@@ -175,14 +161,11 @@ lxw_rowcol_to_range_abs(char *range,
     if (first_row == last_row && first_col == last_col)
         return;
 
-    /* Get the end of the cell. */
-    pos = strlen(range);
-
     /* Add the range separator. */
-    range[pos++] = ':';
+    range.push_back(':');
 
     /* Add the first cell to the range. */
-    lxw_rowcol_to_cell_abs(&range[pos], last_row, last_col, 1, 1);
+    lxw_rowcol_to_cell_abs(range, last_row, last_col, 1, 1);
 }
 
 /*
@@ -194,33 +177,23 @@ lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
                           lxw_row_t first_row, lxw_col_t first_col,
                           lxw_row_t last_row, lxw_col_t last_col)
 {
-    size_t pos;
-    char *quoted_name = lxw_quote_sheetname(sheetname);
-
-    strncpy(formula, quoted_name, LXW_MAX_FORMULA_RANGE_LENGTH - 1);
-    free(quoted_name);
-
-    /* Get the end of the sheetname. */
-    pos = strlen(formula);
+    formula = lxw_quote_sheetname(sheetname);
 
     /* Add the range separator. */
-    formula[pos++] = '!';
+    formula.push_back('!');
 
     /* Add the first cell to the range. */
-    lxw_rowcol_to_cell_abs(&formula[pos], first_row, first_col, 1, 1);
+    lxw_rowcol_to_cell_abs(formula, first_row, first_col, 1, 1);
 
     /* If the start and end cells are the same just return a single cell. */
     if (first_row == last_row && first_col == last_col)
         return;
 
-    /* Get the end of the cell. */
-    pos = strlen(formula);
-
     /* Add the range separator. */
-    formula[pos++] = ':';
+    formula.push_back(':');
 
     /* Add the first cell to the range. */
-    lxw_rowcol_to_cell_abs(&formula[pos], last_row, last_col, 1, 1);
+    lxw_rowcol_to_cell_abs(formula, last_row, last_col, 1, 1);
 }
 
 /*
@@ -394,25 +367,6 @@ lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904)
     return days + seconds;
 }
 
-/* Simple strdup() implementation since it isn't ANSI C. */
-char *
-lxw_strdup(const char *str)
-{
-    size_t len;
-    char *copy;
-
-    if (!str)
-        return NULL;
-
-    len = strlen(str) + 1;
-    copy = malloc(len);
-
-    if (copy)
-        memcpy(copy, str, len);
-
-    return copy;
-}
-
 /* Simple tolower() for strings. */
 void
 lxw_str_tolower(char *str)
@@ -425,40 +379,38 @@ lxw_str_tolower(char *str)
 
 /* Create a quoted version of the worksheet name, or return an unmodified
  * copy if it doesn't required quoting. */
-char *
-lxw_quote_sheetname(const char *str)
+std::string lxw_quote_sheetname(const std::string& str)
 {
 
-    uint8_t needs_quoting = 0;
+    bool needs_quoting = false;
     size_t number_of_quotes = 2;
     size_t i, j;
-    size_t len = strlen(str);
+    size_t len = str.size();
 
     /* Don't quote the sheetname if it is already quoted. */
     if (str[0] == '\'')
-        return lxw_strdup(str);
+        return str;
 
     /* Check if the sheetname contains any characters that require it
      * to be quoted. Also check for single quotes within the string. */
     for (i = 0; i < len; i++) {
         if (!isalnum((unsigned char)str[i]) && str[i] != '_' && str[i] != '.')
-            needs_quoting = 1;
+            needs_quoting = true;
 
         if (str[i] == '\'') {
-            needs_quoting = 1;
+            needs_quoting = true;
             number_of_quotes++;
         }
     }
 
     if (!needs_quoting) {
-        return lxw_strdup(str);
+        return str;
     }
     else {
         /* Add single quotes to the start and end of the string. */
-        char *quoted_name = calloc(1, len + number_of_quotes + 1);
-        RETURN_ON_MEM_ERROR(quoted_name, NULL);
-
-        quoted_name[0] = '\'';
+        std::string quoted_name;
+        quoted_name.reserve(len + number_of_quotes + 1);
+        quoted_name.push_back('\'');
 
         for (i = 0, j = 1; i < len; i++, j++) {
             quoted_name[j] = str[i];
@@ -489,3 +441,7 @@ lxw_tmpfile(const char *tmpdir)
     return tmpfile();
 #endif
 }
+
+
+} // namespace xlsxwriter
+

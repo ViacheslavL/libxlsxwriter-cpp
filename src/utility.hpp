@@ -20,6 +20,7 @@
 #include "common.hpp"
 #include <string>
 
+namespace xlsxwriter {
 
 /**
  * @brief Convert an Excel `A1` cell string into a `(row, col)` pair.
@@ -114,10 +115,10 @@ extern "C" {
  *
  * @return A pointer to a statically allocated string. Do not free.
  */
-char *lxw_strerror(lxw_error error_num);
+const std::string& lxw_strerror(lxw_error error_num);
 
 /* Create a quoted version of the worksheet name */
-char *lxw_quote_sheetname(const char *str);
+std::string lxw_quote_sheetname(const std::string& str);
 
 void lxw_col_to_name(std::string& col_name, lxw_col_t col_num, uint8_t absolute);
 
@@ -136,31 +137,20 @@ void lxw_rowcol_to_range_abs(std::string& range,
                              lxw_row_t last_row, lxw_col_t last_col);
 
 void lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
-                               lxw_row_t first_row, lxw_col_t first_col,
-                               lxw_row_t last_row, lxw_col_t last_col);
+                          lxw_row_t first_row, lxw_col_t first_col,
+                          lxw_row_t last_row, lxw_col_t last_col);
 
 uint32_t lxw_name_to_row(const std::string& row_str);
-uint16_t lxw_name_to_col(const std::string& col_str);
+uint16_t lxw_name_to_col(const std::string&  col_str);
 uint32_t lxw_name_to_row_2(const std::string& row_str);
 uint16_t lxw_name_to_col_2(const std::string& col_str);
 
 double lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904);
 
-char *lxw_strdup(const char *str);
-
 void lxw_str_tolower(char *str);
 
-FILE *lxw_tmpfile(const char *tmpdir);
+FILE *lxw_tmpfile(char *tmpdir);
 
-/* Declarations required for unit testing. */
-#ifdef TESTING
-
-#endif
-
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
+} // namespace xlsxwriter
 
 #endif /* __LXW_UTILITY_H__ */
