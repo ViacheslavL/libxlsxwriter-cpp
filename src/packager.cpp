@@ -223,7 +223,7 @@ uint8_t packager::_write_drawing_files()
     int err;
 
     for(const auto& worksheet : workbook->worksheets) {
-        xlsxwriter::drawing *drawing = worksheet->drawing;
+        const std::shared_ptr<xlsxwriter::drawing>& drawing = worksheet->drawing;
 
         if (drawing) {
             lxw_snprintf(filename, LXW_FILENAME_LENGTH,

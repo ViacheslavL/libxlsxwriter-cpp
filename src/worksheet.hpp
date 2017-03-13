@@ -112,7 +112,6 @@ struct lxw_table_rows {
     struct lxw_rb_generate_cell{int unused;}
 
 STAILQ_HEAD(lxw_merged_ranges, lxw_merged_range);
-STAILQ_HEAD(lxw_selections, lxw_selection);
 STAILQ_HEAD(lxw_image_data, lxw_image_options);
 STAILQ_HEAD(lxw_chart_data, lxw_image_options);
 
@@ -131,9 +130,9 @@ STAILQ_HEAD(lxw_chart_data, lxw_image_options);
  */
 struct lxw_row_col_options {
     /** Hide the row/column */
-    uint8_t hidden;
+    bool hidden;
     uint8_t level;
-    uint8_t collapsed;
+    bool collapsed;
 };
 
 struct lxw_col_options {
@@ -151,8 +150,6 @@ struct lxw_merged_range {
     lxw_row_t last_row;
     lxw_col_t first_col;
     lxw_col_t last_col;
-
-    STAILQ_ENTRY (lxw_merged_range) list_pointers;
 };
 
 struct lxw_repeat_rows {
@@ -194,12 +191,9 @@ struct lxw_panes {
 };
 
 struct lxw_selection {
-    char pane[LXW_PANE_NAME_LENGTH];
-    char active_cell[LXW_MAX_CELL_RANGE_LENGTH];
-    char sqref[LXW_MAX_CELL_RANGE_LENGTH];
-
-    STAILQ_ENTRY (lxw_selection) list_pointers;
-
+    std::string pane;
+    std::string active_cell;
+    std::string sqref;
 };
 
 /**
@@ -252,10 +246,10 @@ typedef std::shared_ptr<image_options> image_options_ptr;
  * worksheet_set_footer_opt() functions.
  *
  */
-typedef struct lxw_header_footer_options {
+struct lxw_header_footer_options {
     /** Header or footer margin in inches. Excel default is 0.3. */
     double margin;
-} lxw_header_footer_options;
+};
 
 /**
  * @brief Worksheet protection options.
@@ -348,11 +342,11 @@ typedef struct lxw_row {
 } lxw_row;
 
 /* Struct to represent a worksheet cell. */
-typedef struct lxw_cell {
+struct lxw_cell {
     lxw_row_t row_num;
     lxw_col_t col_num;
     enum cell_types type;
-    lxw_format *format;
+    format_ptr format;
 
     union {
         double number;
@@ -367,7 +361,7 @@ typedef struct lxw_cell {
 
     /* List pointers for tree.h. */
     RB_ENTRY (lxw_cell) tree_pointers;
-} lxw_cell;
+};
 
 class packager;
 class workbook;
@@ -548,7 +542,7 @@ public:
      */
     lxw_error write_formula(lxw_row_t row,
                             lxw_col_t col, const std::string& formula,
-                            const std::shared_ptr<lxw_format>& format);
+                            const format_ptr& format);
     /**
      * @brief Write an array formula to a worksheet cell.
      *
@@ -595,14 +589,14 @@ public:
                                   lxw_row_t last_row,
                                   lxw_col_t last_col,
                                   const std::string& formula,
-                                  const std::shared_ptr<lxw_format>& format);
+                                  const format_ptr& format);
 
     lxw_error write_array_formula_num(lxw_row_t first_row,
                                       lxw_col_t first_col,
                                       lxw_row_t last_row,
                                       lxw_col_t last_col,
                                       const std::string& formula,
-                                      const std::shared_ptr<lxw_format>& format,
+                                      const format_ptr& format,
                                       double result);
 
     /**
@@ -637,8 +631,8 @@ public:
 
     lxw_error write_url_opt(lxw_row_t row_num,
                             lxw_col_t col_num, const std::string& url,
-                            const format_ptr& format, const std::string& string,
-                            const std::string& tooltip);
+                            const format_ptr& format, const std::string& string = std::string(),
+                            const std::string& tooltip = std::string());
     /**
      *
      * @param row       The zero indexed row number.
@@ -865,7 +859,7 @@ public:
     lxw_error write_formula_num(lxw_row_t row,
                                 lxw_col_t col,
                                 const std::string& formula,
-                                const lxw_format& format, double result);
+                                const format_ptr& format, double result);
 
     /**
      * @brief Set the properties for a row of cells.
@@ -918,7 +912,7 @@ public:
      * @endcode
      *
      */
-    lxw_error set_row(lxw_row_t row, double height, const lxw_format& format);
+    lxw_error set_row(lxw_row_t row, double height, const format_ptr& format);
 
     /**
      * @brief Set the properties for a row of cells.
@@ -955,7 +949,7 @@ public:
     lxw_error set_row_opt(lxw_row_t row,
                           double height,
                           const format_ptr& format,
-                          const lxw_row_col_options& options);
+                          const lxw_row_col_options& options = {false, 0, false});
 
     /**
      * @brief Set the properties for one or more columns of cells.
@@ -1295,7 +1289,7 @@ public:
     lxw_error merge_range(lxw_row_t first_row,
                           lxw_col_t first_col, lxw_row_t last_row,
                           lxw_col_t last_col, const std::string& string,
-                          const lxw_format& format);
+                          const format_ptr& format);
 
     /**
      * @brief Set the autofilter area in the worksheet.
@@ -1862,7 +1856,7 @@ public:
      * @endcode
      *
      */
-    lxw_error worksheet_set_header_opt(const std::string& header_string, lxw_header_footer_options *options);
+    lxw_error set_header_opt(const std::string& header_string, const lxw_header_footer_options& options = {0});
 
     /**
      * @brief Set the printed page footer caption with additional options.
@@ -1875,7 +1869,7 @@ public:
      * The syntax of this function is the same as set_header_opt().
      *
      */
-    lxw_error set_footer_opt(const std::string& footer_string, lxw_header_footer_options *options);
+    lxw_error set_footer_opt(const std::string& footer_string, const lxw_header_footer_options& options = {0});
 
     /**
      * @brief Set the horizontal page breaks on a worksheet.
@@ -1916,7 +1910,7 @@ public:
      * breaks.
      *
      */
-    lxw_error set_h_pagebreaks(const std::vector<lxw_row_t> breaks);
+    lxw_error set_h_pagebreaks(const std::vector<lxw_row_t>& breaks);
 
     /**
      * @brief Set the vertical page breaks on a worksheet.
@@ -2400,8 +2394,8 @@ private:
     lxw_table_rows *table;
     lxw_table_rows *hyperlinks;
     lxw_cell **array;
-    lxw_merged_ranges *merged_ranges;
-    lxw_selections *selections;
+    std::vector<std::shared_ptr<lxw_merged_range>> merged_ranges;
+    std::vector<std::shared_ptr<lxw_selection>> selections;
     std::vector<std::shared_ptr<image_options>> image_data;
     std::vector<std::shared_ptr<image_options>> chart_data;
 
@@ -2428,7 +2422,7 @@ private:
     double *col_sizes;
     uint16_t col_sizes_max;
 
-    lxw_format **col_formats;
+    xlsxwriter::format **col_formats;
     uint16_t col_formats_max;
 
     uint8_t col_size_changed;
@@ -2491,8 +2485,8 @@ private:
 
     uint16_t merged_range_count;
 
-    lxw_row_t *hbreaks;
-    lxw_col_t *vbreaks;
+    std::vector<lxw_row_t> hbreaks;
+    std::vector<lxw_col_t> vbreaks;
     uint16_t hbreaks_count;
     uint16_t vbreaks_count;
 
@@ -2504,7 +2498,7 @@ private:
 
     lxw_protection protection;
 
-    xlsxwriter::drawing *drawing;
+    std::shared_ptr<xlsxwriter::drawing> drawing;
 
     STAILQ_ENTRY (lxw_worksheet) list_pointers;
 
@@ -2538,6 +2532,29 @@ private:
     uint32_t _calculate_x_split_width(double x_split) const;
     void _write_cell(lxw_cell *cell, const format_ptr &row_format);
     void _write_rows();
+    void _write_drawing(uint16_t id);
+    void _write_drawings();
+    void _position_object_emus(const image_options_ptr &image, const drawing_object_ptr &drawing_object);
+    void _write_formula_num_cell(lxw_cell *cell);
+    void _write_array_formula_num_cell(lxw_cell *cell);
+    void _write_inline_string_cell(const std::string &range, int32_t style_index, lxw_cell *cell);
+    void _write_freeze_panes();
+    void _position_object_pixels(const image_options_ptr &image, const drawing_object_ptr &drawing_object);
+    void _write_string_cell(const std::string &range, int32_t style_index, lxw_cell *cell);
+    void _write_number_cell(const std::string &range, int32_t style_index, lxw_cell *cell);
+    void _write_split_panes();
+    void _write_selection(const std::shared_ptr<lxw_selection> &selection);
+    int32_t _size_col(lxw_col_t col_num);
+    void _write_hyperlink_external(lxw_row_t row_num, lxw_col_t col_num, const std::string &location, const std::string &tooltip, uint16_t id);
+    void _write_hyperlinks();
+    void _write_hyperlink_internal(lxw_row_t row_num, lxw_col_t col_num, const std::string &location, const std::string &display, const std::string &tooltip);
+    void _write_page_set_up_pr();
+    void _write_cols();
+    int32_t _size_row(lxw_row_t row_num);
+    void _write_panes();
+    void _write_selections();
+    lxw_row *_get_row(lxw_row_t row_num);
+    lxw_error _check_dimensions(lxw_row_t row_num, lxw_col_t col_num, int8_t ignore_row, int8_t ignore_col);
 };
 
 typedef std::shared_ptr<worksheet> worksheet_ptr;
