@@ -71,12 +71,10 @@ lxw_cell * worksheet::find_cell(lxw_row *row, lxw_col_t col_num)
  */
 worksheet::worksheet(lxw_worksheet_init_data *init_data)
 {
-    table = calloc(1, sizeof(struct lxw_table_rows));
-    GOTO_LABEL_ON_MEM_ERROR(table, mem_error);
+    table = new lxw_table_rows();
     RB_INIT(table);
 
-    hyperlinks = calloc(1, sizeof(struct lxw_table_rows));
-    GOTO_LABEL_ON_MEM_ERROR(hyperlinks, mem_error);
+    hyperlinks = new lxw_table_rows();
     RB_INIT(hyperlinks);
 
     /* Initialize the cached rows. */
@@ -88,17 +86,15 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
         GOTO_LABEL_ON_MEM_ERROR(array, mem_error);
     }
 
-    col_options =
-        calloc(LXW_COL_META_MAX, sizeof(lxw_col_options *));
+    col_options = calloc(LXW_COL_META_MAX, sizeof(lxw_col_options *));
     col_options_max = LXW_COL_META_MAX;
     GOTO_LABEL_ON_MEM_ERROR(col_options, mem_error);
 
-    col_formats = calloc(LXW_COL_META_MAX, sizeof(lxw_format *));
+    col_formats = calloc(LXW_COL_META_MAX, sizeof(xlsxwriter::format *));
     col_formats_max = LXW_COL_META_MAX;
     GOTO_LABEL_ON_MEM_ERROR(col_formats, mem_error);
 
-    optimize_row = calloc(1, sizeof(struct lxw_row));
-    GOTO_LABEL_ON_MEM_ERROR(optimize_row, mem_error);
+    optimize_row = new lxw_row();
     optimize_row->height = LXW_DEF_ROW_HEIGHT;
 
     if (init_data && init_data->optimize) {
@@ -219,11 +215,11 @@ _free_row(lxw_row *row)
 lxw_row *
 _new_row(lxw_row_t row_num)
 {
-    lxw_row *row = calloc(1, sizeof(lxw_row));
+    lxw_row *row = new lxw_row();
 
     if (row) {
         row->row_num = row_num;
-        row->cells = calloc(1, sizeof(struct lxw_table_cells));
+        row->cells = new lxw_table_cells();
         row->height = LXW_DEF_ROW_HEIGHT;
 
         if (row->cells)
@@ -241,12 +237,9 @@ _new_row(lxw_row_t row_num)
 /*
  * Create a new worksheet number cell object.
  */
-lxw_cell *
-_new_number_cell(lxw_row_t row_num,
-                 lxw_col_t col_num, double value, lxw_format *format)
+lxw_cell * _new_number_cell(lxw_row_t row_num, lxw_col_t col_num, double value, xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -260,13 +253,11 @@ _new_number_cell(lxw_row_t row_num,
 /*
  * Create a new worksheet string cell object.
  */
-lxw_cell *
-_new_string_cell(lxw_row_t row_num,
+lxw_cell * _new_string_cell(lxw_row_t row_num,
                  lxw_col_t col_num, int32_t string_id, char *sst_string,
-                 lxw_format *format)
+                 xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -283,10 +274,9 @@ _new_string_cell(lxw_row_t row_num,
  */
 lxw_cell *
 _new_inline_string_cell(lxw_row_t row_num,
-                        lxw_col_t col_num, char *string, lxw_format *format)
+                        lxw_col_t col_num, char *string, xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -302,10 +292,9 @@ _new_inline_string_cell(lxw_row_t row_num,
  */
 lxw_cell *
 _new_formula_cell(lxw_row_t row_num,
-                  lxw_col_t col_num, char *formula, lxw_format *format)
+                  lxw_col_t col_num, char *formula, xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -321,10 +310,9 @@ _new_formula_cell(lxw_row_t row_num,
  */
 lxw_cell *
 _new_array_formula_cell(lxw_row_t row_num, lxw_col_t col_num, char *formula,
-                        char *range, lxw_format *format)
+                        char *range, xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -340,10 +328,9 @@ _new_array_formula_cell(lxw_row_t row_num, lxw_col_t col_num, char *formula,
  * Create a new worksheet blank cell object.
  */
 lxw_cell *
-_new_blank_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_format *format)
+_new_blank_cell(lxw_row_t row_num, lxw_col_t col_num, xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -358,10 +345,9 @@ _new_blank_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_format *format)
  */
 lxw_cell *
 _new_boolean_cell(lxw_row_t row_num, lxw_col_t col_num, int value,
-                  lxw_format *format)
+                  xlsxwriter::format *format)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -380,8 +366,7 @@ _new_hyperlink_cell(lxw_row_t row_num, lxw_col_t col_num,
                     enum cell_types link_type, char *url, char *string,
                     char *tooltip)
 {
-    lxw_cell *cell = calloc(1, sizeof(lxw_cell));
-    RETURN_ON_MEM_ERROR(cell, cell);
+    lxw_cell *cell = new lxw_cell();
 
     cell->row_num = row_num;
     cell->col_num = col_num;
@@ -502,8 +487,7 @@ void worksheet::_insert_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *cel
 /*
  * Insert a hyperlink object into the hyperlink list.
  */
-void worksheet::_insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num,
-                  lxw_cell *link)
+void worksheet::_insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *link)
 {
     lxw_row *row = _get_row_list(hyperlinks, row_num);
 
@@ -860,10 +844,10 @@ void worksheet::_write_split_panes()
     double y_split = panes.y_split;
     uint8_t has_selection = false;
 
-    char row_cell[LXW_MAX_CELL_NAME_LENGTH];
-    char col_cell[LXW_MAX_CELL_NAME_LENGTH];
-    char top_left_cell[LXW_MAX_CELL_NAME_LENGTH];
-    char active_pane[LXW_PANE_NAME_LENGTH];
+    std::string row_cell;//[LXW_MAX_CELL_NAME_LENGTH];
+    std::string col_cell;//[LXW_MAX_CELL_NAME_LENGTH];
+    std::string top_left_cell;//[LXW_MAX_CELL_NAME_LENGTH];
+    std::string active_pane;//[LXW_PANE_NAME_LENGTH];
 
     /* If there is a user selection we remove it from the list and use it. */
     if (!selections.empty()) {
@@ -882,7 +866,7 @@ void worksheet::_write_split_panes()
         y_split = (uint32_t) (20 * y_split + 300);
 
     if (x_split > 0.0)
-        x_split = _worksheet_calculate_x_split_width(x_split);
+        x_split = _calculate_x_split_width(x_split);
 
     /* For non-explicit topLeft definitions, estimate the cell offset based on
      * the pixels dimensions. This is only a workaround and doesn't take
@@ -897,66 +881,66 @@ void worksheet::_write_split_panes()
 
     /* If there is no selection set the active cell to the top left cell. */
     if (!has_selection) {
-        lxw_strcpy(user_selection->active_cell, top_left_cell);
-        lxw_strcpy(user_selection->sqref, top_left_cell);
+        user_selection->active_cell =  top_left_cell;
+        user_selection->sqref = top_left_cell;
     }
 
     /* Set the active pane. */
     if (y_split > 0.0 && x_split > 0.0) {
-        lxw_strcpy(active_pane, "bottomRight");
+        active_pane = "bottomRight";
 
         lxw_rowcol_to_cell(row_cell, top_row, 0);
         lxw_rowcol_to_cell(col_cell, 0, left_col);
 
         selection = std::make_shared<lxw_selection>();
         if (selection) {
-            lxw_strcpy(selection->pane, "topRight");
-            lxw_strcpy(selection->active_cell, col_cell);
-            lxw_strcpy(selection->sqref, col_cell);
+            selection->pane = "topRight";
+            selection->active_cell = col_cell;
+            selection->sqref = col_cell;
 
-            STAILQ_INSERT_TAIL(selections, selection, list_pointers);
+            selections.push_back(selection);
         }
 
         selection = std::make_shared<lxw_selection>();
         if (selection) {
-            lxw_strcpy(selection->pane, "bottomLeft");
-            lxw_strcpy(selection->active_cell, row_cell);
-            lxw_strcpy(selection->sqref, row_cell);
+            selection->pane = "bottomLeft";
+            selection->active_cell = row_cell;
+            selection->sqref = row_cell;
 
-            STAILQ_INSERT_TAIL(selections, selection, list_pointers);
+            selections.push_back(selection);
         }
 
         selection = std::make_shared<lxw_selection>();
         if (selection) {
-            lxw_strcpy(selection->pane, "bottomRight");
-            lxw_strcpy(selection->active_cell, user_selection->active_cell);
-            lxw_strcpy(selection->sqref, user_selection->sqref);
+            selection->pane = "bottomRight";
+            selection->active_cell = user_selection->active_cell;
+            selection->sqref = user_selection->sqref;
 
-            STAILQ_INSERT_TAIL(selections, selection, list_pointers);
+            selections.push_back(selection);
         }
     }
     else if (x_split > 0.0) {
-        lxw_strcpy(active_pane, "topRight");
+        active_pane = "topRight";
 
         selection = std::make_shared<lxw_selection>();
         if (selection) {
-            lxw_strcpy(selection->pane, "topRight");
-            lxw_strcpy(selection->active_cell, user_selection->active_cell);
-            lxw_strcpy(selection->sqref, user_selection->sqref);
+            selection->pane = "topRight";
+            selection->active_cell = user_selection->active_cell;
+            selection->sqref = user_selection->sqref;
 
-            STAILQ_INSERT_TAIL(selections, selection, list_pointers);
+            selections.push_back(selection);
         }
     }
     else {
-        lxw_strcpy(active_pane, "bottomLeft");
+        active_pane = "bottomLeft";
 
         selection = std::make_shared<lxw_selection>();
         if (selection) {
-            lxw_strcpy(selection->pane, "bottomLeft");
-            lxw_strcpy(selection->active_cell, user_selection->active_cell);
-            lxw_strcpy(selection->sqref, user_selection->sqref);
+            selection->pane = "bottomLeft";
+            selection->active_cell = user_selection->active_cell;
+            selection->sqref = user_selection->sqref;
 
-            STAILQ_INSERT_TAIL(selections, selection, list_pointers);
+            selections.push_back(selection);
         }
     }
 
@@ -1058,14 +1042,14 @@ void worksheet::_write_sheet_view()
     /* Set the zoom level. */
     if (zoom != 100) {
         if (!page_view) {
-            attributes.push_back("zoomScale", std::to_string(zoom));
+            attributes.push_back({"zoomScale", std::to_string(zoom)});
 
             if (zoom_scale_normal)
-                attributes.push_back("zoomScaleNormal", std::to_string(zoom));
+                attributes.push_back({"zoomScaleNormal", std::to_string(zoom)});
         }
     }
 
-    attributes.push_back("workbookViewId", "0");
+    attributes.push_back({"workbookViewId", "0"});
 
     if (panes.type != NO_PANES || !selections.empty()) {
         lxw_xml_start_tag("sheetView", attributes);
@@ -1536,14 +1520,14 @@ void worksheet::_position_object_pixels(const image_options_ptr& image,
     height = height + y1;
 
     /* Subtract the underlying cell widths to find the end cell. */
-    while (width >= _worksheet_size_col(col_end)) {
-        width -= _worksheet_size_col(col_end);
+    while (width >= _size_col(col_end)) {
+        width -= _size_col(col_end);
         col_end++;
     }
 
     /* Subtract the underlying cell heights to find the end cell. */
-    while (height >= _worksheet_size_row(row_end)) {
-        height -= _worksheet_size_row(row_end);
+    while (height >= _size_row(row_end)) {
+        height -= _size_row(row_end);
         row_end++;
     }
 
@@ -2130,17 +2114,14 @@ void worksheet::_write_array_formula_num_cell(lxw_cell *cell)
 /*
  * Write out a boolean worksheet cell.
  */
-void
-_write_boolean_cell(lxw_cell *cell)
+void worksheet::_write_boolean_cell(lxw_cell *cell)
 {
-    char data[LXW_ATTR_32];
+    std::string data("0");
 
     if (cell->u.number)
         data[0] = '1';
     else
         data[0] = '0';
-
-    data[1] = '\0';
 
     lxw_xml_data_element("v", data);
 }
@@ -2186,7 +2167,7 @@ _calculate_spans(struct lxw_row *row, char *span, int32_t *block_num)
 /*
  * Write out a generic worksheet cell.
  */
-void worksheet::_write_cell(lxw_cell *cell, const format_ptr& row_format)
+void worksheet::_write_cell(lxw_cell *cell, xlsxwriter::format* row_format)
 {
     std::string range;
     lxw_row_t row_num = cell->row_num;
@@ -2253,8 +2234,7 @@ void worksheet::_write_cell(lxw_cell *cell, const format_ptr& row_format)
 /*
  * Write out the worksheet data as a series of rows and cells.
  */
-void
-worksheet::_write_rows()
+void worksheet::_write_rows()
 {
     lxw_row *row;
     lxw_cell *cell;
@@ -2422,9 +2402,9 @@ void worksheet::_write_cols()
 /*
  * Write the <mergeCell> element.
  */
-void worksheet::_write_merge_cell(lxw_merged_range *merged_range)
+void worksheet::_write_merge_cell(const std::shared_ptr<lxw_merged_range>& merged_range)
 {
-    char ref[LXW_MAX_CELL_RANGE_LENGTH];
+    std::string ref;
 
     /* Convert the merge dimensions to a cell range. */
     lxw_rowcol_to_range(ref, merged_range->first_row, merged_range->first_col,
@@ -2444,7 +2424,7 @@ void worksheet::_write_merge_cells()
 {
     if (merged_range_count) {
         xml_attribute_list attributes = {
-            {"count", merged_range_count}
+            {"count", std::to_string(merged_range_count)}
         };
 
         lxw_xml_start_tag("mergeCells", attributes);
@@ -2569,8 +2549,8 @@ worksheet::_write_sheet_pr()
 void worksheet::_write_brk(uint32_t id, uint32_t max)
 {
     xml_attribute_list attributes = {
-        {"id", id},
-        {"max", max},
+        {"id", std::to_string(id)},
+        {"max", std::to_string(max)},
         {"man", "1"}
     };
 
@@ -2580,8 +2560,7 @@ void worksheet::_write_brk(uint32_t id, uint32_t max)
 /*
  * Write the <rowBreaks> element.
  */
-void
-worksheet::_write_row_breaks()
+void worksheet::_write_row_breaks()
 {
     uint16_t count = hbreaks_count;
     uint16_t i;
@@ -2605,20 +2584,18 @@ worksheet::_write_row_breaks()
 /*
  * Write the <colBreaks> element.
  */
-void
-worksheet::_write_col_breaks()
+void worksheet::_write_col_breaks()
 {
-    xml_attribute_list attributes;
-
     uint16_t count = vbreaks_count;
     uint16_t i;
 
     if (!count)
         return;
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_INT("count", count);
-    LXW_PUSH_ATTRIBUTES_INT("manualBreakCount", count);
+    xml_attribute_list attributes = {
+        {"count", std::to_string(count)},
+        {"manualBreakCount", std::to_string(count)}
+    };
 
     lxw_xml_start_tag("colBreaks", attributes);
 
@@ -2626,8 +2603,6 @@ worksheet::_write_col_breaks()
        _write_brk(vbreaks[i], LXW_ROW_MAX - 1);
 
     lxw_xml_end_tag("colBreaks");
-
-
 }
 
 /*
@@ -2635,31 +2610,27 @@ worksheet::_write_col_breaks()
  */
 void worksheet::_write_auto_filter()
 {
-    xml_attribute_list attributes;
+    std::string range;
 
-    char range[LXW_MAX_CELL_RANGE_LENGTH];
-
-    if (!autofilter.in_use)
+    if (!autofilter_.in_use)
         return;
 
     lxw_rowcol_to_range(range,
-                        autofilter.first_row,
-                        autofilter.first_col,
-                        autofilter.last_row, autofilter.last_col);
+                        autofilter_.first_row,
+                        autofilter_.first_col,
+                        autofilter_.last_row, autofilter_.last_col);
 
-    LXW_INIT_ATTRIBUTES();
-    LXW_PUSH_ATTRIBUTES_STR("ref", range);
+    xml_attribute_list attributes = {
+        {"ref", range}
+    };
 
     lxw_xml_empty_tag("autoFilter", attributes);
-
-
 }
 
 /*
  * Write the <hyperlink> element for external links.
  */
-void
-worksheet::_write_hyperlink_external(lxw_row_t row_num,
+void worksheet::_write_hyperlink_external(lxw_row_t row_num,
                                     lxw_col_t col_num, const std::string& location,
                                     const std::string& tooltip, uint16_t id)
 {
@@ -2700,13 +2671,13 @@ void worksheet::_write_hyperlink_internal(lxw_row_t row_num,
         {"ref", ref}
     };
 
-    if (location)
+    if (!location.empty())
         attributes.push_back({"location", location});
 
-    if (tooltip)
+    if (!tooltip.empty())
         attributes.push_back({"tooltip", tooltip});
 
-    if (display)
+    if (!display.empty())
         attributes.push_back({"display", display});
 
     lxw_xml_empty_tag("hyperlink", attributes);
@@ -3004,8 +2975,7 @@ worksheet::write_string(lxw_row_t row_num,
             return LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND;
 
         string_id = sst_element->index;
-        cell = _new_string_cell(row_num, col_num, string_id,
-                                sst_element->string, format);
+        cell = _new_string_cell(row_num, col_num, string_id, sst_element->string, format);
     }
     else {
         /* Look for and escape control chars in the string. */
@@ -3086,8 +3056,8 @@ lxw_error worksheet::write_array_formula_num(
     lxw_cell *cell;
     lxw_row_t tmp_row;
     lxw_col_t tmp_col;
-    char *formula_copy;
-    char *range;
+    std::string formula_copy;
+    std::string range;
     lxw_error err;
 
     /* Swap last row/col with first row/col as necessary */
@@ -3102,7 +3072,7 @@ lxw_error worksheet::write_array_formula_num(
         first_col = tmp_col;
     }
 
-    if (!formula)
+    if (formula.empty())
         return LXW_ERROR_NULL_PARAMETER_IGNORED;
 
     /* Check that column number is valid and store the max value */
@@ -3111,8 +3081,6 @@ lxw_error worksheet::write_array_formula_num(
         return err;
 
     /* Define the array range. */
-    range = calloc(1, LXW_MAX_CELL_RANGE_LENGTH);
-    RETURN_ON_MEM_ERROR(range, -1);
 
     if (first_row == last_row && first_col == last_col)
         lxw_rowcol_to_cell(range, first_row, last_col);
@@ -3122,18 +3090,18 @@ lxw_error worksheet::write_array_formula_num(
     /* Copy and trip leading "{=" from formula. */
     if (formula[0] == '{')
         if (formula[1] == '=')
-            formula_copy = lxw_strdup(formula + 2);
+            formula_copy = formula.substr(2);
         else
-            formula_copy = lxw_strdup(formula + 1);
+            formula_copy = formula.substr(1);
     else
-        formula_copy = lxw_strdup(formula);
+        formula_copy = formula;
 
     /* Strip trailing "}" from formula. */
-    if (formula_copy[strlen(formula_copy) - 1] == '}')
-        formula_copy[strlen(formula_copy) - 1] = '\0';
+    if (formula_copy[formula_copy.size() - 1] == '}')
+        formula_copy[formula_copy.size() - 1] = '\0';
 
     /* Create a new array formula cell object. */
-    cell = _new_array_formula_cell(first_row, first_col, formula_copy, range, format);
+    cell = _new_array_formula_cell(first_row, first_col, formula_copy, range, format.get());
 
     cell->formula_result = result;
 
@@ -3254,7 +3222,6 @@ worksheet::write_url_opt(lxw_row_t row_num,
     char *found_string;
     lxw_error err;
     size_t string_size;
-    size_t i;
     enum cell_types link_type = HYPERLINK_URL;
 
     if (url.empty())
@@ -3278,9 +3245,8 @@ worksheet::write_url_opt(lxw_row_t row_num,
     if (found_string)
         link_type = HYPERLINK_EXTERNAL;
 
-    if (string) {
-        string_copy = lxw_strdup(string);
-        GOTO_LABEL_ON_MEM_ERROR(string_copy, mem_error);
+    if (!string.empty()) {
+        string_copy = string;
     }
     else {
         if (link_type == HYPERLINK_URL) {
@@ -3297,7 +3263,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
         GOTO_LABEL_ON_MEM_ERROR(string_copy, mem_error);
     }
 
-    if (url) {
+    if (!url.empty()) {
         if (link_type == HYPERLINK_URL)
             url_copy = lxw_strdup(url);
         else
@@ -3321,7 +3287,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
         uint8_t not_escaped = 1;
 
         /* First check if the URL is already escaped by the user. */
-        for (i = 0; i <= strlen(url_copy) - 3; i++) {
+        for (size_t i = 0; i <= strlen(url_copy) - 3; i++) {
             if (url_copy[i] == '%' && isxdigit(url_copy[i + 1])
                 && isxdigit(url_copy[i + 2])) {
 
@@ -3334,7 +3300,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
             url_external = calloc(1, strlen(url_copy) * 3 + 1);
             GOTO_LABEL_ON_MEM_ERROR(url_external, mem_error);
 
-            for (i = 0; i <= strlen(url_copy); i++) {
+            for (size_t i = 0; i <= strlen(url_copy); i++) {
                 switch (url_copy[i]) {
                     case (' '):
                     case ('"'):
@@ -3373,11 +3339,11 @@ worksheet::write_url_opt(lxw_row_t row_num,
          */
 
         /* For external links change the dir separator from Unix to DOS. */
-        for (i = 0; i <= strlen(url_copy); i++)
+        for (size_t i = 0; i <= strlen(url_copy); i++)
             if (url_copy[i] == '/')
                 url_copy[i] = '\\';
 
-        for (i = 0; i <= strlen(string_copy); i++)
+        for (size_t i = 0; i <= strlen(string_copy); i++)
             if (string_copy[i] == '/')
                 string_copy[i] = '\\';
 
@@ -3433,7 +3399,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
                                url_string, tooltip_copy);
     GOTO_LABEL_ON_MEM_ERROR(link, mem_error);
 
-    _insert_hyperlink(row_num, col_num, link);
+    (row_num, col_num, link);
 
     free(string_copy);
     hlink_count++;
@@ -3525,7 +3491,7 @@ lxw_error worksheet::set_column_opt(
         lxw_col_t col;
         lxw_col_t old_size = col_formats_max;
         lxw_col_t new_size = _next_power_of_two(lastcol + 1);
-        lxw_format **new_ptr = realloc(col_formats,
+        xlsxwriter::format **new_ptr = realloc(col_formats,
                                        new_size * sizeof(lxw_format *));
 
         if (new_ptr) {
@@ -3541,8 +3507,7 @@ lxw_error worksheet::set_column_opt(
     }
 
     /* Store the column options. */
-    copied_options = calloc(1, sizeof(lxw_col_options));
-    RETURN_ON_MEM_ERROR(copied_options, LXW_ERROR_MEMORY_MALLOC_FAILED);
+    copied_options = new lxw_col_options();
 
     copied_options->firstcol = firstcol;
     copied_options->lastcol = lastcol;
@@ -3556,7 +3521,7 @@ lxw_error worksheet::set_column_opt(
 
     /* Store the column formats for use when writing cell data. */
     for (col = firstcol; col <= lastcol; col++) {
-        col_formats[col] = format;
+        col_formats[col] = format.get();
     }
 
     /* Store the column change to allow optimizations. */
@@ -3576,8 +3541,7 @@ lxw_error worksheet::set_column(lxw_col_t firstcol, lxw_col_t lastcol, double wi
 /*
  * Set the properties of a row with options.
  */
-lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height,
-                      const format_ptr& format, const lxw_row_col_options& user_options)
+lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, const format_ptr& format, const lxw_row_col_options& user_options)
 {
 
     lxw_col_t min_col;
@@ -3606,7 +3570,7 @@ lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height,
     row = _get_row(row_num);
 
     row->height = height;
-    row->format = format;
+    row->format = format.get();
     row->hidden = hidden;
     row->level = level;
     row->collapsed = collapsed;

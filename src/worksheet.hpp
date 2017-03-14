@@ -346,7 +346,7 @@ struct lxw_cell {
     lxw_row_t row_num;
     lxw_col_t col_num;
     enum cell_types type;
-    format_ptr format;
+    xlsxwriter::format* format;
 
     union {
         double number;
@@ -1085,7 +1085,7 @@ public:
                              lxw_col_t last_col,
                              double width,
                              const format_ptr& format,
-                             const lxw_row_col_options& options);
+                             const lxw_row_col_options& options = {false, 0, false});
 
     /**
      * @brief Insert an image in a worksheet cell.
@@ -2517,7 +2517,7 @@ private:
     lxw_row *_get_row_list(struct lxw_table_rows *table,
                                   lxw_row_t row_num);
 
-    void _write_merge_cell(lxw_merged_range *merged_range);
+    void _write_merge_cell(const std::shared_ptr<lxw_merged_range>& merged_range);
     void _write_merge_cells();
 
     void _write_odd_header();
@@ -2530,7 +2530,7 @@ private:
     void _write_sheet_protection();
     void _write_optimized_sheet_data();
     uint32_t _calculate_x_split_width(double x_split) const;
-    void _write_cell(lxw_cell *cell, const format_ptr &row_format);
+    void _write_cell(lxw_cell *cell, xlsxwriter::format* row_format);
     void _write_rows();
     void _write_drawing(uint16_t id);
     void _write_drawings();
@@ -2555,6 +2555,12 @@ private:
     void _write_selections();
     lxw_row *_get_row(lxw_row_t row_num);
     lxw_error _check_dimensions(lxw_row_t row_num, lxw_col_t col_num, int8_t ignore_row, int8_t ignore_col);
+    void _write_brk(uint32_t id, uint32_t max);
+    void _write_row_breaks();
+    void _write_auto_filter();
+    void _write_col_breaks();
+    void _write_boolean_cell(lxw_cell *cell);
+    void _insert_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *cell);
 };
 
 typedef std::shared_ptr<worksheet> worksheet_ptr;
