@@ -164,6 +164,9 @@ protected:
     std::string lxw_escape_data(const std::string& data);
 
     FILE* file;
+
+private:
+    void _fprint_escaped_attributes(const std::list<std::pair<std::string, std::string> > &attributes);
 };
 
 

@@ -351,13 +351,13 @@ struct lxw_cell {
     union {
         double number;
         int32_t string_id;
-        char *string;
+        std::string *string;
     } u;
 
     double formula_result;
-    char *user_data1;
-    char *user_data2;
-    char *sst_string;
+    std::string *user_data1;
+    std::string *user_data2;
+    std::string *sst_string;
 
     /* List pointers for tree.h. */
     RB_ENTRY (lxw_cell) tree_pointers;
@@ -2561,6 +2561,7 @@ private:
     void _write_col_breaks();
     void _write_boolean_cell(lxw_cell *cell);
     void _insert_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *cell);
+    void _insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *link);
 };
 
 typedef std::shared_ptr<worksheet> worksheet_ptr;

@@ -202,7 +202,7 @@ enum lxw_marker_types {
 struct series_data_point {
     bool is_string;
     double number;
-    std::string string;
+    std::string* string;
     bool no_data;
 };
 

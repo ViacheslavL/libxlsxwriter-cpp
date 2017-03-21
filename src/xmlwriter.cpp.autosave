@@ -99,11 +99,11 @@ void xmlwriter::lxw_xml_data_element(const std::string& tag, const std::string& 
 {
     fprintf(file, "<%s", tag);
 
-    _fprint_escaped_attributes(file, attributes);
+    _fprint_escaped_attributes(attributes);
 
     fprintf(file, ">");
 
-    _fprint_escaped_data(file, data);
+    _fprint_escaped_data(data);
 
     fprintf(file, "</%s>", tag);
 }

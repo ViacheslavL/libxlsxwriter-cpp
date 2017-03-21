@@ -544,8 +544,8 @@ void chart::_write_pt(uint16_t index, const std::shared_ptr<series_data_point>& 
 
     lxw_xml_start_tag("c:pt", attributes);
 
-    if (data_point->is_string && !data_point->string.empty())
-        _write_v_str(data_point->string);
+    if (data_point->is_string && !data_point->string->empty())
+        _write_v_str(*data_point->string);
     else
         _write_v_num(data_point->number);
 

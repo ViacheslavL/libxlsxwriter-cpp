@@ -14,6 +14,8 @@
 #include "format.hpp"
 #include "utility.hpp"
 #include "relationships.hpp"
+#include <iostream>
+#include <strstream>
 
 #define LXW_STR_MAX      32767
 #define LXW_BUFFER_SIZE  4096
@@ -82,17 +84,14 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     hyperlinks->cached_row_num = LXW_ROW_MAX + 1;
 
     if (init_data && init_data->optimize) {
-        array = calloc(LXW_COL_MAX, sizeof(struct lxw_cell *));
-        GOTO_LABEL_ON_MEM_ERROR(array, mem_error);
+        array = new lxw_cell *[LXW_COL_MAX]();
     }
 
-    col_options = calloc(LXW_COL_META_MAX, sizeof(lxw_col_options *));
+    col_options = new lxw_col_options*[LXW_COL_META_MAX]();
     col_options_max = LXW_COL_META_MAX;
-    GOTO_LABEL_ON_MEM_ERROR(col_options, mem_error);
 
-    col_formats = calloc(LXW_COL_META_MAX, sizeof(xlsxwriter::format *));
+    col_formats = new xlsxwriter::format*[LXW_COL_META_MAX]();
     col_formats_max = LXW_COL_META_MAX;
-    GOTO_LABEL_ON_MEM_ERROR(col_formats, mem_error);
 
     optimize_row = new lxw_row();
     optimize_row->height = LXW_DEF_ROW_HEIGHT;
@@ -106,9 +105,8 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
             tmpfile = lxw_tmpfile(NULL);
 
         if (!tmpfile) {
-            LXW_ERROR("Error creating tmpfile() for worksheet in "
+            throw std::string("Error creating tmpfile() for worksheet in "
                       "'constant_memory' mode.");
-            goto mem_error;
         }
 
         optimize_tmpfile = tmpfile;
@@ -169,8 +167,7 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
 /*
  * Free a worksheet cell.
  */
-void
-_free_cell(lxw_cell *cell)
+void _free_cell(lxw_cell *cell)
 {
     if (!cell)
         return;
@@ -178,13 +175,13 @@ _free_cell(lxw_cell *cell)
     if (cell->type != NUMBER_CELL && cell->type != STRING_CELL
         && cell->type != BLANK_CELL && cell->type != BOOLEAN_CELL) {
 
-        free(cell->u.string);
+        delete cell->u.string;
     }
 
-    free(cell->user_data1);
-    free(cell->user_data2);
+    delete cell->user_data1;
+    delete cell->user_data2;
 
-    free(cell);
+    delete cell;
 }
 
 /*
@@ -254,7 +251,7 @@ lxw_cell * _new_number_cell(lxw_row_t row_num, lxw_col_t col_num, double value, 
  * Create a new worksheet string cell object.
  */
 lxw_cell * _new_string_cell(lxw_row_t row_num,
-                 lxw_col_t col_num, int32_t string_id, char *sst_string,
+                 lxw_col_t col_num, int32_t string_id, std::string *sst_string,
                  xlsxwriter::format *format)
 {
     lxw_cell *cell = new lxw_cell();
@@ -274,7 +271,7 @@ lxw_cell * _new_string_cell(lxw_row_t row_num,
  */
 lxw_cell *
 _new_inline_string_cell(lxw_row_t row_num,
-                        lxw_col_t col_num, char *string, xlsxwriter::format *format)
+                        lxw_col_t col_num, std::string *string, xlsxwriter::format *format)
 {
     lxw_cell *cell = new lxw_cell();
 
@@ -292,7 +289,7 @@ _new_inline_string_cell(lxw_row_t row_num,
  */
 lxw_cell *
 _new_formula_cell(lxw_row_t row_num,
-                  lxw_col_t col_num, char *formula, xlsxwriter::format *format)
+                  lxw_col_t col_num, std::string *formula, xlsxwriter::format *format)
 {
     lxw_cell *cell = new lxw_cell();
 
@@ -309,8 +306,8 @@ _new_formula_cell(lxw_row_t row_num,
  * Create a new worksheet array formula cell object.
  */
 lxw_cell *
-_new_array_formula_cell(lxw_row_t row_num, lxw_col_t col_num, char *formula,
-                        char *range, xlsxwriter::format *format)
+_new_array_formula_cell(lxw_row_t row_num, lxw_col_t col_num, std::string *formula,
+                        std::string *range, xlsxwriter::format *format)
 {
     lxw_cell *cell = new lxw_cell();
 
@@ -363,8 +360,8 @@ _new_boolean_cell(lxw_row_t row_num, lxw_col_t col_num, int value,
  */
 lxw_cell *
 _new_hyperlink_cell(lxw_row_t row_num, lxw_col_t col_num,
-                    enum cell_types link_type, char *url, char *string,
-                    char *tooltip)
+                    enum cell_types link_type, std::string *url, std::string *string,
+                    std::string *tooltip)
 {
     lxw_cell *cell = new lxw_cell();
 
@@ -1086,10 +1083,10 @@ void worksheet::_write_sheet_format_pr()
     };
 
     if (default_row_height != LXW_DEF_ROW_HEIGHT)
-        LXW_PUSH_ATTRIBUTES_STR("customHeight", "1");
+        attributes.push_back({"customHeight", "1"});
 
     if (default_row_zeroed)
-        LXW_PUSH_ATTRIBUTES_STR("zeroHeight", "1");
+        attributes.push_back({"zeroHeight", "1"});
 
     lxw_xml_empty_tag("sheetFormatPr", attributes);
 }
@@ -2049,7 +2046,7 @@ void worksheet::_write_string_cell(const std::string& range,
 void worksheet::_write_inline_string_cell(const std::string& range,
                           int32_t style_index, lxw_cell *cell)
 {
-    std::string string = lxw_escape_data(cell->u.string);
+    std::string string = lxw_escape_data(*cell->u.string);
 
     /* Add attribute to preserve leading or trailing whitespace. */
     if (isspace(string[0])
@@ -2087,7 +2084,7 @@ void worksheet::_write_formula_num_cell(lxw_cell *cell)
 
     lxw_snprintf(data, LXW_ATTR_32, "%.16g", cell->formula_result);
 
-    lxw_xml_data_element("f", cell->u.string);
+    lxw_xml_data_element("f", *cell->u.string);
     lxw_xml_data_element("v", data);
 }
 
@@ -2100,12 +2097,12 @@ void worksheet::_write_array_formula_num_cell(lxw_cell *cell)
 
     xml_attribute_list attributes = {
         {"t", "array"},
-        {"ref", cell->user_data1}
+        {"ref", *cell->user_data1}
     };
 
     lxw_snprintf(data, LXW_ATTR_32, "%.16g", cell->formula_result);
 
-    lxw_xml_data_element("f", cell->u.string, attributes);
+    lxw_xml_data_element("f", *cell->u.string, attributes);
     lxw_xml_data_element("v", data);
 
 
@@ -2713,7 +2710,7 @@ void worksheet::_write_hyperlinks()
 
                 relationship->type = "/hyperlink";
 
-                relationship->target = link->u.string;
+                relationship->target = *link->u.string;
 
                 relationship->target_mode = "External";
 
@@ -2721,8 +2718,8 @@ void worksheet::_write_hyperlinks()
 
                _write_hyperlink_external(link->row_num,
                                                     link->col_num,
-                                                    link->user_data1,
-                                                    link->user_data2,
+                                                    *link->user_data1,
+                                                    *link->user_data2,
                                                     rel_count);
             }
 
@@ -2730,9 +2727,9 @@ void worksheet::_write_hyperlinks()
 
                _write_hyperlink_internal(link->row_num,
                                                     link->col_num,
-                                                    link->u.string,
-                                                    link->user_data1,
-                                                    link->user_data2);
+                                                    *link->u.string,
+                                                    *link->user_data1,
+                                                    *link->user_data2);
             }
 
         }
@@ -2930,7 +2927,7 @@ worksheet::write_number(lxw_row_t row_num,
     if (err)
         return err;
 
-    cell = _new_number_cell(row_num, col_num, value, format);
+    cell = _new_number_cell(row_num, col_num, value, format.get());
 
     _insert_cell(row_num, col_num, cell);
 
@@ -2947,7 +2944,7 @@ worksheet::write_string(lxw_row_t row_num,
 {
     lxw_cell *cell;
     int32_t string_id;
-    char *string_copy;
+    std::string *string_copy = new std::string();
     struct sst_element *sst_element;
     lxw_error err;
 
@@ -2975,19 +2972,19 @@ worksheet::write_string(lxw_row_t row_num,
             return LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND;
 
         string_id = sst_element->index;
-        cell = _new_string_cell(row_num, col_num, string_id, sst_element->string, format);
+        cell = _new_string_cell(row_num, col_num, string_id, &sst_element->string, format.get());
     }
     else {
         /* Look for and escape control chars in the string. */
-        if (strpbrk(string, "\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C"
+        if (strpbrk(string.c_str(), "\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C"
                     "\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16"
                     "\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F")) {
-            string_copy = lxw_escape_control_characters(string);
+            *string_copy = lxw_escape_control_characters(string);
         }
         else {
-            string_copy = lxw_strdup(string);
+            *string_copy = string;
         }
-        cell = _new_inline_string_cell(row_num, col_num, string_copy, format);
+        cell = _new_inline_string_cell(row_num, col_num, string_copy, format.get());
     }
 
     _insert_cell(row_num, col_num, cell);
@@ -3005,7 +3002,7 @@ lxw_error worksheet::write_formula_num(
         const format_ptr& format, double result)
 {
     lxw_cell *cell;
-    char *formula_copy;
+    std::string* formula_copy = new std::string();
     lxw_error err;
 
     if (formula.empty())
@@ -3017,11 +3014,11 @@ lxw_error worksheet::write_formula_num(
 
     /* Strip leading "=" from formula. */
     if (formula[0] == '=')
-        formula_copy = formula.substr(1);
+        *formula_copy = formula.substr(1);
     else
-        formula_copy = formula;
+        *formula_copy = formula;
 
-    cell = _new_formula_cell(row_num, col_num, formula_copy, format);
+    cell = _new_formula_cell(row_num, col_num, formula_copy, format.get());
     cell->formula_result = result;
 
     _insert_cell(row_num, col_num, cell);
@@ -3056,8 +3053,8 @@ lxw_error worksheet::write_array_formula_num(
     lxw_cell *cell;
     lxw_row_t tmp_row;
     lxw_col_t tmp_col;
-    std::string formula_copy;
-    std::string range;
+    std::string* formula_copy = new std::string();
+    std::string* range = new std::string();
     lxw_error err;
 
     /* Swap last row/col with first row/col as necessary */
@@ -3083,22 +3080,22 @@ lxw_error worksheet::write_array_formula_num(
     /* Define the array range. */
 
     if (first_row == last_row && first_col == last_col)
-        lxw_rowcol_to_cell(range, first_row, last_col);
+        lxw_rowcol_to_cell(*range, first_row, last_col);
     else
-        lxw_rowcol_to_range(range, first_row, first_col, last_row, last_col);
+        lxw_rowcol_to_range(*range, first_row, first_col, last_row, last_col);
 
     /* Copy and trip leading "{=" from formula. */
     if (formula[0] == '{')
         if (formula[1] == '=')
-            formula_copy = formula.substr(2);
+            *formula_copy = formula.substr(2);
         else
-            formula_copy = formula.substr(1);
+            *formula_copy = formula.substr(1);
     else
-        formula_copy = formula;
+        *formula_copy = formula;
 
     /* Strip trailing "}" from formula. */
-    if (formula_copy[formula_copy.size() - 1] == '}')
-        formula_copy[formula_copy.size() - 1] = '\0';
+    if ((*formula_copy)[formula_copy->size() - 1] == '}')
+        (*formula_copy)[formula_copy->size() - 1] = '\0';
 
     /* Create a new array formula cell object. */
     cell = _new_array_formula_cell(first_row, first_col, formula_copy, range, format.get());
@@ -3152,7 +3149,7 @@ lxw_error worksheet::write_blank(lxw_row_t row_num, lxw_col_t col_num,
     if (err)
         return err;
 
-    cell = _new_blank_cell(row_num, col_num, format);
+    cell = _new_blank_cell(row_num, col_num, format.get());
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3172,7 +3169,7 @@ lxw_error worksheet::write_boolean(lxw_row_t row_num, lxw_col_t col_num, bool va
     if (err)
         return err;
 
-    cell = _new_boolean_cell(row_num, col_num, value, format);
+    cell = _new_boolean_cell(row_num, col_num, value, format.get());
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3197,7 +3194,7 @@ lxw_error worksheet::write_datetime(
 
     excel_date = lxw_datetime_to_excel_date(datetime, LXW_EPOCH_1900);
 
-    cell = _new_number_cell(row_num, col_num, excel_date, format);
+    cell = _new_number_cell(row_num, col_num, excel_date, format.get());
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3214,12 +3211,12 @@ worksheet::write_url_opt(lxw_row_t row_num,
                         const std::string& tooltip)
 {
     lxw_cell *link;
-    char *string_copy = NULL;
-    char *url_copy = NULL;
-    char *url_external = NULL;
-    char *url_string = NULL;
-    char *tooltip_copy = NULL;
-    char *found_string;
+    std::string *string_copy = new std::string();
+    std::string *url_copy = nullptr;
+    std::string *url_external = nullptr;
+    std::string *url_string = nullptr;
+    std::string *tooltip_copy = nullptr;
+    std::string *found_string = nullptr;
     lxw_error err;
     size_t string_size;
     enum cell_types link_type = HYPERLINK_URL;
@@ -3236,60 +3233,58 @@ worksheet::write_url_opt(lxw_row_t row_num,
         return err;
 
     /* Set the URI scheme from internal links. */
-    found_string = strstr(url, "internal:");
-    if (found_string)
+    size_t idx = url.find("internal:");
+    if (idx < url.size())
         link_type = HYPERLINK_INTERNAL;
 
     /* Set the URI scheme from external links. */
-    found_string = strstr(url, "external:");
-    if (found_string)
+    idx = url.find("external:");
+    if (idx < url.size())
         link_type = HYPERLINK_EXTERNAL;
 
     if (!string.empty()) {
-        string_copy = string;
+        *string_copy = string;
     }
     else {
         if (link_type == HYPERLINK_URL) {
             /* Strip the mailto header. */
-            found_string = strstr(url, "mailto:");
-            if (found_string)
-                string_copy = lxw_strdup(url + sizeof("mailto"));
+            idx = url.find("mailto:");
+            if (idx < url.size())
+                *string_copy = url.substr(sizeof("mailto"));
             else
-                string_copy = lxw_strdup(url);
+                *string_copy = url;
         }
         else {
-            string_copy = lxw_strdup(url + sizeof("__ternal"));
+            *string_copy = url.substr(sizeof("__ternal"));
         }
-        GOTO_LABEL_ON_MEM_ERROR(string_copy, mem_error);
     }
 
     if (!url.empty()) {
+        url_copy = new std::string();
         if (link_type == HYPERLINK_URL)
-            url_copy = lxw_strdup(url);
+            *url_copy = url;
         else
-            url_copy = lxw_strdup(url + sizeof("__ternal"));
-
-        GOTO_LABEL_ON_MEM_ERROR(url_copy, mem_error);
+            *url_copy = url.substr(sizeof("__ternal"));
     }
 
-    if (tooltip) {
-        tooltip_copy = lxw_strdup(tooltip);
-        GOTO_LABEL_ON_MEM_ERROR(tooltip_copy, mem_error);
+    if (!tooltip.empty()) {
+        tooltip_copy = new std::string();
+        *tooltip_copy = tooltip;
     }
 
     if (link_type == HYPERLINK_INTERNAL) {
-        url_string = lxw_strdup(string_copy);
-        GOTO_LABEL_ON_MEM_ERROR(url_string, mem_error);
+        url_string = new std::string();
+        *url_string = *string_copy;
     }
 
     /* Escape the URL. */
-    if (link_type == HYPERLINK_URL && strlen(url_copy) >= 3) {
+    if (link_type == HYPERLINK_URL && url_copy->size() >= 3) {
         uint8_t not_escaped = 1;
 
         /* First check if the URL is already escaped by the user. */
-        for (size_t i = 0; i <= strlen(url_copy) - 3; i++) {
-            if (url_copy[i] == '%' && isxdigit(url_copy[i + 1])
-                && isxdigit(url_copy[i + 2])) {
+        for (size_t i = 0; i <= url_copy->size() - 3; i++) {
+            if ((*url_copy)[i] == '%' && isxdigit((*url_copy)[i + 1])
+                && isxdigit((*url_copy)[i + 2])) {
 
                 not_escaped = 0;
                 break;
@@ -3297,37 +3292,37 @@ worksheet::write_url_opt(lxw_row_t row_num,
         }
 
         if (not_escaped) {
-            url_external = calloc(1, strlen(url_copy) * 3 + 1);
-            GOTO_LABEL_ON_MEM_ERROR(url_external, mem_error);
+            url_external = new std::string();
 
-            for (size_t i = 0; i <= strlen(url_copy); i++) {
-                switch (url_copy[i]) {
-                    case (' '):
-                    case ('"'):
-                    case ('%'):
-                    case ('<'):
-                    case ('>'):
-                    case ('['):
-                    case (']'):
-                    case ('`'):
-                    case ('^'):
-                    case ('{'):
-                    case ('}'):
-                        lxw_snprintf(url_external + strlen(url_external),
-                                     sizeof("%xx"), "%%%2x", url_copy[i]);
-                        break;
-                    default:
-                        url_external[strlen(url_external)] = url_copy[i];
+            for (size_t i = 0; i <= url_copy->size(); i++) {
+                switch ((*url_copy)[i]) {
+                case (' '):
+                case ('"'):
+                case ('%'):
+                case ('<'):
+                case ('>'):
+                case ('['):
+                case (']'):
+                case ('`'):
+                case ('^'):
+                case ('{'):
+                case ('}'):
+                {
+                    std::strstream ss;
+                    ss << "%" << std::hex << (int)(*url_copy)[i];
+                    url_external->append(ss.str());
+                    break;
+                }
+                default:
+                    url_external->push_back((*url_copy)[i]);
                 }
 
             }
 
-            free(url_copy);
-            url_copy = lxw_strdup(url_external);
-            GOTO_LABEL_ON_MEM_ERROR(url_copy, mem_error);
+            delete url_copy;
+            url_copy = url_external;
 
-            free(url_external);
-            url_external = NULL;
+            url_external = nullptr;
         }
     }
 
@@ -3339,79 +3334,70 @@ worksheet::write_url_opt(lxw_row_t row_num,
          */
 
         /* For external links change the dir separator from Unix to DOS. */
-        for (size_t i = 0; i <= strlen(url_copy); i++)
-            if (url_copy[i] == '/')
-                url_copy[i] = '\\';
+        for (size_t i = 0; i < url_copy->size(); i++)
+            if ((*url_copy)[i] == '/')
+                (*url_copy)[i] = '\\';
 
-        for (size_t i = 0; i <= strlen(string_copy); i++)
-            if (string_copy[i] == '/')
-                string_copy[i] = '\\';
+        for (size_t i = 0; i < string_copy->size(); i++)
+            if ((*string_copy)[i] == '/')
+                (*string_copy)[i] = '\\';
 
-        found_string = strchr(url_copy, '#');
+        idx = url_copy->find('#');
 
-        if (found_string) {
-            url_string = lxw_strdup(found_string + 1);
-            GOTO_LABEL_ON_MEM_ERROR(url_string, mem_error);
+        if (idx < url_copy->size()) {
+            *url_string = url_copy->substr(idx + 1);
 
-            *found_string = '\0';
+            *url_copy = url_copy->substr(0, idx);
         }
 
         /* Look for Windows style "C:/" link or Windows share "\\" link. */
-        found_string = strchr(url_copy, ':');
-        if (!found_string)
-            found_string = strstr(url_copy, "\\\\");
+        idx  = url_copy->find(':');
+        if (idx == url_copy->size())
+            idx = url_copy->find("\\\\");
 
-        if (found_string) {
+        if (idx < url_copy->size()) {
             /* Add the file:/// URI to the url if non-local. */
-            string_size = sizeof("file:///") + strlen(url_copy);
-            url_external = calloc(1, string_size);
-            GOTO_LABEL_ON_MEM_ERROR(url_external, mem_error);
+            string_size = sizeof("file:///") + url_copy->size();
+            url_external = new std::string();
 
-            lxw_snprintf(url_external, string_size, "file:///%s", url_copy);
+            *url_external = "file:///" + *url_copy;
 
         }
 
         /* Convert a ./dir/file.xlsx link to dir/file.xlsx. */
-        found_string = strstr(url_copy, ".\\");
-        if (found_string == url_copy)
-            memmove(url_copy, url_copy + 2, strlen(url_copy) - 1);
+        idx = url_copy->find(".\\");
+        if (idx < url_copy->size())
+            *url_copy = url_copy->substr(2);
 
         if (url_external) {
-            free(url_copy);
-            url_copy = lxw_strdup(url_external);
-            GOTO_LABEL_ON_MEM_ERROR(url_copy, mem_error);
+            url_copy = url_external;
 
-            free(url_external);
+            delete url_external;
             url_external = NULL;
         }
 
     }
 
     /* Excel limits escaped URL to 255 characters. */
-    if (strlen(url_copy) > 255)
-        goto mem_error;
+    if (url_copy->size() > 255)
+        //! @TODO make log here
+        delete string_copy;
+        return LXW_NO_ERROR;
 
-    err = write_string(row_num, col_num, string_copy, format);
+    err = write_string(row_num, col_num, *string_copy, format);
     if (err)
-        goto mem_error;
+        //! @TODO make log here
+        delete string_copy;
+        return LXW_NO_ERROR;
 
     link = _new_hyperlink_cell(row_num, col_num, link_type, url_copy,
                                url_string, tooltip_copy);
-    GOTO_LABEL_ON_MEM_ERROR(link, mem_error);
 
-    (row_num, col_num, link);
+    _insert_hyperlink(row_num, col_num, link);
 
-    free(string_copy);
+    delete string_copy;
     hlink_count++;
     return LXW_NO_ERROR;
-
-mem_error:
-    free(string_copy);
-    free(url_copy);
-    free(url_external);
-    free(url_string);
-    free(tooltip_copy);
-    return LXW_ERROR_MEMORY_MALLOC_FAILED;
 }
 
 /*
@@ -3470,7 +3456,7 @@ lxw_error worksheet::set_column_opt(
         lxw_col_t col;
         lxw_col_t old_size = col_options_max;
         lxw_col_t new_size = _next_power_of_two(firstcol + 1);
-        lxw_col_options **new_ptr = realloc(col_options,
+        lxw_col_options **new_ptr = (lxw_col_options **)realloc(col_options,
                                             new_size *
                                             sizeof(lxw_col_options *));
 
@@ -3491,8 +3477,7 @@ lxw_error worksheet::set_column_opt(
         lxw_col_t col;
         lxw_col_t old_size = col_formats_max;
         lxw_col_t new_size = _next_power_of_two(lastcol + 1);
-        xlsxwriter::format **new_ptr = realloc(col_formats,
-                                       new_size * sizeof(lxw_format *));
+        xlsxwriter::format **new_ptr = (xlsxwriter::format **)realloc(col_formats, new_size * sizeof(xlsxwriter::format*));
 
         if (new_ptr) {
             for (col = old_size; col < new_size; col++)
