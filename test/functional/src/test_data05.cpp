@@ -7,17 +7,17 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_data05.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
-    lxw_format    *format    = workbook_add_format(workbook);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data05.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
+    xlsxwriter::format    *format    = workbook->add_format();
 
     format->bold = 1;
 
-    worksheet_write_string(worksheet, 0, 0, "Foo", format);
+    worksheet->write_string(0, 0, "Foo", format);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

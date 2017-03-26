@@ -25,12 +25,11 @@ class packager;
 /*
  * Struct to represent a content_types.
  */
-struct content_types : public xmlwriter {
+class content_types : public xmlwriter {
     friend class packager;
 public:
 
     content_types();
-    ~content_types();
 
     void assemble_xml_file();
 
@@ -51,7 +50,6 @@ public:
     void add_custom_properties();
 
     /* Declarations required for unit testing. */
-    void _content_types_xml_declaration();
     void _write_default(const std::string& ext, const std::string& type);
     void _write_override(const std::string& part_name, const std::string& type);
 

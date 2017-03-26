@@ -7,18 +7,18 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_format02.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_format02.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format    *format1    = workbook_add_format(workbook);
-    lxw_format    *format2    = workbook_add_format(workbook);
+    xlsxwriter::format    *format1    = workbook->add_format();
+    xlsxwriter::format    *format2    = workbook->add_format();
 
-    worksheet_set_row(worksheet, 0, 30, NULL);
+    worksheet->set_row(0, 30, NULL);
 
     format_set_font_name(format1, "Arial");
     format_set_bold(format1);
@@ -31,8 +31,8 @@ int main() {
     format_set_align(format2, LXW_ALIGN_CENTER);
     format_set_align(format2, LXW_ALIGN_VERTICAL_BOTTOM);
 
-    worksheet_write_string(worksheet, 0, 0, "Foo", format1);
-    worksheet_write_string(worksheet, 0, 1, "Bar", format2);
+    worksheet->write_string(0, 0, "Foo", format1);
+    worksheet->write_string(0, 1, "Bar", format2);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

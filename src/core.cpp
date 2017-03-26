@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "core.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/core.hpp>
+#include <xlsxwriter/utility.hpp>
 
 namespace xlsxwriter {
 

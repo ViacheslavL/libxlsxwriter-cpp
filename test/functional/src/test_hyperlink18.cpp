@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink18.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink18.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet_write_url(worksheet, CELL("A1"), "http://google.com/00000000001111111111222222222233333333334444444444555555555566666666666777777777778888888888999999999990000000000111111111122222222223333333333444444444455555555556666666666677777777777888888888899999999999000000000011111111112222222222x", NULL);
 
@@ -21,5 +21,5 @@ int main() {
 
 
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

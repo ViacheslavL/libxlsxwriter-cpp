@@ -7,16 +7,16 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_gh42_02.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_gh42_02.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     char string[] = {0xe5, 0x9b, 0xbe, 0x20, 0xe5, 0x9b, 0xbe, 0x00};
 
-    worksheet_write_string(worksheet, 0, 0, string, NULL);
+    worksheet->write_string(0, 0, string, NULL);
 
     workbook_close(workbook);
 

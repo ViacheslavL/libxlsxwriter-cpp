@@ -7,17 +7,17 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook_options options = {1, NULL};
+    xlsxwriter::workbook_options options = {1, NULL};
 
     /* Use deprecated constructor for testing. */
-    lxw_workbook  *workbook  = new_workbook_opt("test_optimize26.xlsx", &options);
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook_opt("test_optimize26.xlsx", &options);
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, 2, 2, "café", NULL);
+    worksheet->write_string(2, 2, "café", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

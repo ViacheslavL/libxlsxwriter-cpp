@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_chart_size04.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_size04.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_COLUMN);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
@@ -30,7 +30,7 @@ int main() {
     int row, col;
     for (row = 0; row < 5; row++)
         for (col = 0; col < 3; col++)
-            worksheet_write_number(worksheet, row, col, data[row][col], NULL);
+            worksheet->write_number(row, col, data[row][col], NULL);
 
     chart_add_series(chart, NULL, "=Sheet1!$A$1:$A$5");
     chart_add_series(chart, NULL, "=Sheet1!$B$1:$B$5");
@@ -39,5 +39,5 @@ int main() {
     lxw_image_options options = {.x_offset = 8, .y_offset = 9};
     worksheet_insert_chart_opt(worksheet, CELL("E9"), chart, &options);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,15 +7,15 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_tab_color01.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_tab_color01.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo" , NULL);
-    worksheet_set_tab_color(worksheet, LXW_COLOR_RED);
+    worksheet->write_string(CELL("A1"), "Foo" , NULL);
+    worksheet->set_tab_color(xlsxwriter::LXW_COLOR_RED);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

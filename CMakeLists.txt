@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(libxlsxwriter++)
+project(xlsxwriter++)
 
 set(CMAKE_DEBUG_POSTFIX d)
 
@@ -42,6 +42,9 @@ if (NOT MSVC)
         set(tmp "${tmp} -march=native -mtune=native")
     endif()
     set(CMAKE_C_FLAGS "${tmp}"
+        CACHE STRING "c-libraries flags compile"
+        FORCE)
+    set(CMAKE_CXX_FLAGS "${tmp}"
         CACHE STRING "libxlsxwriter compile flags"
         FORCE)
 else()
@@ -53,7 +56,7 @@ endif()
 function(add_simple_executable ex_name)
     string(CONCAT ex_source ${ex_name} ".cpp")
     add_executable(${ex_name} ${ex_source})
-    target_link_libraries(${ex_name} xlsxwriter ${ZLIB_LIBRARIES})
+    target_link_libraries(${ex_name} xlsxwriter++ ${ZLIB_LIBRARIES})
 endfunction()
 
 # process library components
@@ -65,7 +68,7 @@ add_subdirectory(include)
 # enable regression tests
 set(BUILD_TESTING OFF CACHE BOOL "Enable regresion tests")
 if (BUILD_TESTING)
-    include(CTest)
+    #include(CTest)
     configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake"

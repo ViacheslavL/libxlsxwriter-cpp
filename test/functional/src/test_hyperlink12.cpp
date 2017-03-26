@@ -7,13 +7,13 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink12.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
-    lxw_format *format = workbook_add_format(workbook);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink12.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
+    xlsxwriter::format *format = workbook->add_format();
 
     format_set_underline(format, LXW_UNDERLINE_SINGLE);
     format_set_font_color(format, LXW_COLOR_BLUE);
@@ -21,5 +21,5 @@ int main() {
     worksheet_write_url(worksheet, CELL("A1"), "mailto:jmcnamara@cpan.org", format);
     worksheet_write_url(worksheet, CELL("A3"), "ftp://perl.org/", format);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

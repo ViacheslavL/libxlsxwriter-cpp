@@ -7,15 +7,15 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_data06.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
-    lxw_format    *format1   = workbook_add_format(workbook);
-    lxw_format    *format2   = workbook_add_format(workbook);
-    lxw_format    *format3   = workbook_add_format(workbook);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data06.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
+    xlsxwriter::format    *format1   = workbook->add_format();
+    xlsxwriter::format    *format2   = workbook->add_format();
+    xlsxwriter::format    *format3   = workbook->add_format();
 
     format1->bold = 1;
 
@@ -24,10 +24,10 @@ int main() {
     format3->bold = 1;
     format3->italic = 1;
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo", format1);
-    worksheet_write_string(worksheet, CELL("A2"), "Bar", format2);
-    worksheet_write_string(worksheet, CELL("A3"), "Baz", format3);
+    worksheet->write_string(CELL("A1"), "Foo", format1);
+    worksheet->write_string(CELL("A2"), "Bar", format2);
+    worksheet->write_string(CELL("A3"), "Baz", format3);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }
 

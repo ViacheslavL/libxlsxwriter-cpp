@@ -7,17 +7,17 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_default_row01.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_default_row01.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_default_row(worksheet, 24, LXW_FALSE);
+    worksheet_set_default_row(worksheet, 24, false);
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo" , NULL);
-    worksheet_write_string(worksheet, CELL("A10"), "Bar" , NULL);
+    worksheet->write_string(CELL("A1"), "Foo" , NULL);
+    worksheet->write_string(CELL("A10"), "Bar" , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

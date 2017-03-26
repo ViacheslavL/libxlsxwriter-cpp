@@ -7,11 +7,11 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_defined_name01.xlsx");
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_defined_name01.xlsx");
     lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, "Sheet 3");
@@ -37,5 +37,5 @@ int main() {
     (void)worksheet2;
     (void)worksheet3;
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

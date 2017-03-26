@@ -7,14 +7,14 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_data01.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data01.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+    worksheet->write_string(0, 0, "Hello", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

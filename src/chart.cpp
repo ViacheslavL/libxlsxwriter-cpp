@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "chart.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/chart.hpp>
+#include <xlsxwriter/utility.hpp>
 #include <math.h>
 #include <memory>
 
@@ -609,7 +609,6 @@ void chart::_write_num_cache(const series_range_ptr& range)
  */
 void chart::_write_str_cache(const series_range_ptr& range)
 {
-    lxw_series_data_point *data_point;
     uint16_t index = 0;
 
     lxw_xml_start_tag("c:strCache");
@@ -1808,7 +1807,7 @@ void chart::_write_chart()
 /*
  * Initialize the chart specific properties.
  */
-void chart::_initialize(uint8_t type)
+void chart::_initialize(uint8_t /*type*/)
 {
     /*
     switch (type) {
@@ -2037,6 +2036,11 @@ void chart_series::set_values(const std::string& sheetname,
 /*
  * Set an axis caption.
  */
+chart_axis::chart_axis()
+{
+
+}
+
 void chart_axis::set_name(const std::string& name)
 {
     if (name.empty())

@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "xmlwriter.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
 #include <list>
 #include <iomanip>
 
@@ -38,7 +38,7 @@ void xmlwriter::lxw_xml_declaration()
  */
 void xmlwriter::lxw_xml_start_tag(const std::string& tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
-    fprintf(file, "<%s", tag);
+    fprintf(file, "<%s", tag.c_str());
 
     _fprint_escaped_attributes(attributes);
 
@@ -54,7 +54,7 @@ void xmlwriter::lxw_xml_start_tag_unencoded(const char *tag, const std::list<std
     fprintf(file, "<%s", tag);
 
     for (const auto& attribute : attributes) {
-        fprintf(file, " %s=\"%s\"", attribute.first, attribute.second);
+        fprintf(file, " %s=\"%s\"", attribute.first.c_str(), attribute.second.c_str());
     }
 
     fprintf(file, ">");
@@ -73,7 +73,7 @@ void xmlwriter::lxw_xml_end_tag(const std::string& tag)
  */
 void xmlwriter::lxw_xml_empty_tag(const std::string&  tag, const std::list<std::pair<std::string, std::string>>& attributes)
 {
-    fprintf(file, "<%s", tag);
+    fprintf(file, "<%s", tag.c_str());
 
     _fprint_escaped_attributes(attributes);
 
@@ -88,7 +88,7 @@ void xmlwriter::lxw_xml_empty_tag_unencoded(const char *tag, const std::list<std
 {
     fprintf(file, "<%s", tag);
     for (const auto& attribute : attributes) {
-        fprintf(file, " %s=\"%s\"", attribute.first, attribute.second);
+        fprintf(file, " %s=\"%s\"", attribute.first.c_str(), attribute.second.c_str());
     }
     fprintf(file, "/>");
 }
@@ -98,7 +98,7 @@ void xmlwriter::lxw_xml_empty_tag_unencoded(const char *tag, const std::list<std
  */
 void xmlwriter::lxw_xml_data_element(const std::string& tag, const std::string& data, const std::list<std::pair<std::string, std::string>>& attributes)
 {
-    fprintf(file, "<%s", tag);
+    fprintf(file, "<%s", tag.c_str());
 
     _fprint_escaped_attributes(attributes);
 
@@ -106,7 +106,7 @@ void xmlwriter::lxw_xml_data_element(const std::string& tag, const std::string& 
 
     _fprint_escaped_data(data);
 
-    fprintf(file, "</%s>", tag);
+    fprintf(file, "</%s>", tag.c_str());
 }
 
 /*
@@ -237,16 +237,16 @@ std::string xmlwriter::lxw_escape_control_characters(const std::string& string)
 void xmlwriter::_fprint_escaped_attributes(const std::list<std::pair<std::string, std::string>>& attributes)
 {
     for (const auto& attribute : attributes) {
-        fprintf(file, " %s=", attribute.first);
+        fprintf(file, " %s=", attribute.first.c_str());
 
         if (!strpbrk(attribute.second.c_str(), "&<>\"")) {
-            fprintf(file, "\"%s\"", attribute.second);
+            fprintf(file, "\"%s\"", attribute.second.c_str());
         }
         else {
             std::string encoded = _escape_attributes(attribute);
 
             if (!encoded.empty()) {
-                fprintf(file, "\"%s\"", encoded);
+                fprintf(file, "\"%s\"", encoded.c_str());
             }
         }
     }
@@ -257,12 +257,12 @@ void xmlwriter::_fprint_escaped_data(const std::string& data)
 {
     /* Escape the data section of the XML element. */
     if (!strpbrk(data.c_str(), "&<>")) {
-        fprintf(file, "%s", data);
+        fprintf(file, "%s", data.c_str());
     }
     else {
         std::string encoded = lxw_escape_data(data);
         if (!encoded.empty()) {
-            fprintf(file, "%s", encoded);
+            fprintf(file, "%s", encoded.c_str());
         }
     }
 }

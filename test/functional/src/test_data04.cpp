@@ -7,18 +7,18 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_data04.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data04.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, 0,       0, "Foo",  NULL);
-    worksheet_write_string(worksheet, 0,       1, "Bar",  NULL);
-    worksheet_write_string(worksheet, 1,       0, "Bing", NULL);
-    worksheet_write_string(worksheet, 2,       0, "Buzz", NULL);
-    worksheet_write_string(worksheet, 1048575, 0, "End",  NULL);
+    worksheet->write_string(0,       0, "Foo",  NULL);
+    worksheet->write_string(0,       1, "Bar",  NULL);
+    worksheet->write_string(1,       0, "Bing", NULL);
+    worksheet->write_string(2,       0, "Buzz", NULL);
+    worksheet->write_string(1048575, 0, "End",  NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

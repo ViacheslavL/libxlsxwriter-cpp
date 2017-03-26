@@ -7,7 +7,7 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
@@ -30,5 +30,5 @@ int main() {
 
     worksheet_write_string(worksheet1, CELL("A1"), "Foo" , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

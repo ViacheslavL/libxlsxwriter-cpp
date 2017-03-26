@@ -7,7 +7,7 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
@@ -27,8 +27,8 @@ int main() {
 
     workbook_set_properties(workbook, properties);
 
-    worksheet_set_column(worksheet, 0, 0, 70, NULL);
-    worksheet_write_string(worksheet, CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
+    worksheet->set_column(0, 0, 70, NULL);
+    worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
 
     free(properties->title);
     free(properties->subject);
@@ -41,5 +41,5 @@ int main() {
     free(properties->status);
     free(properties);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

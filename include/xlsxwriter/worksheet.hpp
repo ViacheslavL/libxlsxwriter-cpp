@@ -435,7 +435,7 @@ public:
      * @ref format.h "Format" object.
      *
      * @code
-     *     std::shared_ptr<lxw_format> format = workbook.add_format();
+     *     std::shared_ptr<xlsxwriter::format> format = workbook.add_format();
      *     format->set_num_format("$#,##0.00");
      *
      *     worksheet->write_number(0, 0, 1234.567, format);
@@ -453,7 +453,7 @@ public:
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param string    String to write to cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -492,7 +492,7 @@ public:
      */
     lxw_error write_string(lxw_row_t row,
                            lxw_col_t col, const std::string& string,
-                           const format_ptr& format);
+                           format* pformat = nullptr);
     /**
      * @brief Write a formula to a worksheet cell.
      *
@@ -542,7 +542,7 @@ public:
      */
     lxw_error write_formula(lxw_row_t row,
                             lxw_col_t col, const std::string& formula,
-                            const format_ptr& format);
+                            format* format);
     /**
      * @brief Write an array formula to a worksheet cell.
      *
@@ -605,7 +605,7 @@ public:
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param datetime  The datetime to write to the cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -627,18 +627,18 @@ public:
      */
     lxw_error write_datetime(lxw_row_t row,
                                        lxw_col_t col, lxw_datetime *datetime,
-                                       const format_ptr& format);
+                                       format* format);
 
     lxw_error write_url_opt(lxw_row_t row_num,
                             lxw_col_t col_num, const std::string& url,
-                            const format_ptr& format, const std::string& string = std::string(),
+                            format* pformat, const std::string& string = std::string(),
                             const std::string& tooltip = std::string());
     /**
      *
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param url       The url to write to the cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -764,7 +764,7 @@ public:
      */
     lxw_error write_url(lxw_row_t row,
                         lxw_col_t col, const std::string& url,
-                        const format_ptr& format);
+                        format* pformat = nullptr);
 
     /**
      * @brief Write a formatted boolean worksheet cell.
@@ -772,7 +772,7 @@ public:
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param value     The boolean value to write to the cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -783,8 +783,7 @@ public:
      * @endcode
      *
      */
-    lxw_error write_boolean(lxw_row_t row, lxw_col_t col,
-                            bool value, const format_ptr& format);
+    lxw_error write_boolean(lxw_row_t row, lxw_col_t col, bool value, format* pformat = nullptr);
 
     /**
      * @brief Write a formatted blank worksheet cell.
@@ -812,8 +811,7 @@ public:
      * As such, if you write an empty cell without formatting it is ignored.
      *
      */
-    lxw_error write_blank(lxw_row_t row, lxw_col_t col,
-                          const format_ptr& format);
+    lxw_error write_blank(lxw_row_t row, lxw_col_t col, format* pformat = nullptr);
 
     /**
      * @brief Write a formula to a worksheet cell with a user defined result.
@@ -821,7 +819,7 @@ public:
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param formula   Formula string to write to cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      * @param result    A user defined result for a formula.
      *
      * @return A #lxw_error code.
@@ -859,7 +857,7 @@ public:
     lxw_error write_formula_num(lxw_row_t row,
                                 lxw_col_t col,
                                 const std::string& formula,
-                                const format_ptr& format, double result);
+                                format* pformat, double result);
 
     /**
      * @brief Set the properties for a row of cells.
@@ -881,7 +879,7 @@ public:
      * format.h "Format" for all cells in the row:
      *
      * @code
-     *     lxw_format *bold = workbook->add_format();
+     *     xlsxwriter::format *bold = workbook->add_format();
      *     format->set_bold(bold);
      *
      *     // Set the header row to bold.
@@ -912,14 +910,14 @@ public:
      * @endcode
      *
      */
-    lxw_error set_row(lxw_row_t row, double height, const format_ptr& format);
+    lxw_error set_row(lxw_row_t row, double height, format* format = nullptr);
 
     /**
      * @brief Set the properties for a row of cells.
      *
      * @param row       The zero indexed row number.
      * @param height    The row height.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      * @param options   Optional row parameters: hidden, level, collapsed.
      *
      * The `%set_row_opt()` function  is the same as
@@ -948,7 +946,7 @@ public:
      */
     lxw_error set_row_opt(lxw_row_t row,
                           double height,
-                          const format_ptr& format,
+                          format* pformat,
                           const lxw_row_col_options& options = {false, 0, false});
 
     /**
@@ -1235,7 +1233,7 @@ public:
      * @param last_row  The last row of the range.
      * @param last_col  The last col of the range.
      * @param string    String to write to the merged range.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -1284,12 +1282,12 @@ public:
      * @endcode
      *
      * @note Merged ranges generally don’t work in libxlsxwriter when the Workbook
-     * #lxw_workbook_options `constant_memory` mode is enabled.
+     * #xlsxwriter::workbook_options `constant_memory` mode is enabled.
      */
     lxw_error merge_range(lxw_row_t first_row,
                           lxw_col_t first_col, lxw_row_t last_row,
                           lxw_col_t last_col, const std::string& string,
-                          const format_ptr& format);
+                          format* pformat);
 
     /**
      * @brief Set the autofilter area in the worksheet.
@@ -2260,7 +2258,7 @@ public:
      * tab:
      *
      * @code
-     *      worksheet_set_tab_color(LXW_COLOR_RED);
+     *      worksheet_set_tab_color(xlsxwriter::LXW_COLOR_RED);
      *      worksheet_set_tab_color(LXW_COLOR_GREEN);
      *      worksheet_set_tab_color(0xFF9900); // Orange.
      * @endcode
@@ -2500,8 +2498,6 @@ private:
 
     std::shared_ptr<xlsxwriter::drawing> drawing;
 
-    STAILQ_ENTRY (lxw_worksheet) list_pointers;
-
     /* Declarations required for unit testing. */
     void _xml_declaration();
     void _write_worksheet();
@@ -2514,8 +2510,6 @@ private:
     void _write_page_setup();
     void _write_col_info(lxw_col_options *options);
     void _write_row(lxw_row *row, const std::string& spans);
-    lxw_row *_get_row_list(struct lxw_table_rows *table,
-                                  lxw_row_t row_num);
 
     void _write_merge_cell(const std::shared_ptr<lxw_merged_range>& merged_range);
     void _write_merge_cells();
@@ -2564,6 +2558,7 @@ private:
     void _insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *link);
 };
 
+lxw_row *_get_row_list(lxw_table_rows *table, lxw_row_t row_num);
 typedef std::shared_ptr<worksheet> worksheet_ptr;
 
 } // xlsxwriter

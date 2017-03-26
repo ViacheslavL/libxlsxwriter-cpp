@@ -7,14 +7,14 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_set_selection01.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_set_selection01.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet_set_selection(worksheet, RANGE("B4:C5"));
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -10,22 +10,22 @@
 #define __LXW_PACKAGER_HPP__
 
 #include <stdint.h>
-#include "xlsxwriter/third_party/zip.h"
+#include <xlsxwriter/third_party/zip.h>
 
 #include <string>
 
-#include "common.hpp"
-#include "workbook.hpp"
-#include "worksheet.hpp"
-#include "shared_strings.hpp"
-#include "app.hpp"
-#include "core.hpp"
-#include "custom.hpp"
-#include "theme.hpp"
-#include "styles.hpp"
-#include "format.hpp"
-#include "content_types.hpp"
-#include "relationships.hpp"
+#include <xlsxwriter/common.hpp>
+#include <xlsxwriter/workbook.hpp>
+#include <xlsxwriter/worksheet.hpp>
+#include <xlsxwriter/shared_strings.hpp>
+#include <xlsxwriter/app.hpp>
+#include <xlsxwriter/core.hpp>
+#include <xlsxwriter/custom.hpp>
+#include <xlsxwriter/theme.hpp>
+#include <xlsxwriter/styles.hpp>
+#include <xlsxwriter/format.hpp>
+#include <xlsxwriter/content_types.hpp>
+#include <xlsxwriter/relationships.hpp>
 
 #define LXW_ZIP_BUFFER_SIZE (16384)
 

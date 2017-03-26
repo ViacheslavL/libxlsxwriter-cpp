@@ -7,24 +7,24 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_shared_strings01.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_shared_strings01.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint8_t i;
     char c[] = {0x00, 0x00};
 
-    worksheet_write_string(worksheet, 0, 0, "_x0000_", NULL);
+    worksheet->write_string(0, 0, "_x0000_", NULL);
 
     for (i = 1; i < 127; i++) {
         (*c)++;
         if (i != 34) {
-            worksheet_write_string(worksheet, i, 0, c, NULL);
+            worksheet->write_string(i, 0, c, NULL);
 
         }
     }
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_row_col_format16.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_row_col_format16.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format    *italic      = workbook_add_format(workbook);
+    xlsxwriter::format    *italic      = workbook->add_format();
     format_set_italic(italic);
 
-    worksheet_set_column(worksheet, 16383, 16383, 8.43, italic);
+    worksheet->set_column(16383, 16383, 8.43, italic);
 
-    worksheet_write_string(worksheet, 0, 16383, "Foo", NULL);
+    worksheet->write_string(0, 16383, "Foo", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

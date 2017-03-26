@@ -7,15 +7,15 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_types02.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_types02.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_boolean(worksheet, CELL("A1"), 1 , NULL);
-    worksheet_write_boolean(worksheet, CELL("A2"), 0 , NULL);
+    worksheet->write_boolean(CELL("A1"), 1 , NULL);
+    worksheet->write_boolean(CELL("A2"), 0 , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

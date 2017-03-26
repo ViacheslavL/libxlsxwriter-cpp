@@ -7,22 +7,22 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
     lxw_workbook  *workbook     = workbook_new("test_row_col_format14.xlsx");
     lxw_worksheet *worksheet    = workbook_add_worksheet(workbook, NULL);
     lxw_row_col_options options = {1, 0, 0};
-    lxw_format    *bold         = workbook_add_format(workbook);
+    xlsxwriter::format    *bold         = workbook->add_format();
 
     format_set_bold(bold);
 
-    worksheet_set_column(worksheet, 1, 3, 5, NULL);
-    worksheet_set_column(worksheet, 5, 5, 8, NULL);
-    worksheet_set_column(worksheet, 7, 7, LXW_DEF_COL_WIDTH, bold);
-    worksheet_set_column(worksheet, 9, 9, 2, NULL);
+    worksheet->set_column(1, 3, 5, NULL);
+    worksheet->set_column(5, 5, 8, NULL);
+    worksheet->set_column(7, 7, LXW_DEF_COL_WIDTH, bold);
+    worksheet->set_column(9, 9, 2, NULL);
     worksheet_set_column_opt(worksheet, 11, 11, LXW_DEF_COL_WIDTH, NULL, &options);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

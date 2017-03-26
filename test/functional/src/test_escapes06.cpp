@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_escapes06.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
-    lxw_format *num_format = workbook_add_format(workbook);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_escapes06.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
+    xlsxwriter::format *num_format = workbook->add_format();
 
     format_set_num_format(num_format, "[Red]0.0%\\ \"a\"");
 
-    worksheet_set_column(worksheet, 0, 0, 14, NULL);
+    worksheet->set_column(0, 0, 14, NULL);
 
-    worksheet_write_number(worksheet, CELL("A1"), 123, num_format);
+    worksheet->write_number(CELL("A1"), 123, num_format);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

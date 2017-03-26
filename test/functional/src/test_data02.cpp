@@ -7,20 +7,20 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_data02.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data02.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* Tests for the row range. */
-    worksheet_write_number(worksheet, 0,       0, 123, NULL);
-    worksheet_write_number(worksheet, 1048575, 0, 456, NULL);
+    worksheet->write_number(0,       0, 123, NULL);
+    worksheet->write_number(1048575, 0, 456, NULL);
 
     /* These should be ignored. */
-    worksheet_write_number(worksheet, -1,      0, 123, NULL);
-    worksheet_write_number(worksheet, 1048576, 0, 456, NULL);
+    worksheet->write_number(-1,      0, 123, NULL);
+    worksheet->write_number(1048576, 0, 456, NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,25 +7,25 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_protect03.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_protect03.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format *unlocked = workbook_add_format(workbook);
+    xlsxwriter::format *unlocked = workbook->add_format();
     format_set_unlocked(unlocked);
 
-    lxw_format *hidden = workbook_add_format(workbook);
+    xlsxwriter::format *hidden = workbook->add_format();
     format_set_unlocked(hidden);
     format_set_hidden(hidden);
 
     worksheet_protect(worksheet, "password", NULL);
 
-    worksheet_write_number(worksheet, CELL("A1"), 1 , NULL);
-    worksheet_write_number(worksheet, CELL("A2"), 2, unlocked);
-    worksheet_write_number(worksheet, CELL("A3"), 3, hidden);
+    worksheet->write_number(CELL("A1"), 1 , NULL);
+    worksheet->write_number(CELL("A2"), 2, unlocked);
+    worksheet->write_number(CELL("A3"), 3, hidden);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

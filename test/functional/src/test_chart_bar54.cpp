@@ -7,7 +7,7 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
@@ -77,5 +77,5 @@ int main() {
     lxw_chart_add_data_cache(series4->values,     data[0], 5, 3, 2);
 
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,16 +7,16 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_image08.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image08.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     lxw_image_options options = {.x_scale = 0.5, .y_scale = 0.5};
 
     worksheet_insert_image_opt(worksheet, CELL("B3"), "images/grey.png", &options);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

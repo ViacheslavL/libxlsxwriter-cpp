@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_format01.xlsx");
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_format01.xlsx");
     lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, "Data Sheet");
     lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
 
-    lxw_format    *unused1    = workbook_add_format(workbook);
-    lxw_format    *format     = workbook_add_format(workbook);
-    lxw_format    *unused2    = workbook_add_format(workbook);
-    lxw_format    *unused3    = workbook_add_format(workbook);
+    xlsxwriter::format    *unused1    = workbook->add_format();
+    xlsxwriter::format    *format     = workbook->add_format();
+    xlsxwriter::format    *unused2    = workbook->add_format();
+    xlsxwriter::format    *unused3    = workbook->add_format();
 
 
     /* Avoid warnings about unused variables since this test is checking
@@ -46,5 +46,5 @@ int main() {
     /* For testing. This doesn't have a formula and should be ignored. */
     worksheet_write_formula(worksheet1, 0, 0, NULL, NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

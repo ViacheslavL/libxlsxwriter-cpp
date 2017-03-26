@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "content_types.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/content_types.hpp>
+#include <xlsxwriter/utility.hpp>
 
 namespace xlsxwriter {
 
@@ -122,7 +122,7 @@ void content_types::_write_overrides()
 void content_types::assemble_xml_file()
 {
     /* Write the XML declaration. */
-    _content_types_xml_declaration();
+    _xml_declaration();
 
     _write_types();
     _write_defaults();

@@ -7,7 +7,7 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
@@ -46,5 +46,5 @@ int main() {
 
     worksheet_insert_chart(worksheet2, CELL("E9"), chart);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

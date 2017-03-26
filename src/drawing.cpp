@@ -7,10 +7,10 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "common.hpp"
-#include "drawing.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/common.hpp>
+#include <xlsxwriter/drawing.hpp>
+#include <xlsxwriter/utility.hpp>
 
 #define LXW_OBJ_NAME_LENGTH 14  /* "Picture 65536", or "Chart 65536" */
 /*

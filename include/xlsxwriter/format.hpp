@@ -36,7 +36,7 @@
  *     format_ptr format = workbook->add_format();
  * @endcode
  *
- * The members of the lxw_format struct aren't modified directly. Instead the
+ * The members of the xlsxwriter::format struct aren't modified directly. Instead the
  * format properties are set by calling the functions shown in this section.
  * For example:
  *
@@ -46,7 +46,7 @@
  *
  *    // Set some of the format properties.
  *    format->set_bold();
- *    format->set_font_color(LXW_COLOR_RED);
+ *    format->set_font_color(xlsxwriter::LXW_COLOR_RED);
  *
  *    // Use the format to change the text format in a cell.
  *    worksheet->write_string(0, 0, "Hello", format);
@@ -90,8 +90,8 @@ typedef int32_t lxw_color_t;
 
 #define LXW_FORMAT_FIELD_COPY(dst, src)             \
     do{                                             \
-        strncpy(dst, src, LXW_FORMAT_FIELD_LEN -1); \
-        dst[LXW_FORMAT_FIELD_LEN - 1] = '\0';       \
+        strncpy(dst, src, xlsxwriter::format_FIELD_LEN -1); \
+        dst[xlsxwriter::format_FIELD_LEN - 1] = '\0';       \
     } while (0)
 
 /** Format underline values for format_set_underline(). */
@@ -383,18 +383,18 @@ class workbook;
  *
  * Formats in `libxlsxwriter` are accessed via this struct.
  *
- * The members of the lxw_format struct aren't modified directly. Instead the
+ * The members of the xlsxwriter::format struct aren't modified directly. Instead the
  * format properties are set by calling the functions shown in format.h.
  *
  * For example:
  *
  * @code
  *    // Create the Format.
- *    format_ptr format = workbook->add_format();
+ *    xlsxwriter::format* format = workbook->add_format();
  *
  *    // Set some of the format properties.
- *    format.set_bold();
- *    format.set_font_color(LXW_COLOR_RED);
+ *    xlsxwriter::format->set_bold();
+ *    fxlsxwriter::format->set_font_color(xlsxwriter::LXW_COLOR_RED);
  *
  *    // Use the format to change the text format in a cell.
  *    worksheet->write_string(0, 0, "Hello", format);
@@ -465,7 +465,7 @@ public:
      *
      * @code
      *     format = workbook->add_format();
-     *     format->set_font_color(LXW_COLOR_RED);
+     *     format->set_font_color(xlsxwriter::LXW_COLOR_RED);
      *
      *     worksheet->write_string(0, 0, "Wheelbarrow", format);
      * @endcode
@@ -487,10 +487,10 @@ public:
      * Set the bold property of the font:
      *
      * @code
-     *     format = workbook_add_format(workbook);
+     *     format = workbook->add_format();
      *     format_set_bold(format);
      *
-     *     worksheet_write_string(worksheet, 0, 0, "Bold Text", format);
+     *     worksheet->write_string(0, 0, "Bold Text", format);
      * @endcode
      *
      * @image html format_font_bold.png
@@ -742,13 +742,13 @@ public:
      * As in Excel, vertical and horizontal alignments can be combined:
      *
      * @code
-     *     format = workbook_add_format(workbook);
+     *     format = workbook->add_format();
      *
      *     format_set_align(format, LXW_ALIGN_CENTER);
      *     format_set_align(format, LXW_ALIGN_VERTICAL_CENTER);
      *
      *     worksheet_set_row(0, 30);
-     *     worksheet_write_string(worksheet, 0, 0, "Some Text", format);
+     *     worksheet->write_string(0, 0, "Some Text", format);
      * @endcode
      *
      * @image html format_font_align.png
@@ -1186,4 +1186,4 @@ typedef std::shared_ptr<format> format_ptr;
 
 } // namespace xlsxwriter
 
-#endif /* __LXW_FORMAT_H__ */
+#endif /* __xlsxwriter::format_H__ */

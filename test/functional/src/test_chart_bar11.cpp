@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_chart_bar11.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_bar11.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_chart     *chart1 = workbook_add_chart(workbook, LXW_CHART_BAR);
     lxw_chart     *chart2 = workbook_add_chart(workbook, LXW_CHART_BAR);
     lxw_chart     *chart3 = workbook_add_chart(workbook, LXW_CHART_BAR);
@@ -37,7 +37,7 @@ int main() {
     int row, col;
     for (row = 0; row < 5; row++)
         for (col = 0; col < 3; col++)
-            worksheet_write_number(worksheet, row, col, data[row][col], NULL);
+            worksheet->write_number(row, col, data[row][col], NULL);
 
     worksheet_write_url(worksheet, CELL("A7"), "http://www.perl.com/", NULL);
     worksheet_write_url(worksheet, CELL("A8"), "http://www.perl.org/", NULL);
@@ -56,5 +56,5 @@ int main() {
     worksheet_insert_chart(worksheet, CELL("D25"), chart2);
     worksheet_insert_chart(worksheet, CELL("L32"), chart3);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

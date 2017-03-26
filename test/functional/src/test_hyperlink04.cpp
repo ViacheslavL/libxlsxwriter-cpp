@@ -7,11 +7,11 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink04.xlsx");
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink04.xlsx");
     lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, "Data Sheet");
@@ -27,5 +27,5 @@ int main() {
     worksheet_write_url_opt(worksheet1, CELL("A18"), "internal:Sheet2!A1",       NULL, NULL,        "Tool Tip 1");
     worksheet_write_url_opt(worksheet1, CELL("A20"), "internal:Sheet2!A1",       NULL, "More text", "Tool Tip 2");
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

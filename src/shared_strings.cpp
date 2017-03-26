@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "shared_strings.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/shared_strings.hpp>
+#include <xlsxwriter/utility.hpp>
 #include <ctype.h>
 #include <cstring>
 

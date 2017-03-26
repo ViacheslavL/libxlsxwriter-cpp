@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_row_col_format18.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_row_col_format18.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format    *bold      = workbook_add_format(workbook);
+    xlsxwriter::format    *bold      = workbook->add_format();
     format_set_bold(bold);
 
-    worksheet_set_row(worksheet, 1048575, 15, bold);
+    worksheet->set_row(1048575, 15, bold);
 
-    worksheet_write_string(worksheet, 1048575, 0, "Bar", NULL);
+    worksheet->write_string(1048575, 0, "Bar", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

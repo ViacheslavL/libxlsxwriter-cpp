@@ -7,17 +7,20 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
+#include <string>
 
 int main() {
 
-    lxw_workbook_options options = {LXW_TRUE, "."};
+    xlsxwriter::workbook_options options = {};
+    options.constant_memory = true;
+    options.tmpdir = ".";
 
-    lxw_workbook  *workbook  = workbook_new_opt("test_tmpdir02.xlsx", &options);
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_tmpdir02.xlsx", options);
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
-    worksheet_write_number(worksheet, 1, 0, 123,     NULL);
+    worksheet->write_string(0, 0, "Hello", NULL);
+    worksheet->write_number(1, 0, 123,     NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,25 +7,25 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_default_row05.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_default_row05.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint8_t row;
 
-    worksheet_set_default_row(worksheet, 24, LXW_TRUE);
+    worksheet_set_default_row(worksheet, 24, true);
 
-    worksheet_write_string(worksheet, CELL("A1"),  "Foo" , NULL);
-    worksheet_write_string(worksheet, CELL("A10"), "Bar" , NULL);
-    worksheet_write_string(worksheet, CELL("A20"), "Baz" , NULL);
+    worksheet->write_string(CELL("A1"),  "Foo" , NULL);
+    worksheet->write_string(CELL("A10"), "Bar" , NULL);
+    worksheet->write_string(CELL("A20"), "Baz" , NULL);
 
     for (row = 1; row <= 8; row++)
-        worksheet_set_row(worksheet, row, 24, NULL);
+        worksheet->set_row(row, 24, NULL);
 
     for (row = 10; row <= 19; row++)
-        worksheet_set_row(worksheet, row, 24, NULL);
+        worksheet->set_row(row, 24, NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "app.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/app.hpp>
+#include <xlsxwriter/utility.hpp>
 
 /*
  * Forward declarations.

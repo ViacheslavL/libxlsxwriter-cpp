@@ -8,7 +8,7 @@
 #include "../ctest.h"
 #include "../helper.h"
 
-#include "xlsxwriter/xmlwriter.h"
+#include "xlsxwriter/xmlwriter.hpp"
 
 // Test _xml_declaration().
 CTEST(xmlwriter, xml_declaration) {

@@ -7,15 +7,15 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink17.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink17.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* URL with whitespace. */
     worksheet_write_url(worksheet, CELL("A1"), "http://google.com/some link", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

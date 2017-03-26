@@ -13,8 +13,13 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "utility.hpp"
-#include "xlsxwriter/third_party/tmpfileplus.h"
+#include <xlsxwriter/utility.hpp>
+
+extern "C"
+{
+    #include <xlsxwriter/third_party/tmpfileplus.h>
+}
+
 
 namespace xlsxwriter {
 
@@ -200,18 +205,18 @@ lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
  * Convert an Excel style A1 cell reference to a zero indexed row number.
  */
 lxw_row_t
-lxw_name_to_row(const char *row_str)
+lxw_name_to_row(const std::string& row_str)
 {
     lxw_row_t row_num = 0;
-    const char *p = row_str;
 
     /* Skip the column letters and absolute symbol of the A1 cell. */
-    while (p && !isdigit((unsigned char) *p))
-        p++;
-
-    /* Convert the row part of the A1 cell to a number. */
-    if (p)
-        row_num = atoi(p);
+    for(size_t i = 0; i < row_str.size(); ++i)
+    {
+        if (isdigit(row_str[i]))
+        {
+            row_num = std::stoi(row_str.substr(i));
+        }
+    }
 
     return row_num - 1;
 }
@@ -220,16 +225,16 @@ lxw_name_to_row(const char *row_str)
  * Convert an Excel style A1 cell reference to a zero indexed column number.
  */
 lxw_col_t
-lxw_name_to_col(const char *col_str)
+lxw_name_to_col(const std::string& col_str)
 {
     lxw_col_t col_num = 0;
-    const char *p = col_str;
 
     /* Convert leading column letters of A1 cell. Ignore absolute $ marker. */
-    while (p && (isupper((unsigned char) *p) || *p == '$')) {
-        if (*p != '$')
-            col_num = (col_num * 26) + (*p - 'A' + 1);
-        p++;
+    for (size_t i = 0; i < col_str.size(); ++i){
+        if (isupper(col_str[i]) || col_str[i] == '$') {
+            if (col_str[i] != '$')
+                col_num = (col_num * 26) + (col_str[i] - 'A' + 1);
+        }
     }
 
     return col_num - 1;
@@ -239,16 +244,12 @@ lxw_name_to_col(const char *col_str)
  * Convert the second row of an Excel range ref to a zero indexed number.
  */
 uint32_t
-lxw_name_to_row_2(const char *row_str)
+lxw_name_to_row_2(const std::string& row_str)
 {
-    const char *p = row_str;
-
     /* Find the : separator in the range. */
-    while (p && *p != ':')
-        p++;
-
-    if (p)
-        return lxw_name_to_row(++p);
+    int result = row_str.find(':');
+    if (result < row_str.size())
+        return lxw_name_to_row(row_str.substr(++result));
     else
         return -1;
 }
@@ -257,16 +258,12 @@ lxw_name_to_row_2(const char *row_str)
  * Convert the second column of an Excel range ref to a zero indexed number.
  */
 uint16_t
-lxw_name_to_col_2(const char *col_str)
+lxw_name_to_col_2(const std::string& col_str)
 {
-    const char *p = col_str;
-
     /* Find the : separator in the range. */
-    while (p && *p != ':')
-        p++;
-
-    if (p)
-        return lxw_name_to_col(++p);
+    int result = col_str.find(':');
+    if (result < col_str.size())
+        return lxw_name_to_col(col_str.substr(++result));
     else
         return -1;
 }

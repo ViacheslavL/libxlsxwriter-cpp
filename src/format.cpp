@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "format.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/format.hpp>
+#include <xlsxwriter/utility.hpp>
 
 namespace xlsxwriter {
 
@@ -138,9 +138,6 @@ format* format::_get_format_key()
     key->list_pointers.stqe_next = NULL;
 
     return key;
-
-mem_error:
-    return NULL;
 }
 
 /*
@@ -166,9 +163,6 @@ lxw_font * format::get_font_key()
     key->font_extend = font_extend;
 
     return key;
-
-mem_error:
-    return NULL;
 }
 
 /*

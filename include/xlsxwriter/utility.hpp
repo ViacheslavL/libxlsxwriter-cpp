@@ -30,10 +30,10 @@ namespace xlsxwriter {
  * This is a little syntactic shortcut to help with worksheet layout:
  *
  * @code
- *      worksheet_write_string(worksheet, CELL("A1"), "Foo", NULL);
+ *      worksheet->write_string(CELL("A1"), "Foo", NULL);
  *
  *      //Same as:
- *      worksheet_write_string(worksheet, 0, 0,       "Foo", NULL);
+ *      worksheet->write_string(0, 0,       "Foo", NULL);
  * @endcode
  *
  * @note
@@ -42,7 +42,7 @@ namespace xlsxwriter {
  * expands to two function calls.
  */
 #define CELL(cell) \
-    lxw_name_to_row(cell), lxw_name_to_col(cell)
+    xlsxwriter::lxw_name_to_row(cell), xlsxwriter::lxw_name_to_col(cell)
 
 /**
  * @brief Convert an Excel `A:B` column range into a `(col1, col2)` pair.
@@ -52,15 +52,15 @@ namespace xlsxwriter {
  * This is a little syntactic shortcut to help with worksheet layout:
  *
  * @code
- *     worksheet_set_column(worksheet, COLS("B:D"), 20, NULL, NULL);
+ *     worksheet->set_column(COLS("B:D"), 20, NULL, NULL);
  *
  *     // Same as:
- *     worksheet_set_column(worksheet, 1, 3,        20, NULL, NULL);
+ *     worksheet->set_column(1, 3,        20, NULL, NULL);
  * @endcode
  *
  */
 #define COLS(cols) \
-    lxw_name_to_col(cols), lxw_name_to_col_2(cols)
+    xlsxwriter::lxw_name_to_col(cols), xlsxwriter::lxw_name_to_col_2(cols)
 
 /**
  * @brief Convert an Excel `A1:B2` range into a `(first_row, first_col,
@@ -79,8 +79,8 @@ namespace xlsxwriter {
  * @endcode
  */
 #define RANGE(range) \
-    lxw_name_to_row(range), lxw_name_to_col(range), \
-    lxw_name_to_row_2(range), lxw_name_to_col_2(range)
+    xlsxwriter::lxw_name_to_row(range), xlsxwriter::lxw_name_to_col(range), \
+    xlsxwriter::lxw_name_to_row_2(range), xlsxwriter::lxw_name_to_col_2(range)
 
 
 /**

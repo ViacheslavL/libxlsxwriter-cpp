@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_properties04.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_properties04.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_datetime   datetime  = {2016, 12, 12,  23, 0, 0};
 
     workbook_set_custom_property_string  (workbook, "Checked by",     "Adam");
@@ -24,8 +24,8 @@ int main() {
     workbook_set_custom_property_string  (workbook, "Department",      "Finance");
     workbook_set_custom_property_number  (workbook, "Group",           1.2345678901234);
 
-    worksheet_set_column(worksheet, 0, 0, 70, NULL);
-    worksheet_write_string(worksheet, CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
+    worksheet->set_column(0, 0, 70, NULL);
+    worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

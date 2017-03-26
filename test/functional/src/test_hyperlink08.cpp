@@ -7,16 +7,16 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink08.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink08.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* Test with forward slashes instead of back slashes in test_hyperlink07.c. */
     worksheet_write_url_opt(worksheet, CELL("A1"), "external://VBOXSVR/share/foo.xlsx", NULL, "J:/foo.xlsx", NULL);
     worksheet_write_url(    worksheet, CELL("A3"), "external:foo.xlsx" , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

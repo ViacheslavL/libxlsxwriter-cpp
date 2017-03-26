@@ -23,17 +23,18 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_library(xlsxwriter ${xlsxwriter_srcs})
+add_library(xlsxwriter++ ${xlsxwriter_srcs})
 
-target_link_libraries(xlsxwriter ${ZLIB_LIBRARIES} lxw_tmpfileplus lxw_minizip)
+target_link_libraries(xlsxwriter++ lxw_tmpfileplus lxw_minizip ${ZLIB_LIBRARIES}  )
 
 add_library(xlsxwriter_test STATIC ${xlsxwriter_srcs})
+
 target_compile_definitions(xlsxwriter_test PRIVATE -DTESTING)
 
 
 
-install(TARGETS xlsxwriter
-    EXPORT libxlsxwriter
+install(TARGETS xlsxwriter++
+    EXPORT xlsxwriter++
     INCLUDES DESTINATION include
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib

@@ -7,21 +7,21 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_types08.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_types08.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format *bold = workbook_add_format(workbook);
-    format_set_bold(bold);
+    xlsxwriter::format *bold = workbook->add_format();
+    bold->set_bold();
 
-    lxw_format *italic = workbook_add_format(workbook);
-    format_set_italic(italic);
+    xlsxwriter::format *italic = workbook->add_format();
+    italic->set_italic();
 
-    worksheet_write_boolean(worksheet, CELL("A1"), 2, bold);
-    worksheet_write_boolean(worksheet, CELL("A2"), 0, italic);
+    worksheet->write_boolean(CELL("A1"), 2, bold);
+    worksheet->write_boolean(CELL("A2"), 0, italic);
 
-    return workbook_close(workbook);
+    return workbook->close();
 }

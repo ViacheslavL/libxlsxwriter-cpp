@@ -7,25 +7,25 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_format06.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_format06.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format    *format1    = workbook_add_format(workbook);
-    lxw_format    *format2    = workbook_add_format(workbook);
+    xlsxwriter::format    *format1    = workbook->add_format();
+    xlsxwriter::format    *format2    = workbook->add_format();
 
 
     format_set_num_format_index(format1, 2);
     format_set_num_format_index(format2, 12);
 
-    worksheet_write_number(worksheet, 0, 0, 1.2222, NULL);
-    worksheet_write_number(worksheet, 1, 0, 1.2222, format1);
-    worksheet_write_number(worksheet, 2, 0, 1.2222, format2);
-    worksheet_write_number(worksheet, 3, 0, 1.2222, NULL);
-    worksheet_write_number(worksheet, 4, 0, 1.2222, NULL);
+    worksheet->write_number(0, 0, 1.2222, NULL);
+    worksheet->write_number(1, 0, 1.2222, format1);
+    worksheet->write_number(2, 0, 1.2222, format2);
+    worksheet->write_number(3, 0, 1.2222, NULL);
+    worksheet->write_number(4, 0, 1.2222, NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

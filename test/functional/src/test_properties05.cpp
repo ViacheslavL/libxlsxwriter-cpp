@@ -7,17 +7,17 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_properties05.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_properties05.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     workbook_set_custom_property_string  (workbook, "Location", "Café");
 
-    worksheet_set_column(worksheet, 0, 0, 70, NULL);
-    worksheet_write_string(worksheet, CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
+    worksheet->set_column(0, 0, 70, NULL);
+    worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

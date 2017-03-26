@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_defined_name04.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_defined_name04.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     workbook_define_name(workbook, "\\__",     "=Sheet1!$A$1");
     workbook_define_name(workbook, "a3f6",     "=Sheet1!$A$2");
@@ -23,5 +23,5 @@ int main() {
 
     (void)worksheet;
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

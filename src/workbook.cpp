@@ -7,11 +7,11 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "workbook.hpp"
-#include "utility.hpp"
-#include "packager.hpp"
-#include "hash_table.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/workbook.hpp>
+#include <xlsxwriter/utility.hpp>
+#include <xlsxwriter/packager.hpp>
+#include <xlsxwriter/hash_table.hpp>
 #include <iostream>
 #include <sstream>
 
@@ -275,7 +275,7 @@ lxw_error workbook::_store_defined_name(
         const std::string& app_name,
         const std::string& formula,
         int16_t index,
-        uint8_t hidden)
+        bool hidden)
 {
     defined_name_ptr defined_name;
     std::string name_copy; //[LXW_DEFINED_NAME_LENGTH];
@@ -436,7 +436,7 @@ void workbook::_populate_range_data_cache(const series_range_ptr& range)
     if (!worksheet) {
         LXW_WARN_FORMAT2("workbook_add_chart(): worksheet name '%s' "
                          "in chart formula '%s' doesn't exist.",
-                         range->sheetname, range->formula);
+                         range->sheetname.c_str(), range->formula.c_str());
         range->ignore_cache = true;
         return;
     }
@@ -518,7 +518,7 @@ void workbook::_populate_range_dimensions(const series_range_ptr& range)
     }
 
     /* Create a copy of the formula to modify and parse into parts. */
-    lxw_snprintf(formula, LXW_MAX_FORMULA_RANGE_LENGTH, "%s", range->formula);
+    lxw_snprintf(formula, LXW_MAX_FORMULA_RANGE_LENGTH, "%s", range->formula.c_str());
 
     /* Check for valid formula. TODO. This needs stronger validation. */
     tmp_str = strchr(formula, '!');
@@ -543,7 +543,7 @@ void workbook::_populate_range_dimensions(const series_range_ptr& range)
         if (!get_worksheet_by_name(sheetname)) {
             LXW_WARN_FORMAT2("workbook_add_chart(): worksheet name '%s' "
                              "in chart formula '%s' doesn't exist.",
-                             sheetname, range->formula);
+                             sheetname, range->formula.c_str());
             range->ignore_cache = true;
             return;
         }
@@ -610,7 +610,6 @@ void workbook::_add_chart_cache_data()
  */
 void workbook::_prepare_drawings()
 {
-    lxw_image_options *image_options;
     uint16_t chart_ref_id = 0;
     uint16_t image_ref_id = 0;
     uint16_t drawing_id = 0;
@@ -1044,7 +1043,7 @@ void workbook::workbook_new_opt(const workbook_options& options)
 /*
  * Add a new worksheet to the Excel workbook.
  */
-worksheet_ptr workbook::add_worksheet(const std::string& sheetname)
+worksheet* workbook::add_worksheet(const std::string& sheetname)
 {
     lxw_worksheet_init_data init_data = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     std::string new_name;
@@ -1069,7 +1068,7 @@ worksheet_ptr workbook::add_worksheet(const std::string& sheetname)
     /* Check if the worksheet name is already in use. */
     if (get_worksheet_by_name(init_data.name)) {
         LXW_WARN_FORMAT1("workbook_add_worksheet(): worksheet name '%s' "
-                         "already exists.", init_data.name);
+                         "already exists.", init_data.name.c_str());
         return nullptr;
     }
 
@@ -1091,7 +1090,7 @@ worksheet_ptr workbook::add_worksheet(const std::string& sheetname)
     /* Store the worksheet so we can look it up by name. */    
     worksheet_names.insert(std::make_pair(init_data.name, worksheet));
 
-    return worksheet;
+    return worksheet.get();
 }
 
 /*
@@ -1148,7 +1147,7 @@ chart_ptr workbook::add_chart(uint8_t type)
 /*
  * Add a new format to the Excel workbook.
  */
-format_ptr workbook::add_format()
+format* workbook::add_format()
 {
     /* Create a new format object. */
     format_ptr format = std::make_shared<xlsxwriter::format>();
@@ -1158,7 +1157,7 @@ format_ptr workbook::add_format()
 
     formats.push_back(format);
 
-    return format;
+    return format.get();
 }
 
 /*

@@ -9,9 +9,9 @@
 
 #include <string.h>
 
-#include "xmlwriter.hpp"
-#include "theme.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/theme.hpp>
+#include <xlsxwriter/utility.hpp>
 
 namespace xlsxwriter {
 

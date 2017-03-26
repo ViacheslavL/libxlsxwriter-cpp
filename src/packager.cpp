@@ -7,10 +7,10 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "packager.hpp"
-#include "hash_table.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/packager.hpp>
+#include <xlsxwriter/hash_table.hpp>
+#include <xlsxwriter/utility.hpp>
 
 namespace xlsxwriter {
 
@@ -168,7 +168,7 @@ uint8_t packager::_write_image_files()
 
         for (const auto& image : sheet->image_data) {
             lxw_snprintf(filename, LXW_FILENAME_LENGTH,
-                         "xl/media/image%d.%s", index++, image->extension);
+                         "xl/media/image%d.%s", index++, image->extension.c_str());
 
             rewind(image->stream);
 
@@ -409,9 +409,9 @@ uint8_t packager::_write_styles_file()
      * xf_format list. */
     for (const auto& pair : workbook->used_xf_formats.order_list) {
         /*
-        lxw_format *workbook_format = (lxw_format *) hash_element->value;
-        lxw_format *style_format = lxw_format_new();
-        memcpy(style_format, workbook_format, sizeof(lxw_format));
+        xlsxwriter::format *workbook_format = (xlsxwriter::format *) hash_element->value;
+        xlsxwriter::format *style_format = xlsxwriter::format_new();
+        memcpy(style_format, workbook_format, sizeof(xlsxwriter::format));
         STAILQ_INSERT_TAIL(styles->xf_formats, style_format, list_pointers);
         */
         styles->xf_formats.push_back(pair.first);

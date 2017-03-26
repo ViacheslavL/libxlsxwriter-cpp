@@ -7,11 +7,11 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_set_selection02.xlsx");
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_set_selection02.xlsx");
     lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
@@ -26,5 +26,5 @@ int main() {
     worksheet_set_selection(worksheet5, RANGE("C4:G7")); /* Same as 2. */
     worksheet_set_selection(worksheet6, RANGE("G7:C4")); /* Same as 3. */
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

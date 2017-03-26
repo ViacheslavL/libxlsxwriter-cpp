@@ -9,11 +9,11 @@
 
 #include <ctype.h>
 
-#include "xmlwriter.hpp"
-#include "worksheet.hpp"
-#include "format.hpp"
-#include "utility.hpp"
-#include "relationships.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/worksheet.hpp>
+#include <xlsxwriter/format.hpp>
+#include <xlsxwriter/utility.hpp>
+#include <xlsxwriter/relationships.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -378,8 +378,7 @@ _new_hyperlink_cell(lxw_row_t row_num, lxw_col_t col_num,
 /*
  * Get or create the row object for a given row number.
  */
-lxw_row *
-_get_row_list(struct lxw_table_rows *table, lxw_row_t row_num)
+lxw_row * _get_row_list(lxw_table_rows *table, lxw_row_t row_num)
 {
     lxw_row *row;
     lxw_row *existing_row;
@@ -658,10 +657,10 @@ void worksheet::_write_worksheet()
 void worksheet::_write_dimension()
 {
     std::string ref;
-    lxw_row_t dim_rowmin = dim_rowmin;
-    lxw_row_t dim_rowmax = dim_rowmax;
-    lxw_col_t dim_colmin = dim_colmin;
-    lxw_col_t dim_colmax = dim_colmax;
+    lxw_row_t dim_rowmin = this->dim_rowmin;
+    lxw_row_t dim_rowmax = this->dim_rowmax;
+    lxw_col_t dim_colmin = this->dim_colmin;
+    lxw_col_t dim_colmax = this->dim_colmax;
 
     if (dim_rowmin == LXW_ROW_MAX && dim_colmin == LXW_COL_MAX) {
         /* If the rows and cols are still the defaults then no dimensions have
@@ -1628,7 +1627,7 @@ void worksheet::prepare_image(uint16_t image_ref_id, uint16_t drawing_id,
     relationship->type = "/image";
 
     lxw_snprintf(filename, 32, "../media/image%d.%s", image_ref_id,
-                 image_data->extension);
+                 image_data->extension.c_str());
 
     relationship->target = filename;
 
@@ -1795,7 +1794,7 @@ _process_png(const image_options_ptr& image_options)
     if (width == 0) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "no size data found in file: %s.",
-                         image_options->filename);
+                         image_options->filename.c_str());
         return LXW_ERROR_IMAGE_DIMENSIONS;
     }
 
@@ -1906,7 +1905,7 @@ _process_jpeg(const image_options_ptr& image_options)
     if (width == 0) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "no size data found in file: %s.",
-                         image_options->filename);
+                         image_options->filename.c_str());
         return LXW_ERROR_IMAGE_DIMENSIONS;
     }
 
@@ -1947,7 +1946,7 @@ _process_bmp(const image_options_ptr& image_options)
     if (width == 0) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "no size data found in file: %s.",
-                         image_options->filename);
+                         image_options->filename.c_str());
         return LXW_ERROR_IMAGE_DIMENSIONS;
     }
 
@@ -1974,7 +1973,7 @@ lxw_error _get_image_properties(const image_options_ptr& image_options)
     if (fread(signature, 1, 4, image_options->stream) < 4) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "couldn't read file type for file: %s.",
-                         image_options->filename);
+                         image_options->filename.c_str());
         return LXW_ERROR_IMAGE_DIMENSIONS;
     }
 
@@ -1993,7 +1992,7 @@ lxw_error _get_image_properties(const image_options_ptr& image_options)
     else {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "unsupported image format for file: %s.",
-                         image_options->filename);
+                         image_options->filename.c_str());
         return LXW_ERROR_IMAGE_DIMENSIONS;
     }
 
@@ -2735,7 +2734,6 @@ void worksheet::_write_hyperlinks()
         }
 
     }
-mem_error:
     lxw_xml_end_tag("hyperlinks");
 }
 
@@ -2940,7 +2938,7 @@ worksheet::write_number(lxw_row_t row_num,
 lxw_error
 worksheet::write_string(lxw_row_t row_num,
                        lxw_col_t col_num, const std::string& string,
-                      const format_ptr& format)
+                      format* pformat)
 {
     lxw_cell *cell;
     int32_t string_id;
@@ -2951,8 +2949,8 @@ worksheet::write_string(lxw_row_t row_num,
     if (string.empty()) {
         /* Treat a NULL or empty string with formatting as a blank cell. */
         /* Null strings without formats should be ignored.      */
-        if (format)
-            return write_blank(row_num, col_num, format);
+        if (pformat)
+            return write_blank(row_num, col_num, pformat);
         else
             return LXW_ERROR_NULL_PARAMETER_IGNORED;
     }
@@ -2972,7 +2970,7 @@ worksheet::write_string(lxw_row_t row_num,
             return LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND;
 
         string_id = sst_element->index;
-        cell = _new_string_cell(row_num, col_num, string_id, &sst_element->string, format.get());
+        cell = _new_string_cell(row_num, col_num, string_id, &sst_element->string, pformat);
     }
     else {
         /* Look for and escape control chars in the string. */
@@ -2984,7 +2982,7 @@ worksheet::write_string(lxw_row_t row_num,
         else {
             *string_copy = string;
         }
-        cell = _new_inline_string_cell(row_num, col_num, string_copy, format.get());
+        cell = _new_inline_string_cell(row_num, col_num, string_copy, pformat);
     }
 
     _insert_cell(row_num, col_num, cell);
@@ -2999,7 +2997,7 @@ lxw_error worksheet::write_formula_num(
         lxw_row_t row_num,
         lxw_col_t col_num,
         const std::string& formula,
-        const format_ptr& format, double result)
+        format* pformat, double result)
 {
     lxw_cell *cell;
     std::string* formula_copy = new std::string();
@@ -3018,7 +3016,7 @@ lxw_error worksheet::write_formula_num(
     else
         *formula_copy = formula;
 
-    cell = _new_formula_cell(row_num, col_num, formula_copy, format.get());
+    cell = _new_formula_cell(row_num, col_num, formula_copy, pformat);
     cell->formula_result = result;
 
     _insert_cell(row_num, col_num, cell);
@@ -3034,9 +3032,9 @@ worksheet::write_formula(
         lxw_row_t row_num,
         lxw_col_t col_num,
         const std::string& formula,
-        const format_ptr& format)
+        format* pformat)
 {
-    return write_formula_num(row_num, col_num, formula, format, 0);
+    return write_formula_num(row_num, col_num, formula, pformat, 0);
 }
 
 /*
@@ -3135,21 +3133,20 @@ lxw_error worksheet::write_array_formula(
 /*
  * Write a blank cell with a format to a cell in Excel.
  */
-lxw_error worksheet::write_blank(lxw_row_t row_num, lxw_col_t col_num,
-                      const format_ptr& format)
+lxw_error worksheet::write_blank(lxw_row_t row_num, lxw_col_t col_num, format* pformat)
 {
     lxw_cell *cell;
     lxw_error err;
 
     /* Blank cells without formatting are ignored by Excel. */
-    if (!format)
+    if (!pformat)
         return LXW_NO_ERROR;
 
     err = _check_dimensions(row_num, col_num, false, false);
     if (err)
         return err;
 
-    cell = _new_blank_cell(row_num, col_num, format.get());
+    cell = _new_blank_cell(row_num, col_num, pformat);
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3159,7 +3156,7 @@ lxw_error worksheet::write_blank(lxw_row_t row_num, lxw_col_t col_num,
 /*
  * Write a boolean cell with a format to a cell in Excel.
  */
-lxw_error worksheet::write_boolean(lxw_row_t row_num, lxw_col_t col_num, bool value, const format_ptr& format)
+lxw_error worksheet::write_boolean(lxw_row_t row_num, lxw_col_t col_num, bool value, format* pformat)
 {
     lxw_cell *cell;
     lxw_error err;
@@ -3169,7 +3166,7 @@ lxw_error worksheet::write_boolean(lxw_row_t row_num, lxw_col_t col_num, bool va
     if (err)
         return err;
 
-    cell = _new_boolean_cell(row_num, col_num, value, format.get());
+    cell = _new_boolean_cell(row_num, col_num, value, pformat);
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3182,7 +3179,7 @@ lxw_error worksheet::write_boolean(lxw_row_t row_num, lxw_col_t col_num, bool va
 lxw_error worksheet::write_datetime(
                          lxw_row_t row_num,
                          lxw_col_t col_num, lxw_datetime *datetime,
-                         const format_ptr& format)
+                         format* pformat)
 {
     lxw_cell *cell;
     double excel_date;
@@ -3194,7 +3191,7 @@ lxw_error worksheet::write_datetime(
 
     excel_date = lxw_datetime_to_excel_date(datetime, LXW_EPOCH_1900);
 
-    cell = _new_number_cell(row_num, col_num, excel_date, format.get());
+    cell = _new_number_cell(row_num, col_num, excel_date, pformat);
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3207,7 +3204,7 @@ lxw_error worksheet::write_datetime(
 lxw_error
 worksheet::write_url_opt(lxw_row_t row_num,
                         lxw_col_t col_num, const std::string& url,
-                        const format_ptr& format, const std::string& string,
+                        format* pformat, const std::string& string,
                         const std::string& tooltip)
 {
     lxw_cell *link;
@@ -3216,7 +3213,6 @@ worksheet::write_url_opt(lxw_row_t row_num,
     std::string *url_external = nullptr;
     std::string *url_string = nullptr;
     std::string *tooltip_copy = nullptr;
-    std::string *found_string = nullptr;
     lxw_error err;
     size_t string_size;
     enum cell_types link_type = HYPERLINK_URL;
@@ -3379,16 +3375,18 @@ worksheet::write_url_opt(lxw_row_t row_num,
     }
 
     /* Excel limits escaped URL to 255 characters. */
-    if (url_copy->size() > 255)
+    if (url_copy->size() > 255) {
         //! @TODO make log here
         delete string_copy;
         return LXW_NO_ERROR;
+    }
 
-    err = write_string(row_num, col_num, *string_copy, format);
-    if (err)
+    err = write_string(row_num, col_num, *string_copy, pformat);
+    if (err) {
         //! @TODO make log here
         delete string_copy;
         return LXW_NO_ERROR;
+    }
 
     link = _new_hyperlink_cell(row_num, col_num, link_type, url_copy,
                                url_string, tooltip_copy);
@@ -3406,9 +3404,9 @@ worksheet::write_url_opt(lxw_row_t row_num,
 lxw_error worksheet::write_url(lxw_row_t row_num,
                      lxw_col_t col_num,
                      const std::string& url,
-                     const format_ptr& format)
+                     format* pformat)
 {
-    return write_url_opt(row_num, col_num, url, format);
+    return write_url_opt(row_num, col_num, url, pformat);
 }
 
 /*
@@ -3526,7 +3524,7 @@ lxw_error worksheet::set_column(lxw_col_t firstcol, lxw_col_t lastcol, double wi
 /*
  * Set the properties of a row with options.
  */
-lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, const format_ptr& format, const lxw_row_col_options& user_options)
+lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, format* pformat, const lxw_row_col_options& user_options)
 {
 
     lxw_col_t min_col;
@@ -3555,7 +3553,7 @@ lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, const format
     row = _get_row(row_num);
 
     row->height = height;
-    row->format = format.get();
+    row->format = pformat;
     row->hidden = hidden;
     row->level = level;
     row->collapsed = collapsed;
@@ -3570,9 +3568,9 @@ lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, const format
 /*
  * Set the properties of a row.
  */
-lxw_error worksheet::set_row(lxw_row_t row_num, double height, const format_ptr& format)
+lxw_error worksheet::set_row(lxw_row_t row_num, double height, format* pformat)
 {
-    return set_row_opt(row_num, height, format);
+    return set_row_opt(row_num, height, pformat);
 }
 
 /*
@@ -3582,7 +3580,7 @@ lxw_error worksheet::set_row(lxw_row_t row_num, double height, const format_ptr&
 lxw_error worksheet::merge_range(lxw_row_t first_row,
                       lxw_col_t first_col, lxw_row_t last_row,
                       lxw_col_t last_col, const std::string& string,
-                      const format_ptr& format)
+                      format* pformat)
 {
     lxw_row_t tmp_row;
     lxw_col_t tmp_col;
@@ -3621,14 +3619,14 @@ lxw_error worksheet::merge_range(lxw_row_t first_row,
     merged_range_count++;
 
     /* Write the first cell */
-    write_string(first_row, first_col, string, format);
+    write_string(first_row, first_col, string, pformat);
 
     /* Pad out the rest of the area with formatted blank cells. */
     for (tmp_row = first_row; tmp_row <= last_row; tmp_row++) {
         for (tmp_col = first_col; tmp_col <= last_col; tmp_col++) {
             if (tmp_row == first_row && tmp_col == first_col)
                 continue;
-            write_blank(tmp_row, tmp_col, format);
+            write_blank(tmp_row, tmp_col, pformat);
         }
     }
 
@@ -4298,7 +4296,7 @@ lxw_error worksheet::insert_image_opt(
     if (!image_stream) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
                          "file doesn't exist or can't be opened: %s.",
-                         filename);
+                         filename.c_str());
         return LXW_ERROR_PARAMETER_VALIDATION;
     }
 
@@ -4306,7 +4304,7 @@ lxw_error worksheet::insert_image_opt(
     short_name = lxw_basename(filename);
     if (short_name.empty()) {
         LXW_WARN_FORMAT1("worksheet_insert_image()/_opt(): "
-                         "couldn't get basename for file: %s.", filename);
+                         "couldn't get basename for file: %s.", filename.c_str());
         return LXW_ERROR_PARAMETER_VALIDATION;
     }
 

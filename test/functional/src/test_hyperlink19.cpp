@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink19.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink19.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* This test requires that we check if the cell that the hyperlink refers
      * to is a string. If it isn't be have to add a display attribute. However,
@@ -23,5 +23,5 @@ int main() {
 
     workbook->sst->string_count = 0;
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

@@ -7,16 +7,16 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_print_area07.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_print_area07.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet_print_area(worksheet, RANGE("A1:XFD1048576"));
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo" , NULL);
+    worksheet->write_string(CELL("A1"), "Foo" , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

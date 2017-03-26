@@ -7,14 +7,14 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_hyperlink15.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink15.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet_write_url(worksheet, CELL("B2"), "external:subdir/blank.xlsx", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

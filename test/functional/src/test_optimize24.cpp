@@ -7,20 +7,20 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook_options options = {1, NULL};
+    xlsxwriter::workbook_options options = {1, NULL};
 
-    lxw_workbook  *workbook  = workbook_new_opt("test_optimize24.xlsx", &options);
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
-    lxw_format    *bold      = workbook_add_format(workbook);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_optimize24.xlsx", &options);
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
+    xlsxwriter::format    *bold      = workbook->add_format();
 
     format_set_bold(bold);
 
-    worksheet_set_row(worksheet, 0, 20, bold);
-    worksheet_write_string(worksheet, 0, 0, "Foo", NULL);
+    worksheet->set_row(0, 20, bold);
+    worksheet->write_string(0, 0, "Foo", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

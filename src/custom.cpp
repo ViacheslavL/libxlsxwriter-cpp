@@ -7,9 +7,9 @@
  *
  */
 
-#include "xmlwriter.hpp"
-#include "custom.hpp"
-#include "utility.hpp"
+#include <xlsxwriter/xmlwriter.hpp>
+#include <xlsxwriter/custom.hpp>
+#include <xlsxwriter/utility.hpp>
 
 
 /*****************************************************************************

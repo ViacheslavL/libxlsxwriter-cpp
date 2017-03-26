@@ -7,7 +7,7 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
@@ -24,5 +24,5 @@ int main() {
     free(properties->hyperlink_base);
     free(properties);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

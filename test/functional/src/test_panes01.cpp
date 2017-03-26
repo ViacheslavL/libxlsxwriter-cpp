@@ -7,11 +7,11 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_panes01.xlsx");
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_panes01.xlsx");
     lxw_worksheet *worksheet01 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet02 = workbook_add_worksheet(workbook, NULL);
     lxw_worksheet *worksheet03 = workbook_add_worksheet(workbook, NULL);
@@ -54,5 +54,5 @@ int main() {
     worksheet_split_panes(worksheet12, 15, 8.46);
     worksheet_split_panes(worksheet13, 45, 54.14);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

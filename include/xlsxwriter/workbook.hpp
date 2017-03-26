@@ -22,7 +22,7 @@
  * represents the Excel file as it is written on disk.
  *
  * @code
- *     #include "xlsxwriter.h"
+ *     #include "xlsxwriter.hpp"
  *
  *     int main() {
  *
@@ -76,18 +76,6 @@ typedef struct lxw_worksheet_name {
 
 /* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
  * warnings and to avoid portability issues with the _unused attribute. */
-
-/*
-#define LXW_RB_GENERATE_NAMES(name, type, field, cmp)     \
-    RB_GENERATE_INSERT_COLOR(name, type, field, static)   \
-    RB_GENERATE_REMOVE_COLOR(name, type, field, static)   \
-    RB_GENERATE_INSERT(name, type, field, cmp, static)    \
-    RB_GENERATE_REMOVE(name, type, field, static)         \
-    RB_GENERATE_FIND(name, type, field, cmp, static)      \
-    RB_GENERATE_NEXT(name, type, field, static)           \
-    RB_GENERATE_MINMAX(name, type, field, static)         \
-    /* Add unused struct to allow adding a semicolon */   /*\
-    struct lxw_rb_generate_names{int unused;}*/
 
 /* Struct to represent a defined name. */
 struct defined_name {
@@ -201,7 +189,7 @@ public:
      *    workbook_ptr workbook  = std::make_shared<workbook>("filename.xlsx", options);
      * @endcode
      *
-     * The options that can be set via #lxw_workbook_options are:
+     * The options that can be set via #xlsxwriter::workbook_options are:
      *
      * - `constant_memory`: Reduces the amount of data stored in memory so that
      *   large files can be written efficiently.
@@ -223,8 +211,6 @@ public:
      */
 
     workbook(const std::string& filename, const workbook_options &options = workbook_options());
-
-    ~workbook();
 
     /**
      * @brief get_worksheets
@@ -267,13 +253,13 @@ public:
      * than one worksheet.
      *
      */
-     worksheet_ptr add_worksheet(const std::string& sheetname = std::string());
+     worksheet* add_worksheet(const std::string& sheetname = std::string());
 
     /**
      * @brief Create a new @ref format.hpp "Format" object to formats cells in
      *        worksheets.
      *
-     * @return A lxw_format instance.
+     * @return A xlsxwriter::format instance.
      *
      * The `workbook->add_format()` function can be used to create new @ref
      * format.hpp "Format" objects which are used to apply formatting to a cell.
@@ -284,7 +270,7 @@ public:
      *
      *    // Set some of the format properties.
      *    format->set_bold();
-     *    format->set_font_color(LXW_COLOR_RED);
+     *    format->set_font_color(xlsxwriter::LXW_COLOR_RED);
      *
      *    // Use the format to change the text format in a cell.
      *    worksheet->write_string(0, 0, "Hello", format);
@@ -294,7 +280,7 @@ public:
      * sections for more details about Format properties and how to set them.
      *
      */
-    format_ptr add_format();
+    format* add_format();
 
     /**
      * @brief Create a new chart to be added to a worksheet:
@@ -635,7 +621,6 @@ private:
     void _prepare_fills();
     void _prepare_borders();
     void _prepare_fonts();
-    lxw_error _store_defined_name(const std::string &name, const std::string &app_name, const std::string &formula, int16_t index, uint8_t hidden);
     void _populate_range_data_cache(const series_range_ptr &range);
     void _populate_range_dimensions(const series_range_ptr &range);
     void _populate_range(const series_range_ptr &range);

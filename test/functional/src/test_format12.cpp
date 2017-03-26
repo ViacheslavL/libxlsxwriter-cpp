@@ -7,32 +7,32 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_format12.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_format12.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format *top_left_bottom = workbook_add_format(workbook);
+    xlsxwriter::format *top_left_bottom = workbook->add_format();
     format_set_bottom(top_left_bottom, LXW_BORDER_THIN);
     format_set_left(top_left_bottom, LXW_BORDER_THIN);
     format_set_top(top_left_bottom, LXW_BORDER_THIN);
 
-    lxw_format *top_bottom = workbook_add_format(workbook);
+    xlsxwriter::format *top_bottom = workbook->add_format();
     format_set_bottom(top_bottom, LXW_BORDER_THIN);
     format_set_top(top_bottom, LXW_BORDER_THIN);
 
-    lxw_format *top_left = workbook_add_format(workbook);
+    xlsxwriter::format *top_left = workbook->add_format();
     format_set_left(top_left, LXW_BORDER_THIN);
     format_set_top(top_left, LXW_BORDER_THIN);
 
-    lxw_format *unused = workbook_add_format(workbook);
+    xlsxwriter::format *unused = workbook->add_format();
     format_set_left(unused, LXW_BORDER_THIN);
 
-    worksheet_write_string(worksheet, CELL("B2"), "test", top_left_bottom);
-    worksheet_write_string(worksheet, CELL("D2"), "test", top_left);
-    worksheet_write_string(worksheet, CELL("F2"), "test", top_bottom);
+    worksheet->write_string(CELL("B2"), "test", top_left_bottom);
+    worksheet->write_string(CELL("D2"), "test", top_left);
+    worksheet->write_string(CELL("F2"), "test", top_bottom);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

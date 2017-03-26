@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_autofilter00.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_autofilter00.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint16_t i;
 
     struct row {
@@ -77,19 +77,19 @@ int main() {
 
 
     /* Write the column headers. */
-    worksheet_write_string(worksheet, 0, 0, "Region", NULL);
-    worksheet_write_string(worksheet, 0, 1, "Item",   NULL);
-    worksheet_write_string(worksheet, 0, 2, "Volume" , NULL);
-    worksheet_write_string(worksheet, 0, 3, "Month",  NULL);
+    worksheet->write_string(0, 0, "Region", NULL);
+    worksheet->write_string(0, 1, "Item",   NULL);
+    worksheet->write_string(0, 2, "Volume" , NULL);
+    worksheet->write_string(0, 3, "Month",  NULL);
 
 
     /* Write the row data. */
     for (i = 0; i < sizeof(data)/sizeof(struct row); i++) {
-        worksheet_write_string(worksheet, i + 1, 0, data[i].region, NULL);
-        worksheet_write_string(worksheet, i + 1, 1, data[i].item,   NULL);
-        worksheet_write_number(worksheet, i + 1, 2, data[i].volume , NULL);
-        worksheet_write_string(worksheet, i + 1, 3, data[i].month,  NULL);
+        worksheet->write_string(i + 1, 0, data[i].region, NULL);
+        worksheet->write_string(i + 1, 1, data[i].item,   NULL);
+        worksheet->write_number(i + 1, 2, data[i].volume , NULL);
+        worksheet->write_string(i + 1, 3, data[i].month,  NULL);
     }
     
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

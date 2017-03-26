@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook_options options = {1, NULL};
+    xlsxwriter::workbook_options options = {1, NULL};
 
-    lxw_workbook  *workbook  = workbook_new_opt("test_optimize21.xlsx", &options);
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_optimize21.xlsx", &options);
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo",     NULL);
-    worksheet_write_string(worksheet, CELL("C3"), " Foo",    NULL);
-    worksheet_write_string(worksheet, CELL("E5"), "Foo ",    NULL);
-    worksheet_write_string(worksheet, CELL("A7"), "\tFoo\t", NULL);
+    worksheet->write_string(CELL("A1"), "Foo",     NULL);
+    worksheet->write_string(CELL("C3"), " Foo",    NULL);
+    worksheet->write_string(CELL("E5"), "Foo ",    NULL);
+    worksheet->write_string(CELL("A7"), "\tFoo\t", NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

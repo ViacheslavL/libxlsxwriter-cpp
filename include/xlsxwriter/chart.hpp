@@ -28,12 +28,12 @@
  *
  * @code
  *
- * #include "xlsxwriter.h"
+ * #include "xlsxwriter.hpp"
  *
  * int main() {
  *
- *     lxw_workbook  *workbook  = new_workbook("chart.xlsx");
- *     lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+ *     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("chart.xlsx");
+ *     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
  *
  *     // User function to add data to worksheet, not shown here.
  *     write_worksheet_data(worksheet);
@@ -50,7 +50,7 @@
  *     // Insert the chart into the worksheet
  *     worksheet_insert_chart(worksheet, CELL("B7"), chart);
  *
- *     return workbook_close(workbook);
+ *     int result = workbook->close(); return result;
  * }
  *
  * @endcode
@@ -267,8 +267,6 @@ struct chart_series {
     friend class worksheet;
 public:
 
-    chart_series();
-
     /**
      * @brief Set a series "categories" range using row and column values.
      *
@@ -380,10 +378,6 @@ private:
     lxw_marker marker;
     uint8_t x2_axis;
     uint8_t y2_axis;
-
-    STAILQ_ENTRY (lxw_chart_series) list_pointers;
-    STAILQ_ENTRY (lxw_chart_series) expose_query;
-
 };
 
 typedef std::shared_ptr<chart_series> chart_series_ptr;
@@ -507,7 +501,7 @@ public:
 
     chart(uint8_t type);
 
-    ~chart();
+    virtual ~chart();
 
     void assemble_xml_file();
 
@@ -859,7 +853,6 @@ public:
     chart_area(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 
@@ -868,7 +861,6 @@ public:
     chart_bar(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 
@@ -877,7 +869,6 @@ public:
     chart_column(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 
@@ -886,7 +877,6 @@ public:
     chart_line(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 
@@ -913,7 +903,6 @@ public:
     chart_radar(uint8_t t) : chart(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 
@@ -922,7 +911,6 @@ public:
     chart_doughtnut(uint8_t t) : chart_pie(t) {}
 protected:
     void write_chart_type(bool);
-    void write_plot_area();
     void _initialize();
 };
 

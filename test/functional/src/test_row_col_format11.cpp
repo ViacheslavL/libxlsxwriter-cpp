@@ -7,14 +7,14 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_row_col_format11.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_row_col_format11.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_column(worksheet, 2, 2, 4, NULL);
+    worksheet->set_column(2, 2, 4, NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

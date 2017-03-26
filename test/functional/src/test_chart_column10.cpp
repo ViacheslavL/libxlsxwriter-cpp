@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = new_workbook("test_chart_column10.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_column10.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_COLUMN);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
@@ -24,8 +24,8 @@ int main() {
 
     int row;
     for (row = 0; row < 5; row++) {
-        worksheet_write_string(worksheet, row, 0, data_1[row], NULL);
-        worksheet_write_number(worksheet, row, 1, data_2[row], NULL);
+        worksheet->write_string(row, 0, data_1[row], NULL);
+        worksheet->write_number(row, 1, data_2[row], NULL);
     }
 
     chart_add_series(chart,
@@ -35,5 +35,5 @@ int main() {
 
     worksheet_insert_chart(worksheet, CELL("E9"), chart);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

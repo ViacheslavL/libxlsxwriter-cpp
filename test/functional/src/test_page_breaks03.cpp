@@ -7,12 +7,12 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_page_breaks03.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_page_breaks03.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_row_t breaks[1028] = {0};
     int i;
 
@@ -24,7 +24,7 @@ int main() {
 
     worksheet_set_h_pagebreaks(worksheet, breaks);
 
-    worksheet_write_string(worksheet, CELL("A1"), "Foo" , NULL);
+    worksheet->write_string(CELL("A1"), "Foo" , NULL);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

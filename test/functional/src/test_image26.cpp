@@ -7,17 +7,17 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_image26.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image26.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet_insert_image(worksheet, CELL("B2"), "images/black_72.png");
     worksheet_insert_image(worksheet, CELL("B8"), "images/black_96.png");
     worksheet_insert_image(worksheet, CELL("B13"), "images/black_150.png");
     worksheet_insert_image(worksheet, CELL("B17"), "images/black_300.png");
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

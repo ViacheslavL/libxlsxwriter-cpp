@@ -7,32 +7,32 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_row_col_format09.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_row_col_format09.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_format    *bold      = workbook_add_format(workbook);
+    xlsxwriter::format    *bold      = workbook->add_format();
     format_set_bold(bold);
 
-    lxw_format    *mixed     = workbook_add_format(workbook);
+    xlsxwriter::format    *mixed     = workbook->add_format();
     format_set_bold(mixed);
     format_set_italic(mixed);
 
-    lxw_format    *italic    = workbook_add_format(workbook);
+    xlsxwriter::format    *italic    = workbook->add_format();
     format_set_italic(italic);
 
     /* Manually force the format index order for testing. */
     lxw_workbook_set_default_xf_indices(workbook);
 
-    worksheet_set_row(worksheet, 4, 15, bold);
-    worksheet_set_column(worksheet, 2, 2, 8.43, italic);
+    worksheet->set_row(4, 15, bold);
+    worksheet->set_column(2, 2, 8.43, italic);
 
-    worksheet_write_string(worksheet, 0, 2, "Foo", NULL);
-    worksheet_write_string(worksheet, 4, 0, "Foo", NULL);
-    worksheet_write_string(worksheet, 4, 2, "Foo", mixed);
+    worksheet->write_string(0, 2, "Foo", NULL);
+    worksheet->write_string(4, 0, "Foo", NULL);
+    worksheet->write_string(4, 2, "Foo", mixed);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }

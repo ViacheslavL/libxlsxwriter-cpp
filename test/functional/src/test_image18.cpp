@@ -7,19 +7,19 @@
  *
  */
 
-#include "xlsxwriter.h"
+#include "xlsxwriter.hpp"
 
 int main() {
 
-    lxw_workbook  *workbook  = workbook_new("test_image18.xlsx");
-    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image18.xlsx");
+    xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     lxw_image_options options = {.x_offset = 5, .y_offset = 5};
 
-    worksheet_set_row(worksheet, 1, 96, NULL);
-    worksheet_set_column(worksheet, 2, 2, 18, NULL);
+    worksheet->set_row(1, 96, NULL);
+    worksheet->set_column(2, 2, 18, NULL);
 
     worksheet_insert_image_opt(worksheet, CELL("C2"), "images/issue32.png", &options);
 
-    return workbook_close(workbook);
+    int result = workbook->close(); return result;
 }
