@@ -19,18 +19,18 @@ int main() {
     xlsxwriter::format    *border3   = workbook->add_format();
 
 
-    format_set_bg_color(border1, xlsxwriter::LXW_COLOR_RED);
+    border1->set_bg_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_bg_color(border2, LXW_COLOR_YELLOW);
-    format_set_pattern (border2, LXW_PATTERN_DARK_VERTICAL);
+    border2->set_bg_color(xlsxwriter::LXW_COLOR_YELLOW);
+    border2->set_pattern (xlsxwriter::LXW_PATTERN_DARK_VERTICAL);
 
-    format_set_bg_color(border3, LXW_COLOR_YELLOW);
-    format_set_fg_color(border3, xlsxwriter::LXW_COLOR_RED);
-    format_set_pattern (border3, LXW_PATTERN_GRAY_0625);
+    border3->set_bg_color(xlsxwriter::LXW_COLOR_YELLOW);
+    border3->set_fg_color(xlsxwriter::LXW_COLOR_RED);
+    border3->set_pattern (xlsxwriter::LXW_PATTERN_GRAY_0625);
 
-    worksheet_write_blank(worksheet, 1, 1, border1);
-    worksheet_write_blank(worksheet, 3, 1, border2);
-    worksheet_write_blank(worksheet, 5, 1, border3);
+    worksheet->write_blank(1, 1, border1);
+    worksheet->write_blank(3, 1, border2);
+    worksheet->write_blank(5, 1, border3);
 
     int result = workbook->close(); return result;
 }

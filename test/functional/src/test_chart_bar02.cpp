@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook   = new_workbook("test_chart_bar02.xlsx");
+    xlsxwriter::workbook *workbook   = new xlsxwriter::workbook("test_chart_bar02.xlsx");
     xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
     xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
     xlsxwriter::chart     *chart      = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
@@ -31,15 +31,15 @@ int main() {
     int row, col;
     for (row = 0; row < 5; row++)
         for (col = 0; col < 3; col++)
-            worksheet_write_number(worksheet2, row, col, data[row][col] , NULL);
+            worksheet2->write_number(row, col, data[row][col] , NULL);
 
-    worksheet_write_string(worksheet1, CELL("A1"), "Foo" , NULL);
+    worksheet1->write_string(CELL("A1"), "Foo" , NULL);
 
     chart->add_series("Sheet2!$A$1:$A$5", "Sheet2!$B$1:$B$5");
     chart->add_series("Sheet2!$A$1:$A$5", "Sheet2!$C$1:$C$5");
 
 
-    worksheet_insert_chart(worksheet2, CELL("E9"), chart);
+    worksheet2->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

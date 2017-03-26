@@ -15,8 +15,8 @@ int main() {
     xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
     xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
 
-    worksheet_insert_image(worksheet1, CELL("E9"), "images/red.png");
-    worksheet_insert_image(worksheet2, CELL("E9"), "images/yellow.png");
+    worksheet1->insert_image(CELL("E9"), "images/red.png");
+    worksheet2->insert_image(CELL("E9"), "images/yellow.png");
 
     int result = workbook->close(); return result;
 }

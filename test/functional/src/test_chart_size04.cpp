@@ -39,7 +39,7 @@ int main() {
     xlsxwriter::image_options options = {};
     options.x_offset = 8;
     options.y_offset = 9;
-    worksheet->insert_chart_opt(CELL("E9"), chart, options);
+    worksheet->insert_chart_opt(CELL("E9"), chart, &options);
 
     int result = workbook->close(); return result;
 }

@@ -46,22 +46,22 @@ int main() {
 
     worksheet->set_column(COLS("A:D"), 11, NULL);
 
-    chart_add_series(chart,
+    chart->add_series(
          "=Sheet1!$A$2:$A$5",
          "=Sheet1!$B$2:$B$5"
     );
 
-    chart_add_series(chart,
+    chart->add_series(
          "=Sheet1!$A$2:$A$5",
          "=Sheet1!$C$2:$C$5"
     );
 
-    chart_add_series(chart,
+    chart->add_series(
          "=Sheet1!$A$2:$A$5",
          "=Sheet1!$D$2:$D$5"
     );
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

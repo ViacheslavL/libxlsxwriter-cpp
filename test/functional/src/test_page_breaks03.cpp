@@ -13,16 +13,15 @@ int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_page_breaks03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_row_t breaks[1028] = {0};
-    int i;
+    std::vector<lxw_row_t> breaks;
 
-    for (i = 0; i < 1027; i++)
-        breaks[i] = i + 1;
+    for (int i = 0; i < 1027; i++)
+        breaks.push_back(i + 1);
 
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 
-    worksheet_set_h_pagebreaks(worksheet, breaks);
+    worksheet->set_h_pagebreaks(breaks);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

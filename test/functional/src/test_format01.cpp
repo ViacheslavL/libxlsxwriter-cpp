@@ -30,21 +30,21 @@ int main() {
     (void)unused2;
     (void)unused3;
 
-    format_set_bold(format);
+    format->set_bold();
 
-    worksheet_write_string(worksheet1, 0, 0, "Foo", NULL);
-    worksheet_write_number(worksheet1, 1, 0, 123, NULL);
+    worksheet1->write_string(0, 0, "Foo", NULL);
+    worksheet1->write_number(1, 0, 123, NULL);
 
-    worksheet_write_string(worksheet3, 1, 1, "Foo", NULL);
-    worksheet_write_string(worksheet3, 2, 1, "Bar", format);
-    worksheet_write_number(worksheet3, 3, 2, 234, NULL);
+    worksheet3->write_string(1, 1, "Foo", NULL);
+    worksheet3->write_string(2, 1, "Bar", format);
+    worksheet3->write_number(3, 2, 234, NULL);
 
 
     /* For testing. This doesn't have a string or format and should be ignored. */
-    worksheet_write_string(worksheet1, 0, 0, NULL, NULL);
+    worksheet1->write_string(0, 0, NULL, NULL);
 
     /* For testing. This doesn't have a formula and should be ignored. */
-    worksheet_write_formula(worksheet1, 0, 0, NULL, NULL);
+    worksheet1->write_formula(0, 0, NULL, NULL);
 
     int result = workbook->close(); return result;
 }

@@ -17,9 +17,9 @@ int main() {
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 
-    worksheet_print_row_col_headers(worksheet);
+    worksheet->print_row_col_headers();
 
-    worksheet->write_string(CELL("A1"), "Foo" , NULL);
+    worksheet->write_string(CELL("A1"), "Foo");
 
     int result = workbook->close(); return result;
 }

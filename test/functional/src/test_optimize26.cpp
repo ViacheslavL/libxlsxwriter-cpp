@@ -11,10 +11,11 @@
 
 int main() {
 
-    xlsxwriter::workbook_options options = {1, NULL};
+    xlsxwriter::workbook_options options = {};
+    options.constant_memory = true;
 
     /* Use deprecated constructor for testing. */
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook_opt("test_optimize26.xlsx", &options);
+    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_optimize26.xlsx", options);
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_string(2, 2, "café", NULL);

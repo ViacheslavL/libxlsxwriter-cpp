@@ -1927,7 +1927,7 @@ void chart::set_y2_axis(const std::shared_ptr<chart_axis>& axis)
 /*
  * Insert an image into the worksheet.
  */
-std::shared_ptr<chart_series> chart::add_series(const std::string& categories, const std::string&  values, const series_options& options)
+chart_series* chart::add_series(const std::string& categories, const std::string&  values, const series_options& options)
 {
     std::shared_ptr<chart_series> series = std::make_shared<chart_series>();
     series->title.range = std::make_shared<series_range>();
@@ -1956,14 +1956,13 @@ std::shared_ptr<chart_series> chart::add_series(const std::string& categories, c
         series->y2_axis = options.y2_axis;
         is_secondary = true;
     }
-    return series;
+    return series.get();
 }
 
 /*
  * Set on of the 48 built-in Excel chart styles.
  */
-void
-chart_set_style(uint8_t style_id)
+void chart_set_style(uint8_t style_id)
 {
     /* The default style is 2. The range is 1 - 48 */
     if (style_id < 1 || style_id > 48)
@@ -2026,7 +2025,7 @@ void chart_series::set_values(const std::string& sheetname,
                         lxw_row_t last_row, lxw_col_t last_col)
 {
     if (sheetname.empty()) {
-        LXW_WARN("chart_series_set_values(): sheetname must be specified");
+        LXW_WARN("series->set_values(): sheetname must be specified");
         return;
     }
 
@@ -2130,6 +2129,21 @@ void chart::title_set_name_range(const std::string& sheetname,
 void chart::title_off()
 {
     title.off = true;
+}
+
+chart_axis *chart::get_x_axis()
+{
+    return x_axis.get();
+}
+
+chart_axis *chart::get_y_axis()
+{
+    return y_axis.get();
+}
+
+void chart::set_style(uint8_t style_id)
+{
+    this->style_id = style_id;
 }
 
 /*

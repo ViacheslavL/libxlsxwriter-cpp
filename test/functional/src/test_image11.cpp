@@ -16,7 +16,7 @@ int main() {
 
     xlsxwriter::image_options options = {.x_offset = 8, .y_offset = 5};
 
-    worksheet_insert_image_opt(worksheet, CELL("C2"), "images/logo.png", &options);
+    worksheet->insert_image_opt(CELL("C2"), "images/logo.png", &options);
 
     int result = workbook->close(); return result;
 }

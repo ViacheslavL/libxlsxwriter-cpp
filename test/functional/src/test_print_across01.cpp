@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_print_across01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_print_across(worksheet);
+    worksheet->print_across();
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 

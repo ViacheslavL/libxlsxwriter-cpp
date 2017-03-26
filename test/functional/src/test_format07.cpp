@@ -19,9 +19,9 @@ int main() {
     xlsxwriter::format    *format3    = workbook->add_format();
 
 
-    format_set_num_format(format1, "0.000");
-    format_set_num_format(format2, "0.00000");
-    format_set_num_format(format3, "0.000000");
+    format1->set_num_format("0.000");
+    format2->set_num_format("0.00000");
+    format3->set_num_format("0.000000");
 
 
     worksheet->write_number(0, 0, 1.2222, NULL);

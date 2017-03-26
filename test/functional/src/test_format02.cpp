@@ -20,16 +20,16 @@ int main() {
 
     worksheet->set_row(0, 30, NULL);
 
-    format_set_font_name(format1, "Arial");
-    format_set_bold(format1);
-    format_set_align(format1, xlsxwriter::LXW_ALIGN_LEFT);
-    format_set_align(format1, xlsxwriter::LXW_ALIGN_VERTICAL_BOTTOM);
+    format1->set_font_name("Arial");
+    format1->set_bold();
+    format1->set_align(xlsxwriter::LXW_ALIGN_LEFT);
+    format1->set_align(xlsxwriter::LXW_ALIGN_VERTICAL_BOTTOM);
 
-    format_set_font_name(format2, "Arial");
-    format_set_bold(format2);
-    format_set_rotation(format2, 90);
-    format_set_align(format2, xlsxwriter::LXW_ALIGN_CENTER);
-    format_set_align(format2, xlsxwriter::LXW_ALIGN_VERTICAL_BOTTOM);
+    format2->set_font_name("Arial");
+    format2->set_bold();
+    format2->set_rotation(90);
+    format2->set_align(xlsxwriter::LXW_ALIGN_CENTER);
+    format2->set_align(xlsxwriter::LXW_ALIGN_VERTICAL_BOTTOM);
 
     worksheet->write_string(0, 0, "Foo", format1);
     worksheet->write_string(0, 1, "Bar", format2);

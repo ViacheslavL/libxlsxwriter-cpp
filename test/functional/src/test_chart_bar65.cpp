@@ -32,15 +32,15 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col] , NULL);
 
-    xlsxwriter::LXW_CHART_series *series1 = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
-    xlsxwriter::LXW_CHART_series *series2 = chart->add_series(NULL, NULL);
-    xlsxwriter::LXW_CHART_series *series3 = chart->add_series(NULL, NULL);
+    xlsxwriter::chart_series *series1 = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    xlsxwriter::chart_series *series2 = chart->add_series();
+    xlsxwriter::chart_series *series3 = chart->add_series();
 
-    chart_series_set_values(series1, "Sheet1", 0, 0, 4, 0);
-    chart_series_set_values(series2, "Sheet1", 0, 1, 4, 1);
-    chart_series_set_values(series3, "Sheet1", 0, 2, 4, 2);
+    series1->set_values("Sheet1", 0, 0, 4, 0);
+    series2->set_values("Sheet1", 0, 1, 4, 1);
+    series3->set_values("Sheet1", 0, 2, 4, 2);
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

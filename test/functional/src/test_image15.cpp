@@ -21,7 +21,7 @@ int main() {
     worksheet->set_column(2, 4,  3.29, NULL);
     worksheet->set_column(5, 5, 10.71, NULL);
 
-    worksheet_insert_image_opt(worksheet, CELL("C2"), "images/logo.png", &options);
+    worksheet->insert_image_opt(CELL("C2"), "images/logo.png", &options);
 
     int result = workbook->close(); return result;
 }

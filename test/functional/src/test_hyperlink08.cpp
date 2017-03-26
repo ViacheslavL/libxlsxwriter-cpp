@@ -15,8 +15,8 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* Test with forward slashes instead of back slashes in test_hyperlink07.c. */
-    worksheet_write_url_opt(worksheet, CELL("A1"), "external://VBOXSVR/share/foo.xlsx", NULL, "J:/foo.xlsx", NULL);
-    worksheet_write_url(    worksheet, CELL("A3"), "external:foo.xlsx" , NULL);
+    worksheet->write_url_opt(CELL("A1"), "external://VBOXSVR/share/foo.xlsx", NULL, "J:/foo.xlsx", NULL);
+    worksheet->write_url(CELL("A3"), "external:foo.xlsx" , NULL);
 
     int result = workbook->close(); return result;
 }

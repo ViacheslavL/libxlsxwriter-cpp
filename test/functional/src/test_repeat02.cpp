@@ -17,7 +17,7 @@ int main() {
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 
-    worksheet_repeat_columns(worksheet, 0, 0);
+    worksheet->repeat_columns(0, 0);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

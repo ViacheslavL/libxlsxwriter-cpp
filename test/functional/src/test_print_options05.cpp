@@ -17,9 +17,9 @@ int main() {
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 
-    worksheet_gridlines(worksheet, LXW_SHOW_PRINT_GRIDLINES);
-    worksheet_print_row_col_headers(worksheet);
-    worksheet_center_horizontally(worksheet);
+    worksheet->gridlines(xlsxwriter::LXW_SHOW_PRINT_GRIDLINES);
+    worksheet->print_row_col_headers();
+    worksheet->center_horizontally();
     worksheet->center_vertically();
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);

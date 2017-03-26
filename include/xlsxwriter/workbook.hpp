@@ -155,7 +155,7 @@ class packager;
 /**
  * @brief Struct to represent an Excel workbook.
  *
- * The members of the lxw_workbook struct aren't modified directly. Instead
+ * The members of the xlsxwriter::workbook struct aren't modified directly. Instead
  * the workbook properties are set by calling the functions shown in
  * workbook.h.
  */
@@ -324,7 +324,7 @@ public:
      *
      * See @ref chart.h for details.
      */
-    chart_ptr add_chart(uint8_t chart_type);
+    chart* add_chart(uint8_t chart_type);
 
     /**
      * @brief Close the Workbook object and write the XLSX file.
@@ -547,6 +547,9 @@ public:
 
     void assemble_xml_file();
     void set_default_xf_indices();
+
+/// TODO make this private
+    sst_ptr sst;
 private:
     FILE *file;
     std::vector<worksheet_ptr> worksheets;
@@ -555,7 +558,7 @@ private:
     std::vector<chart*> ordered_charts;
     std::vector<format_ptr> formats;
     std::vector<defined_name_ptr> defined_names;
-    sst_ptr sst;
+
     doc_properties properties;
     std::list<custom_property_ptr> custom_properties;
 

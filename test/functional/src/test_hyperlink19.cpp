@@ -18,8 +18,8 @@ int main() {
      * to is a string. If it isn't be have to add a display attribute. However,
      * looking up the cell is currently too expensive.
      */ 
-    worksheet_write_url        (worksheet, CELL("A1"), "http://www.perl.com/", NULL);
-    worksheet_write_formula_num(worksheet, CELL("A1"), "=1+1", NULL, 2);
+    worksheet->write_url(CELL("A1"), "http://www.perl.com/", NULL);
+    worksheet->write_formula_num(CELL("A1"), "=1+1", NULL, 2);
 
     workbook->sst->string_count = 0;
 

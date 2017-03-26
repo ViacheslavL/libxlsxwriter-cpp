@@ -26,12 +26,12 @@ int main() {
         for (col = 0; col < 2; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    chart_add_series(chart,
+    chart->add_series(
          "=Sheet1!$A$1:$A$3",
          "=Sheet1!$B$1:$B$3"
     );
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

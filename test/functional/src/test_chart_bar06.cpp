@@ -36,11 +36,11 @@ int main() {
     chart->add_series(NULL, "=Sheet1!$B$1:$B$5");
     chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
 
-    chart_axis_set_name(chart->x_axis, "Apple");
-    chart_axis_set_name(chart->y_axis, "Pear");
-    chart_title_set_name(chart, "Title");
+    chart->get_x_axis()->set_name("Apple");
+    chart->get_y_axis()->set_name("Pear");
+    chart->title_set_name("Title");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

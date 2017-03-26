@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::format *num_format = workbook->add_format();
 
-    format_set_num_format(num_format, "[Red]0.0%\\ \"a\"");
+    num_format->set_num_format("[Red]0.0%\\ \"a\"");
 
     worksheet->set_column(0, 0, 14, NULL);
 

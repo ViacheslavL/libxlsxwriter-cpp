@@ -43,18 +43,18 @@ int main() {
     worksheet->write_url(CELL("A8"), "http://www.perl.org/", NULL);
     worksheet->write_url(CELL("A9"), "http://www.perl.net/", NULL);
 
-    chart_add_series(chart1, NULL, "=Sheet1!$A$1:$A$5");
-    chart_add_series(chart1, NULL, "=Sheet1!$B$1:$B$5");
-    chart_add_series(chart1, NULL, "=Sheet1!$C$1:$C$5");
+    chart1->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    chart1->add_series(NULL, "=Sheet1!$B$1:$B$5");
+    chart1->add_series(NULL, "=Sheet1!$C$1:$C$5");
 
-    chart_add_series(chart2, NULL, "=Sheet1!$A$1:$A$5");
-    chart_add_series(chart2, NULL, "=Sheet1!$B$1:$B$5");
+    chart2->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    chart2->add_series(NULL, "=Sheet1!$B$1:$B$5");
 
-    chart_add_series(chart3, NULL, "=Sheet1!$A$1:$A$5");
+    chart3->add_series(NULL, "=Sheet1!$A$1:$A$5");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart1);
-    worksheet_insert_chart(worksheet, CELL("D25"), chart2);
-    worksheet_insert_chart(worksheet, CELL("L32"), chart3);
+    worksheet->insert_chart(CELL("E9"), chart1);
+    worksheet->insert_chart(CELL("D25"), chart2);
+    worksheet->insert_chart(CELL("L32"), chart3);
 
     int result = workbook->close(); return result;
 }

@@ -31,13 +31,13 @@ int main() {
          "=Sheet1!$B$1:$B$3"
     );
 
-    chart_title_set_name(chart, "Title");
+    chart->title_set_name("Title");
 
     /* Axis formatting should be igmored. */
-    chart_axis_set_name(chart->x_axis, "XXX");
-    chart_axis_set_name(chart->y_axis, "YYY");
+    chart->get_x_axis()->set_name("XXX");
+    chart->get_y_axis()->set_name("YYY");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

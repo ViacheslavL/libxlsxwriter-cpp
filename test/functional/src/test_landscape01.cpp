@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_string(0, 0, "Foo" , NULL);
-    worksheet_set_landscape(worksheet);
+    worksheet->set_landscape();
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 

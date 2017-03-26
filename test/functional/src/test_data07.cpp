@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_data07.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_formula_num(worksheet, 0, 0, "=1+2", NULL, 3);
+    worksheet->write_formula_num(0, 0, "=1+2", NULL, 3);
 
     int result = workbook->close(); return result;
 }

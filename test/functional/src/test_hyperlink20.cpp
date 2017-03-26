@@ -17,11 +17,11 @@ int main() {
     xlsxwriter::format *format1 = workbook->add_format();
     xlsxwriter::format *format2 = workbook->add_format();
 
-    format_set_underline(format1, LXW_UNDERLINE_SINGLE);
-    format_set_font_color(format1, LXW_COLOR_BLUE);
+    format1->set_underline(xlsxwriter::LXW_UNDERLINE_SINGLE);
+    format1->set_font_color(xlsxwriter::LXW_COLOR_BLUE);
 
-    format_set_underline(format2, LXW_UNDERLINE_SINGLE);
-    format_set_font_color(format2, xlsxwriter::LXW_COLOR_RED);
+    format2->set_underline(xlsxwriter::LXW_UNDERLINE_SINGLE);
+    format2->set_font_color(xlsxwriter::LXW_COLOR_RED);
 
 
     worksheet->write_url(CELL("A1"), "http://www.python.org/1", format1);

@@ -18,8 +18,8 @@ int main() {
     xlsxwriter::format    *format2    = workbook->add_format();
 
 
-    format_set_num_format_index(format1, 2);
-    format_set_num_format_index(format2, 12);
+    format1->set_num_format_index(2);
+    format2->set_num_format_index(12);
 
     worksheet->write_number(0, 0, 1.2222, NULL);
     worksheet->write_number(1, 0, 1.2222, format1);

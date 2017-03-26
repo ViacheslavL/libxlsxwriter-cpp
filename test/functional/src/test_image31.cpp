@@ -19,7 +19,7 @@ int main() {
     worksheet->set_column(3, 3, 3.86, NULL);
     worksheet->set_row(7, 7.5, NULL);
 
-    worksheet_insert_image_opt(worksheet, CELL("E9"), "images/red.png", &options);
+    worksheet->insert_image_opt(CELL("E9"), "images/red.png", &options);
 
     int result = workbook->close(); return result;
 }

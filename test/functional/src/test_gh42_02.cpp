@@ -14,11 +14,11 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_gh42_02.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    char string[] = {0xe5, 0x9b, 0xbe, 0x20, 0xe5, 0x9b, 0xbe, 0x00};
+    std::string string = "\0xe5\0x9b\0xbe\0x20\0xe5\0x9b\0xbe\0x00";
 
     worksheet->write_string(0, 0, string, NULL);
 
-    workbook_close(workbook);
+    workbook->close();
 
     return 0;
 }

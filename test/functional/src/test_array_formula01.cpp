@@ -21,7 +21,7 @@ int main() {
     worksheet->write_number(1, 2, 0, NULL);
     worksheet->write_number(2, 2, 0, NULL);
 
-    worksheet_write_array_formula(worksheet, RANGE("A1:A3"), "{=SUM(B1:C1*B2:C2)}", NULL);
+    worksheet->write_array_formula(RANGE("A1:A3"), "{=SUM(B1:C1*B2:C2)}");
 
     int result = workbook->close(); return result;
 }

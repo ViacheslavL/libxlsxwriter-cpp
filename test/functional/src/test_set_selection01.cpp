@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_set_selection01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_selection(worksheet, RANGE("B4:C5"));
+    worksheet->set_selection(RANGE("B4:C5"));
 
     int result = workbook->close(); return result;
 }

@@ -72,8 +72,10 @@ public:
 
     void _xml_declaration();
 
-private:
+    /// TODO make this private in future
     uint32_t string_count;
+private:
+
     uint32_t unique_count;
     std::unordered_set<sst_element_ptr> strings;
     std::vector<sst_element_ptr> order_list;

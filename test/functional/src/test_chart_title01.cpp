@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_COLUMN);
 
-    xlsxwriter::LXW_CHART_series *series;
+    xlsxwriter::chart_series *series;
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart->axis_id_1 = 46165376;
@@ -36,10 +36,10 @@ int main() {
 
     series = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
 
-    chart_series_set_name(series, "Foo");
-    chart_title_off(chart);
+    series->set_name("Foo");
+    chart->title_off();
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

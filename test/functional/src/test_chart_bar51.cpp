@@ -11,11 +11,11 @@
 
 int main() {
 
-    lxw_workbook     *workbook  = new_workbook("test_chart_bar51.xlsx");
-    lxw_worksheet    *worksheet = workbook->add_worksheet();
+    xlsxwriter::workbook     *workbook  = new xlsxwriter::workbook("test_chart_bar51.xlsx");
+    xlsxwriter::worksheet    *worksheet = workbook->add_worksheet();
     xlsxwriter::chart        *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
-    xlsxwriter::LXW_CHART_series *series1;
-    xlsxwriter::LXW_CHART_series *series2;
+    xlsxwriter::chart_series *series1;
+    xlsxwriter::chart_series *series2;
     int row, col;
 
     uint8_t data[5][3] = {
@@ -35,10 +35,10 @@ int main() {
 
 
     /* Add the cached data for testing. */
-    xlsxwriter::LXW_CHART_add_data_cache(series1->values, data[0], 5, 3, 0);
-    xlsxwriter::LXW_CHART_add_data_cache(series2->values, data[0], 5, 3, 1);
+    chart_add_data_cache(series1->values.get(), data[0], 5, 3, 0);
+    chart_add_data_cache(series2->values.get(), data[0], 5, 3, 1);
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

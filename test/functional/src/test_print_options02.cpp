@@ -17,7 +17,7 @@ int main() {
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);
 
-    worksheet_center_horizontally(worksheet);
+    worksheet->center_horizontally();
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

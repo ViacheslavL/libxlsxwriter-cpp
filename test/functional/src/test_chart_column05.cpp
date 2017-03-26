@@ -36,7 +36,7 @@ int main() {
     chart->add_series(NULL, "=Foo!$B$1:$B$5");
     chart->add_series(NULL, "=Foo!$C$1:$C$5");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

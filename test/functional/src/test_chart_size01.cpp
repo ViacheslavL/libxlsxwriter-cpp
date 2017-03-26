@@ -36,7 +36,9 @@ int main() {
     chart->add_series(NULL, "=Sheet1!$B$1:$B$5");
     chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
 
-    xlsxwriter::image_options options = {.x_scale  = 1.06666667, .y_scale  = 1.11111112};
+    xlsxwriter::image_options options = {};
+    options.x_scale  = 1.06666667;
+    options.y_scale  = 1.11111112;
     worksheet->insert_chart_opt(CELL("E9"), chart, &options);
 
     int result = workbook->close(); return result;

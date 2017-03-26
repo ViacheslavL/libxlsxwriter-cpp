@@ -488,7 +488,7 @@ public:
      *
      * @code
      *     format = workbook->add_format();
-     *     format_set_bold(format);
+     *     format->set_bold();
      *
      *     worksheet->write_string(0, 0, "Bold Text", format);
      * @endcode

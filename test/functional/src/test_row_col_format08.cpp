@@ -18,8 +18,8 @@ int main() {
     bold->set_bold();
 
     xlsxwriter::format    *mixed     = workbook->add_format();
-    format_set_bold(mixed);
-    format_set_italic(mixed);
+    mixed->set_bold();
+    mixed->set_italic();
 
     xlsxwriter::format    *italic    = workbook->add_format();
     italic->set_italic();

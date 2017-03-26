@@ -16,7 +16,7 @@ int main() {
     xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
     xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
 
-    worksheet_hide(worksheet2);
+    worksheet2->hide();
 
     /* Avoid warnings about unused variables. */
     (void)worksheet1;

@@ -21,26 +21,26 @@ int main() {
     xlsxwriter::format    *border5   = workbook->add_format();
 
 
-    format_set_bottom(border1, LXW_BORDER_THIN);
-    format_set_bottom_color(border1, xlsxwriter::LXW_COLOR_RED);
+    border1->set_bottom(xlsxwriter::LXW_BORDER_THIN);
+    border1->set_bottom_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_top(border2, LXW_BORDER_THIN);
-    format_set_top_color(border2, xlsxwriter::LXW_COLOR_RED);
+    border2->set_top(xlsxwriter::LXW_BORDER_THIN);
+    border2->set_top_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_left(border3, LXW_BORDER_THIN);
-    format_set_left_color(border3, xlsxwriter::LXW_COLOR_RED);
+    border3->set_left(xlsxwriter::LXW_BORDER_THIN);
+    border3->set_left_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_right(border4, LXW_BORDER_THIN);
-    format_set_right_color(border4, xlsxwriter::LXW_COLOR_RED);
+    border4->set_right(xlsxwriter::LXW_BORDER_THIN);
+    border4->set_right_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_border(border5, LXW_BORDER_THIN);
-    format_set_border_color(border5, xlsxwriter::LXW_COLOR_RED);
+    border5->set_border(xlsxwriter::LXW_BORDER_THIN);
+    border5->set_border_color(xlsxwriter::LXW_COLOR_RED);
 
-    worksheet_write_blank(worksheet, 1, 1, border1);
-    worksheet_write_blank(worksheet, 3, 1, border2);
-    worksheet_write_blank(worksheet, 5, 1, border3);
-    worksheet_write_blank(worksheet, 7, 1, border4);
-    worksheet_write_blank(worksheet, 9, 1, border5);
+    worksheet->write_blank(1, 1, border1);
+    worksheet->write_blank(3, 1, border2);
+    worksheet->write_blank(5, 1, border3);
+    worksheet->write_blank(7, 1, border4);
+    worksheet->write_blank(9, 1, border5);
 
     int result = workbook->close(); return result;
 }

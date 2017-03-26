@@ -34,9 +34,9 @@ int main() {
 
     chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
 
-    chart_title_set_name(chart, "Title!");
+    chart->title_set_name("Title!");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

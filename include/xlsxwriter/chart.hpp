@@ -48,7 +48,7 @@
  *     chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
  *
  *     // Insert the chart into the worksheet
- *     worksheet_insert_chart(worksheet, CELL("B7"), chart);
+ *     worksheet->insert_chart(CELL("B7"), chart);
  *
  *     int result = workbook->close(); return result;
  * }
@@ -281,7 +281,7 @@ public:
      * is easier to generate programmatically. It requires that you set the
      * `categories` and `values` parameters in `chart_add_series()`to `NULL` and
      * then set them using row and column values in
-     * `chart_series_set_categories()` and `chart_series_set_values()`:
+     * `chart_series_set_categories()` and `series->set_values()`:
      *
      * @code
      *     chart_series_ptr series = chart->add_series();
@@ -308,7 +308,7 @@ public:
      * using the `chart_add_series()` function and Excel range formulas like
      * `"=Sheet1!$A$2:$A$7"`.
      *
-     * The `%chart_series_set_values()` function is an alternative method that is
+     * The `%series->set_values()` function is an alternative method that is
      * easier to generate programmatically. See the documentation for
      * `chart_series_set_categories()` above.
      */
@@ -366,7 +366,9 @@ public:
      * @endcode
      */
     void set_name_range(const std::string& sheetname, lxw_row_t row, lxw_col_t col);
-private:
+
+    /// TODO make this private
+//private:
 
     series_range_ptr categories;
     series_range_ptr values;
@@ -544,7 +546,7 @@ public:
      * convenient when recreating a chart from an example in Excel but it is
      * trickier to generate programmatically. For these cases you can set the
      * `categories` and `values` to `NULL` and use the
-     * `chart_series_set_categories()` and `chart_series_set_values()` functions:
+     * `chart_series_set_categories()` and `series->set_values()` functions:
      *
      * @code
      *     chart_series_ptr series = chart->add_series(chart);
@@ -579,7 +581,7 @@ public:
      * @endcode
      *
      */
-    std::shared_ptr<chart_series> add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
+    chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
 
     void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
@@ -643,6 +645,9 @@ public:
      */
     void title_off();
 
+    chart_axis* get_x_axis();
+    chart_axis* get_y_axis();
+
     /**
      * @brief Set the chart style type.
      *
@@ -653,7 +658,7 @@ public:
      * one of the 48 built-in styles available on the "Design" tab in Excel 2007:
      *
      * @code
-     *     chart_set_style(chart, 37)
+     *     chart->set_style(37)
      * @endcode
      *
      * @image html chart_style.png
@@ -709,8 +714,15 @@ protected:
     chart_title title;
 
     uint32_t id;
+
+    /// this stupid piece of crap is written only because of functional tests
+    /// TODO: get rid of this
+public:
     uint32_t axis_id_1;
     uint32_t axis_id_2;
+
+protected:
+
     uint32_t axis_id_3;
     uint32_t axis_id_4;
 

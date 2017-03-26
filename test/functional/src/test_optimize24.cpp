@@ -11,9 +11,10 @@
 
 int main() {
 
-    xlsxwriter::workbook_options options = {1, NULL};
+    xlsxwriter::workbook_options options = {};
+    options.constant_memory = true;
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_optimize24.xlsx", &options);
+    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_optimize24.xlsx", options);
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::format    *bold      = workbook->add_format();
 

@@ -16,7 +16,7 @@ int main() {
 
     xlsxwriter::format *format = workbook->add_format();
     format->set_align(xlsxwriter::LXW_ALIGN_CENTER);
-    format_set_bold(format);
+    format->set_bold();
 
     worksheet->merge_range(1, 1, 1, 3, "Foo", format);
 

@@ -20,22 +20,22 @@ int main() {
     xlsxwriter::format    *border4   = workbook->add_format();
 
 
-    format_set_border      (border1, LXW_BORDER_HAIR);
-    format_set_border_color(border1, xlsxwriter::LXW_COLOR_RED);
+    border1->set_border      (xlsxwriter::LXW_BORDER_HAIR);
+    border1->set_border_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_diag_type (border2, LXW_DIAGONAL_BORDER_UP);
-    format_set_diag_color(border2, xlsxwriter::LXW_COLOR_RED);
+    border2->set_diag_type (xlsxwriter::LXW_DIAGONAL_BORDER_UP);
+    border2->set_diag_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_diag_type (border3, LXW_DIAGONAL_BORDER_DOWN);
-    format_set_diag_color(border3, xlsxwriter::LXW_COLOR_RED);
+    border3->set_diag_type (xlsxwriter::LXW_DIAGONAL_BORDER_DOWN);
+    border3->set_diag_color(xlsxwriter::LXW_COLOR_RED);
 
-    format_set_diag_type (border4, LXW_DIAGONAL_BORDER_UP_DOWN);
-    format_set_diag_color(border4, xlsxwriter::LXW_COLOR_RED);
+    border4->set_diag_type (xlsxwriter::LXW_DIAGONAL_BORDER_UP_DOWN);
+    border4->set_diag_color(xlsxwriter::LXW_COLOR_RED);
 
-    worksheet_write_blank(worksheet, 1, 1, border1);
-    worksheet_write_blank(worksheet, 3, 1, border2);
-    worksheet_write_blank(worksheet, 5, 1, border3);
-    worksheet_write_blank(worksheet, 7, 1, border4);
+    worksheet->write_blank(1, 1, border1);
+    worksheet->write_blank(3, 1, border2);
+    worksheet->write_blank(5, 1, border3);
+    worksheet->write_blank(7, 1, border4);
 
     int result = workbook->close(); return result;
 }

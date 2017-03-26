@@ -31,9 +31,9 @@ int main() {
          "=Sheet1!$B$1:$B$3"
     );
 
-    chart_set_rotation(chart, 45);
+    chart->set_rotation(45);
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

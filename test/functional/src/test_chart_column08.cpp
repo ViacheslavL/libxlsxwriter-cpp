@@ -32,11 +32,11 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col] , NULL);
 
-    xlsxwriter::LXW_CHART_series *series1 = chart_add_series(chart,
+    xlsxwriter::chart_series *series1 = chart->add_series(
                                                  "=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)",
                                                  "=(Sheet1!$B$1:$B$2,Sheet1!$B$4:$B$5)");
 
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     /* Add the cached data for testing. */
     uint8_t test_data[4][3] = {
@@ -46,8 +46,8 @@ int main() {
         {5, 10, 15}
     };
 
-    xlsxwriter::LXW_CHART_add_data_cache(series1->categories, test_data[0], 4, 3, 0);
-    xlsxwriter::LXW_CHART_add_data_cache(series1->values,     test_data[0], 4, 3, 1);
+    chart_add_data_cache(series1->categories.get(), test_data[0], 4, 3, 0);
+    chart_add_data_cache(series1->values.get(),     test_data[0], 4, 3, 1);
 
 
 

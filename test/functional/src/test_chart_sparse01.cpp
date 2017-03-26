@@ -48,7 +48,7 @@ int main() {
          "=Sheet1!$A$1:$A$6",   /* Ranges exceeds the data. */
          "=Sheet1!$C$1:$C$6"
     );
-    worksheet_insert_chart(worksheet, CELL("E9"), chart);
+    worksheet->insert_chart(CELL("E9"), chart);
 
     int result = workbook->close(); return result;
 }

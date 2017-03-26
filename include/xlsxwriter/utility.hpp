@@ -93,7 +93,7 @@ namespace xlsxwriter {
  * For example:
  *
  * @code
- *     lxw_error error = workbook_close(workbook);
+ *     lxw_error error = workbook->close();
  *
  *     if (error)
  *         printf("Error in workbook_close().\n"

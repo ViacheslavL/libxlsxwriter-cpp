@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook   = new_workbook("test_chart_order01.xlsx");
+    xlsxwriter::workbook *workbook   = new xlsxwriter::workbook("test_chart_order01.xlsx");
     xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
     xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
     xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
@@ -44,20 +44,20 @@ int main() {
     int row, col;
     for (row = 0; row < 5; row++)
         for (col = 0; col < 3; col++) {
-            worksheet_write_number(worksheet1, row, col, data[row][col], NULL);
-            worksheet_write_number(worksheet2, row, col, data[row][col], NULL);
-            worksheet_write_number(worksheet3, row, col, data[row][col], NULL);
+            worksheet1->write_number(row, col, data[row][col], NULL);
+            worksheet2->write_number(row, col, data[row][col], NULL);
+            worksheet3->write_number(row, col, data[row][col], NULL);
         }
 
-    chart_add_series(chart1, NULL, "=Sheet1!$A$1:$A$5");
-    chart_add_series(chart2, NULL, "=Sheet2!$A$1:$A$5");
-    chart_add_series(chart3, NULL, "=Sheet3!$A$1:$A$5");
-    chart_add_series(chart4, NULL, "=Sheet1!$B$1:$B$5");
+    chart1->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    chart2->add_series(NULL, "=Sheet2!$A$1:$A$5");
+    chart3->add_series(NULL, "=Sheet3!$A$1:$A$5");
+    chart4->add_series(NULL, "=Sheet1!$B$1:$B$5");
 
-    worksheet_insert_chart(worksheet1, CELL("E9"),  chart1);
-    worksheet_insert_chart(worksheet2, CELL("E9"),  chart2);
-    worksheet_insert_chart(worksheet3, CELL("E9"),  chart3);
-    worksheet_insert_chart(worksheet1, CELL("E24"), chart4);
+    worksheet1->insert_chart(CELL("E9"),  chart1);
+    worksheet2->insert_chart(CELL("E9"),  chart2);
+    worksheet3->insert_chart(CELL("E9"),  chart3);
+    worksheet1->insert_chart(CELL("E24"), chart4);
 
     int result = workbook->close(); return result;
 }

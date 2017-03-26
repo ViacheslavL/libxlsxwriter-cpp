@@ -16,7 +16,7 @@ int main() {
 
     worksheet->write_url(CELL("A1"), "external:..\\foo.xlsx" , NULL);
     worksheet->write_url(CELL("A3"), "external:..\\foo.xlsx#Sheet1!A1" , NULL);
-    worksheet_write_url_opt(worksheet, CELL("A5"), "external:\\\\VBOXSVR\\share\\foo.xlsx#Sheet1!B2", NULL, "J:\\foo.xlsx#Sheet1!B2", NULL);
+    worksheet->write_url_opt(CELL("A5"), "external:\\\\VBOXSVR\\share\\foo.xlsx#Sheet1!B2", NULL, "J:\\foo.xlsx#Sheet1!B2", NULL);
 
     int result = workbook->close(); return result;
 }

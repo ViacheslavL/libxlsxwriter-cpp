@@ -506,7 +506,7 @@ void workbook::_populate_range_dimensions(const series_range_ptr& range)
     }
 
     /* If the sheetname is already defined it was already set via
-     * chart_series_set_categories() or  chart_series_set_values().
+     * chart_series_set_categories() or  series->set_values().
      */
     if (!range->sheetname.empty())
         return;
@@ -1096,7 +1096,7 @@ worksheet* workbook::add_worksheet(const std::string& sheetname)
 /*
  * Add a new chart to the Excel workbook.
  */
-chart_ptr workbook::add_chart(uint8_t type)
+chart* workbook::add_chart(uint8_t type)
 {
     /* Create a new chart object. */
     chart_ptr chart;
@@ -1141,7 +1141,7 @@ chart_ptr workbook::add_chart(uint8_t type)
         return nullptr;
     }
     charts.push_back(chart);
-    return chart;
+    return chart.get();
 }
 
 /*

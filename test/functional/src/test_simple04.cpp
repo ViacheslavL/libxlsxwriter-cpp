@@ -20,13 +20,13 @@ int main() {
 
     xlsxwriter::format    *format1   = workbook->add_format();
     xlsxwriter::format    *format2   = workbook->add_format();
-    format_set_num_format_index(format1, 20);
-    format_set_num_format_index(format2, 14);
+    format1->set_num_format_index(20);
+    format2->set_num_format_index(14);
 
     worksheet->set_column(0, 0, 12, NULL);
 
-    worksheet_write_datetime(worksheet, 0, 0, &datetime1, format1);
-    worksheet_write_datetime(worksheet, 1, 0, &datetime2, format2);
+    worksheet->write_datetime(0, 0, &datetime1, format1);
+    worksheet->write_datetime(1, 0, &datetime2, format2);
 
     int result = workbook->close(); return result;
 }
