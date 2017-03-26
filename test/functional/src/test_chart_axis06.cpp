@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_axis06.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_PIE);
+    xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_PIE);
 
     uint8_t data[3][2] = {
         {2,  60},
@@ -26,7 +26,7 @@ int main() {
         for (col = 0; col < 2; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    chart_add_series(chart, 
+    chart->add_series(
          "=Sheet1!$A$1:$A$3",
          "=Sheet1!$B$1:$B$3"
     );

@@ -13,9 +13,9 @@ int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_row_col_format12.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_row_col_options options = {1, 0, 0};
+    xlsxwriter::row_col_options options = {1, 0, 0};
 
-    worksheet_set_column_opt(worksheet, 2, 2, LXW_DEF_COL_WIDTH, NULL, &options);
+    worksheet->set_column_opt(2, 2, LXW_DEF_COL_WIDTH, NULL, options);
 
     int result = workbook->close(); return result;
 }

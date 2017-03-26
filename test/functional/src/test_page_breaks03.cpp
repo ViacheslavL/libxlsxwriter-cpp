@@ -19,8 +19,8 @@ int main() {
     for (i = 0; i < 1027; i++)
         breaks[i] = i + 1;
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
     worksheet_set_h_pagebreaks(worksheet, breaks);
 

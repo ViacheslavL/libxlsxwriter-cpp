@@ -12,26 +12,26 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_simple03.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, "Data Sheet");
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet("Data Sheet");
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
 
     xlsxwriter::format *bold = workbook->add_format();
-    format_set_bold(bold);
+    bold->set_bold();
 
-    worksheet_write_string(worksheet1, CELL("A1"), "Foo" , NULL);
-    worksheet_write_number(worksheet1, CELL("A2"), 123 , NULL);
+    worksheet1->write_string(CELL("A1"), "Foo" , NULL);
+    worksheet1->write_number(CELL("A2"), 123 , NULL);
 
-    worksheet_write_string(worksheet3, CELL("B2"), "Foo" , NULL);
-    worksheet_write_string(worksheet3, CELL("B3"), "Bar", bold);
-    worksheet_write_number(worksheet3, CELL("C4"), 234 , NULL);
+    worksheet3->write_string(CELL("B2"), "Foo" , NULL);
+    worksheet3->write_string(CELL("B3"), "Bar", bold);
+    worksheet3->write_number(CELL("C4"), 234 , NULL);
 
     /* Ensure the active worksheet is overwritten, below. */
-    worksheet_activate(worksheet2);
+    worksheet2->activate();
 
-    worksheet_select(worksheet2);
-    worksheet_select(worksheet3);
-    worksheet_activate(worksheet3);
+    worksheet2->select();
+    worksheet3->select();
+    worksheet3->activate();
 
     int result = workbook->close(); return result;
 }

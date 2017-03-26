@@ -14,8 +14,8 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_repeat02.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
     worksheet_repeat_columns(worksheet, 0, 0);
 

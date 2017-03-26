@@ -15,8 +15,8 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_row_t breaks[] = {3, 7, 15, 0};
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
     worksheet_set_h_pagebreaks(worksheet, breaks);
 

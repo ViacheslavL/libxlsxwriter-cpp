@@ -12,27 +12,27 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_defined_name01.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, "Sheet 3");
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet("Sheet 3");
 
-    worksheet_set_paper(worksheet1, 9);
-    worksheet1->vertical_dpi = 200;
+    worksheet1->set_paper(9);
+    worksheet1->set_vertical_dpi(200);
 
-    worksheet_print_area(worksheet1, RANGE("A1:E6"));
-    worksheet_autofilter(worksheet1, RANGE("F1:G1"));
-    worksheet_write_string(worksheet1, CELL("G1"), "Filter", NULL);
-    worksheet_write_string(worksheet1, CELL("F1"), "Auto", NULL);
-    worksheet_fit_to_pages(worksheet1, 2, 2);
+    worksheet1->print_area(RANGE("A1:E6"));
+    worksheet1->autofilter(RANGE("F1:G1"));
+    worksheet1->write_string(CELL("G1"), "Filter", NULL);
+    worksheet1->write_string(CELL("F1"), "Auto", NULL);
+    worksheet1->fit_to_pages(2, 2);
 
-    workbook_define_name(workbook, "'Sheet 3'!Bar", "='Sheet 3'!$A$1");
-    workbook_define_name(workbook, "Abc",           "=Sheet1!$A$1");
-    workbook_define_name(workbook, "Baz",           "=0.98");
-    workbook_define_name(workbook, "Sheet1!Bar",    "=Sheet1!$A$1");
-    workbook_define_name(workbook, "Sheet2!Bar",    "=Sheet2!$A$1");
-    workbook_define_name(workbook, "Sheet2!aaa",    "=Sheet2!$A$1");
-    workbook_define_name(workbook, "_Egg",          "=Sheet1!$A$1");
-    workbook_define_name(workbook, "_Fog",          "=Sheet1!$A$1");
+    workbook->define_name("'Sheet 3'!Bar", "='Sheet 3'!$A$1");
+    workbook->define_name("Abc",           "=Sheet1!$A$1");
+    workbook->define_name("Baz",           "=0.98");
+    workbook->define_name("Sheet1!Bar",    "=Sheet1!$A$1");
+    workbook->define_name("Sheet2!Bar",    "=Sheet2!$A$1");
+    workbook->define_name("Sheet2!aaa",    "=Sheet2!$A$1");
+    workbook->define_name("_Egg",          "=Sheet1!$A$1");
+    workbook->define_name("_Fog",          "=Sheet1!$A$1");
 
     (void)worksheet2;
     (void)worksheet3;

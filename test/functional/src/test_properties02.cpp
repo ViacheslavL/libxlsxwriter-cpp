@@ -11,18 +11,14 @@
 
 int main() {
 
-    lxw_workbook       *workbook   = workbook_new("test_properties02.xlsx");
-    lxw_worksheet      *worksheet  = workbook_add_worksheet(workbook, NULL);
-    lxw_doc_properties *properties = calloc(1, sizeof(lxw_doc_properties));
+    xlsxwriter::workbook       *workbook   = new xlsxwriter::workbook("test_properties02.xlsx");
+    xlsxwriter::worksheet      *worksheet  = workbook->add_worksheet();
+    xlsxwriter::doc_properties properties = {};
 
-    properties->hyperlink_base = strdup("C:\\");
+    properties.hyperlink_base = strdup("C:\\");
 
-    workbook_set_properties(workbook, properties);
+    workbook->set_properties(properties);
 
     (void)worksheet;
-
-    free(properties->hyperlink_base);
-    free(properties);
-
     int result = workbook->close(); return result;
 }

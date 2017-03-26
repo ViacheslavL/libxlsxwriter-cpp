@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_properties03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    workbook_set_custom_property_string(workbook, "Checked by", "Adam");
+    workbook->set_custom_property_string("Checked by", "Adam");
 
     worksheet->set_column(0, 0, 70, NULL);
     worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);

@@ -14,11 +14,11 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_set_start_page01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_start_page(worksheet, 1);
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_start_page(1);
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
-    worksheet->write_string(CELL("A1"), "Foo" , NULL);
+    worksheet->write_string(CELL("A1"), "Foo");
 
     int result = workbook->close(); return result;
 }

@@ -13,19 +13,19 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_simple02.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, "Data Sheet");
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet("Data Sheet");
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
 
     xlsxwriter::format    *format     = workbook->add_format();
-    format_set_bold(format);
+    format->set_bold();
 
-    worksheet_write_string(worksheet1, 0, 0, "Foo", NULL);
-    worksheet_write_number(worksheet1, 1, 0, 123, NULL);
+    worksheet1->write_string(0, 0, "Foo");
+    worksheet1->write_number(1, 0, 123);
 
-    worksheet_write_string(worksheet3, 1, 1, "Foo", NULL);
-    worksheet_write_string(worksheet3, 2, 1, "Bar", format);
-    worksheet_write_number(worksheet3, 3, 2, 234, NULL);
+    worksheet3->write_string(1, 1, "Foo");
+    worksheet3->write_string(2, 1, "Bar", format);
+    worksheet3->write_number(3, 2, 234);
 
     (void)worksheet2; /* Unused. For testing only. */
 

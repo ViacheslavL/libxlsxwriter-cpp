@@ -17,12 +17,12 @@ int main() {
     xlsxwriter::format    *format2   = workbook->add_format();
     xlsxwriter::format    *format3   = workbook->add_format();
 
-    format1->bold = 1;
+    format1->set_bold();
 
-    format2->italic = 1;
+    format2->set_italic();
 
-    format3->bold = 1;
-    format3->italic = 1;
+    format3->set_bold();
+    format3->set_italic();
 
     worksheet->write_string(CELL("A1"), "Foo", format1);
     worksheet->write_string(CELL("A2"), "Bar", format2);

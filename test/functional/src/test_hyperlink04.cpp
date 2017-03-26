@@ -12,9 +12,9 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink04.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, "Data Sheet");
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet("Data Sheet");
 
     (void)worksheet2;
     (void)worksheet3;

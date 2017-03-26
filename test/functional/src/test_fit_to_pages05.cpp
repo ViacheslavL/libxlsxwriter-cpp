@@ -14,9 +14,9 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_fit_to_pages05.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_fit_to_pages(worksheet, 1, 0);
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->fit_to_pages(1, 0);
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

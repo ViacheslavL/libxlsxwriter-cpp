@@ -14,8 +14,7 @@
 
 namespace xlsxwriter {
 
-STATIC uint8_t _add_file_to_zip(FILE * file,
-                                const char *filename);
+uint8_t _add_file_to_zip(FILE * file, const char *filename);
 
 /*
  * Forward declarations.
@@ -461,6 +460,7 @@ uint8_t packager::_write_content_types_file()
         content_types->add_default("bmp", "image/bmp");
 
     for (const auto& worksheet : workbook->worksheets) {
+        (void)worksheet;
         lxw_snprintf(filename, LXW_FILENAME_LENGTH,
                      "/xl/worksheets/sheet%d.xml", index++);
         content_types->add_worksheet_name(filename);
@@ -509,6 +509,7 @@ uint8_t packager::_write_workbook_rels_file()
         return LXW_ERROR_CREATING_TMPFILE;
 
     for(const auto& worksheet : workbook->worksheets) {
+        (void)worksheet;
         lxw_snprintf(sheetname, LXW_FILENAME_LENGTH, "worksheets/sheet%d.xml",
                      index++);
         rels->add_document("/worksheet", sheetname);

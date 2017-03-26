@@ -15,13 +15,13 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     lxw_datetime   datetime  = {2016, 12, 12,  23, 0, 0};
 
-    workbook_set_custom_property_string  (workbook, "Checked by",     "Adam");
+    workbook->set_custom_property_string ( "Checked by",     "Adam");
     workbook_set_custom_property_datetime(workbook, "Date completed",  &datetime);
     workbook_set_custom_property_integer (workbook, "Document number", 12345);
     workbook_set_custom_property_number  (workbook, "Reference",       1.2345);
     workbook_set_custom_property_boolean (workbook, "Source",          1);
     workbook_set_custom_property_boolean (workbook, "Status",          0);
-    workbook_set_custom_property_string  (workbook, "Department",      "Finance");
+    workbook->set_custom_property_string ( "Department",      "Finance");
     workbook_set_custom_property_number  (workbook, "Group",           1.2345678901234);
 
     worksheet->set_column(0, 0, 70, NULL);

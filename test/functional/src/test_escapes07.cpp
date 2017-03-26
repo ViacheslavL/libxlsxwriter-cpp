@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_escapes07.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_url(worksheet, CELL("A1"), "http://example.com/!\"$%&'( )*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", NULL);
+    worksheet->write_url(CELL("A1"), "http://example.com/!\"$%&'( )*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
 
     int result = workbook->close(); return result;
 }

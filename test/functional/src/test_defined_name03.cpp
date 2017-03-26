@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_defined_name03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet( "sheet One");
 
-    workbook_define_name(workbook, "Sales", "='sheet One'!G1:H10");
+    workbook->define_name("Sales", "='sheet One'!G1:H10");
 
     (void)worksheet;
 

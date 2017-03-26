@@ -14,11 +14,11 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink02.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_url(worksheet, CELL("A1"),  "http://www.perl.org/", NULL);
-    worksheet_write_url(worksheet, CELL("D4"),  "http://www.perl.org/", NULL);
-    worksheet_write_url(worksheet, CELL("A8"),  "http://www.perl.org/", NULL);
-    worksheet_write_url(worksheet, CELL("B6"),  "http://www.cpan.org/", NULL);
-    worksheet_write_url(worksheet, CELL("F12"), "http://www.cpan.org/", NULL);
+    worksheet->write_url(CELL("A1"),  "http://www.perl.org/", NULL);
+    worksheet->write_url(CELL("D4"),  "http://www.perl.org/", NULL);
+    worksheet->write_url(CELL("A8"),  "http://www.perl.org/", NULL);
+    worksheet->write_url(CELL("B6"),  "http://www.cpan.org/", NULL);
+    worksheet->write_url(CELL("F12"), "http://www.cpan.org/", NULL);
 
     int result = workbook->close(); return result;
 }

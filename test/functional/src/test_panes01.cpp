@@ -12,19 +12,19 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_panes01.xlsx");
-    lxw_worksheet *worksheet01 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet02 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet03 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet04 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet05 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet06 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet07 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet08 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet09 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet10 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet11 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet12 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet13 = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::worksheet *worksheet01 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet02 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet03 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet04 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet05 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet06 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet07 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet08 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet09 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet10 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet11 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet12 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet13 = workbook->add_worksheet();
 
     worksheet_write_string(worksheet01, CELL("A1"), "Foo" , NULL);
     worksheet_write_string(worksheet02, CELL("A1"), "Foo" , NULL);

@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_str01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_LINE);
+    xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_LINE);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart->axis_id_1 = 40501632;
@@ -39,9 +39,9 @@ int main() {
 
     worksheet->write_string(CELL("A6"), "Foo" , NULL);
 
-    chart_add_series(chart, NULL, "=Sheet1!$A$1:$A$5");
-    chart_add_series(chart, NULL, "=Sheet1!$B$1:$B$5");
-    chart_add_series(chart, NULL, "=Sheet1!$C$1:$C$5");
+    chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    chart->add_series(NULL, "=Sheet1!$B$1:$B$5");
+    chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
 
     worksheet_insert_chart(worksheet, CELL("E9"), chart);
 

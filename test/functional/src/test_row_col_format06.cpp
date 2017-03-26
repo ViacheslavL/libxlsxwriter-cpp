@@ -15,10 +15,10 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format    *bold      = workbook->add_format();
-    format_set_bold(bold);
+    bold->set_bold();
 
     xlsxwriter::format    *italic    = workbook->add_format();
-    format_set_italic(italic);
+    italic->set_italic();
 
     worksheet->set_column(0, 0, 8.43, bold);
     worksheet->set_column(2, 2, 8.43, italic);

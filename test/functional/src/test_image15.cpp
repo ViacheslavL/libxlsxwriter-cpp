@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image15.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_image_options options = {.x_offset = 13, .y_offset = 2};
+    xlsxwriter::image_options options = {.x_offset = 13, .y_offset = 2};
 
     worksheet->set_row(   1,     4.5,  NULL);
     worksheet->set_row(   2,    35.25, NULL);

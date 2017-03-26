@@ -111,10 +111,6 @@ struct lxw_table_rows {
     /* Add unused struct to allow adding a semicolon */   \
     struct lxw_rb_generate_cell{int unused;}
 
-STAILQ_HEAD(lxw_merged_ranges, lxw_merged_range);
-STAILQ_HEAD(lxw_image_data, lxw_image_options);
-STAILQ_HEAD(lxw_chart_data, lxw_image_options);
-
 /**
  * @brief Options for rows and columns.
  *
@@ -128,7 +124,7 @@ STAILQ_HEAD(lxw_chart_data, lxw_image_options);
  * * `level`
  * * `collapsed`
  */
-struct lxw_row_col_options {
+struct row_col_options {
     /** Hide the row/column */
     bool hidden;
     uint8_t level;
@@ -139,7 +135,7 @@ struct lxw_col_options {
     lxw_col_t firstcol;
     lxw_col_t lastcol;
     double width;
-    format_ptr format;
+    xlsxwriter::format* format;
     uint8_t hidden;
     uint8_t level;
     uint8_t collapsed;
@@ -232,9 +228,7 @@ struct image_options {
     std::string extension;
     double x_dpi;
     double y_dpi;
-    chart_ptr chart;
-
-    STAILQ_ENTRY (lxw_image_options) list_pointers;
+    xlsxwriter::chart* chart;
 };
 
 typedef std::shared_ptr<image_options> image_options_ptr;
@@ -392,7 +386,7 @@ class workbook;
  *     int main() {
  *
  *         workbook_ptr workbook  = std::make_shared<workbook>("filename.xlsx");
- *         worksheet_ptr worksheet = workbook_add_worksheet(workbook, NULL);
+ *         worksheet_ptr worksheet = workbook->add_worksheet();
  *
  *         worksheet->write_string(0, 0, "Hello Excel", NULL);
  *
@@ -412,7 +406,7 @@ public:
      * @param row       The zero indexed row number.
      * @param col       The zero indexed column number.
      * @param number    The number to write to the cell.
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -435,7 +429,7 @@ public:
      * @ref format.h "Format" object.
      *
      * @code
-     *     std::shared_ptr<xlsxwriter::format> format = workbook.add_format();
+     *     xlsxwriter::format* format = workbook.add_format();
      *     format->set_num_format("$#,##0.00");
      *
      *     worksheet->write_number(0, 0, 1234.567, format);
@@ -446,7 +440,7 @@ public:
      */
     lxw_error write_number(lxw_row_t row,
                            lxw_col_t col, double number,
-                           const format_ptr& format);
+                           format* pformat = nullptr);
     /**
      * @brief Write a string to a worksheet cell.
      *
@@ -551,7 +545,7 @@ public:
      * @param last_row    The last row of the range.
      * @param last_col    The last col of the range.
      * @param formula     Array formula to write to cell.
-     * @param format      A pointer to a Format instance or NULL.
+     * @param pformat      A pointer to a Format instance or NULL.
      *
      * @return A #lxw_error code.
      *
@@ -589,14 +583,14 @@ public:
                                   lxw_row_t last_row,
                                   lxw_col_t last_col,
                                   const std::string& formula,
-                                  const format_ptr& format);
+                                  format* pformat = nullptr);
 
     lxw_error write_array_formula_num(lxw_row_t first_row,
                                       lxw_col_t first_col,
                                       lxw_row_t last_row,
                                       lxw_col_t last_col,
                                       const std::string& formula,
-                                      const format_ptr& format,
+                                      format* pformat,
                                       double result);
 
     /**
@@ -627,7 +621,7 @@ public:
      */
     lxw_error write_datetime(lxw_row_t row,
                                        lxw_col_t col, lxw_datetime *datetime,
-                                       format* format);
+                                       format* format = nullptr);
 
     lxw_error write_url_opt(lxw_row_t row_num,
                             lxw_col_t col_num, const std::string& url,
@@ -947,7 +941,7 @@ public:
     lxw_error set_row_opt(lxw_row_t row,
                           double height,
                           format* pformat,
-                          const lxw_row_col_options& options = {false, 0, false});
+                          const row_col_options& options = {false, 0, false});
 
     /**
      * @brief Set the properties for one or more columns of cells.
@@ -955,7 +949,7 @@ public:
      * @param first_col The zero indexed first column.
      * @param last_col  The zero indexed last column.
      * @param width     The width of the column(s).
-     * @param format    A pointer to a Format instance or NULL.
+     * @param pformat    A pointer to a Format instance or NULL.
      *
      * The `%set_column()` function can be used to change the default
      * properties of a single column or a range of columns:
@@ -1006,7 +1000,7 @@ public:
      * width of #LXW_DEF_COL_WIDTH = 8.43:
      *
      * @code
-     *     format_ptr format = workbook->add_format();
+     *     format* format = workbook->add_format();
      *     format->set_bold();
      *
      *     // Set the first column to bold.
@@ -1045,7 +1039,7 @@ public:
      */
     lxw_error set_column(lxw_col_t first_col,
                          lxw_col_t last_col,
-                         double width, const format_ptr& format);
+                         double width, format* format = nullptr);
 
      /**
       * @brief Set the properties for one or more columns of cells with options.
@@ -1053,13 +1047,13 @@ public:
       * @param first_col The zero indexed first column.
       * @param last_col  The zero indexed last column.
       * @param width     The width of the column(s).
-      * @param format    A pointer to a Format instance or NULL.
+      * @param pformat    A pointer to a Format instance or NULL.
       * @param options   Optional row parameters: hidden, level, collapsed.
       *
-      * The `%worksheet_set_column_opt()` function  is the same as
+      * The `%set_column_opt()` function  is the same as
       * `worksheet_set_column()` with an additional `options` parameter.
       *
-      * The `options` parameter is a #lxw_row_col_options struct. It has the
+      * The `options` parameter is a #row_col_options struct. It has the
       * following members but currently only the `hidden` property is supported:
       *
       * - `hidden`
@@ -1082,8 +1076,8 @@ public:
     lxw_error set_column_opt(lxw_col_t first_col,
                              lxw_col_t last_col,
                              double width,
-                             const format_ptr& format,
-                             const lxw_row_col_options& options = {false, 0, false});
+                             format* pformat,
+                             const row_col_options& options = {false, 0, false});
 
     /**
      * @brief Insert an image in a worksheet cell.
@@ -1152,7 +1146,7 @@ public:
      */
     lxw_error insert_image_opt(lxw_row_t row, lxw_col_t col,
                                const std::string& filename,
-                               const image_options_ptr& options = nullptr);
+                               image_options* options = nullptr);
     /**
      * @brief Insert a chart object into a worksheet.
      *
@@ -1188,14 +1182,14 @@ public:
      * `%insert_chart()`.
      *
      */
-    lxw_error insert_chart(lxw_row_t row, lxw_col_t col, const chart_ptr& chart);
+    lxw_error insert_chart(lxw_row_t row, lxw_col_t col, xlsxwriter::chart* chart);
 
     /**
      * @brief Insert a chart object into a worksheet, with options.
      *
      * @param row          The zero indexed row number.
      * @param col          The zero indexed column number.
-     * @param chart        A #lxw_chart object created via workbook->add_chart().
+     * @param chart        A #xlsxwriter::chart object created via workbook->add_chart().
      * @param user_options Optional chart parameters.
      *
      * @return A #lxw_error code.
@@ -1222,8 +1216,8 @@ public:
      *
      */
     lxw_error insert_chart_opt(lxw_row_t row, lxw_col_t col,
-                               const chart_ptr& chart,
-                               const image_options_ptr& user_options);
+                               xlsxwriter::chart* chart,
+                               image_options* user_options);
 
     /**
      * @brief Merge a range of cells.
@@ -1331,9 +1325,9 @@ public:
       * initially visible in a multi-sheet workbook:
       *
       * @code
-      *     worksheet_ptr worksheet1 = workbook->add_worksheet(NULL);
-      *     worksheet_ptr worksheet2 = workbook->add_worksheet(NULL);
-      *     worksheet_ptr worksheet3 = workbook->add_worksheet(NULL);
+      *     worksheet_ptr worksheet1 = workbook->add_worksheet();
+      *     worksheet_ptr worksheet2 = workbook->add_worksheet();
+      *     worksheet_ptr worksheet3 = workbook->add_worksheet();
       *
       *     worksheet3->activate();
       * @endcode
@@ -2276,7 +2270,7 @@ public:
      * The `%protect()` function protects worksheet elements from modification:
      *
      * @code
-     *     worksheet_protect(worksheet, "Some Password", options);
+     *     worksheet->protect("Some Password", options);
      * @endcode
      *
      * The `password` and lxw_protection pointer are both optional:
@@ -2331,7 +2325,7 @@ public:
      *         .delete_columns           = 1,
      *     };
      *
-     *     worksheet_protect(worksheet, NULL, &options);
+     *     worksheet->protect(NULL, &options);
      *
      * @endcode
      *
@@ -2374,6 +2368,8 @@ public:
      * 15 so the the height remains unchanged.
      */
     void set_default_row(double height, uint8_t hide_unused_rows);
+
+    void set_vertical_dpi(size_t dpi);
 
     void assemble_xml_file();
     void write_single_row();

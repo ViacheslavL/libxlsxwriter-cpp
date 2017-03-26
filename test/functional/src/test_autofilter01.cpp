@@ -77,22 +77,22 @@ int main() {
 
 
     /* Write the column headers. */
-    worksheet->write_string(0, 0, "Region", NULL);
-    worksheet->write_string(0, 1, "Item",   NULL);
-    worksheet->write_string(0, 2, "Volume" , NULL);
-    worksheet->write_string(0, 3, "Month",  NULL);
+    worksheet->write_string(0, 0, "Region");
+    worksheet->write_string(0, 1, "Item");
+    worksheet->write_string(0, 2, "Volume");
+    worksheet->write_string(0, 3, "Month");
 
 
     /* Write the row data. */
     for (i = 0; i < sizeof(data)/sizeof(struct row); i++) {
-        worksheet->write_string(i + 1, 0, data[i].region, NULL);
-        worksheet->write_string(i + 1, 1, data[i].item,   NULL);
-        worksheet->write_number(i + 1, 2, data[i].volume , NULL);
-        worksheet->write_string(i + 1, 3, data[i].month,  NULL);
+        worksheet->write_string(i + 1, 0, data[i].region);
+        worksheet->write_string(i + 1, 1, data[i].item);
+        worksheet->write_number(i + 1, 2, data[i].volume);
+        worksheet->write_string(i + 1, 3, data[i].month);
     }
     
 
-    worksheet_autofilter(worksheet, 0, 0, 50, 3);
+    worksheet->autofilter(0, 0, 50, 3);
 
 
     int result = workbook->close(); return result;

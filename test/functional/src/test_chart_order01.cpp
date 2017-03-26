@@ -11,14 +11,14 @@
 
 int main() {
 
-    lxw_workbook  *workbook   = new_workbook("test_chart_order01.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
-    lxw_chart     *chart1     = workbook_add_chart(workbook, LXW_CHART_COLUMN);
-    lxw_chart     *chart2     = workbook_add_chart(workbook, LXW_CHART_BAR);
-    lxw_chart     *chart3     = workbook_add_chart(workbook, LXW_CHART_LINE);
-    lxw_chart     *chart4     = workbook_add_chart(workbook, LXW_CHART_PIE);
+    xlsxwriter::workbook *workbook   = new_workbook("test_chart_order01.xlsx");
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
+    xlsxwriter::chart     *chart1     = workbook->add_chart( xlsxwriter::LXW_CHART_COLUMN);
+    xlsxwriter::chart     *chart2     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
+    xlsxwriter::chart     *chart3     = workbook->add_chart( xlsxwriter::LXW_CHART_LINE);
+    xlsxwriter::chart     *chart4     = workbook->add_chart( xlsxwriter::LXW_CHART_PIE);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart1->axis_id_1 = 54976896;

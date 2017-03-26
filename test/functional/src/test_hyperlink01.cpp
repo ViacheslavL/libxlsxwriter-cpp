@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_url(worksheet, CELL("A1"), "http://www.perl.org/" , NULL);
+    worksheet->write_url(CELL("A1"), "http://www.perl.org/" , NULL);
 
     int result = workbook->close(); return result;
 }

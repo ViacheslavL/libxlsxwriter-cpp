@@ -11,24 +11,24 @@
 
 int main() {
 
-    lxw_workbook  *workbook   = workbook_new("test_repeat05.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::workbook *workbook   = new xlsxwriter::workbook("test_repeat05.xlsx");
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
 
-    worksheet_set_paper(worksheet1, 9);
-    worksheet1->vertical_dpi = 200;
+    worksheet1->set_paper(9);
+    worksheet1->set_vertical_dpi(200);
 
-    worksheet_set_paper(worksheet3, 9);
-    worksheet3->vertical_dpi = 200;
+    worksheet3->set_paper(9);
+    worksheet3->set_vertical_dpi(200);
 
     (void) worksheet2;
 
-    worksheet_repeat_rows(worksheet1, 0, 0);
-    worksheet_repeat_rows(worksheet3, 2, 3);
-    worksheet_repeat_columns(worksheet3, 1, 5);
+    worksheet1->repeat_rows(0, 0);
+    worksheet3->repeat_rows(2, 3);
+    worksheet3->repeat_columns(1, 5);
 
-    worksheet_write_string(worksheet1, CELL("A1"), "Foo" , NULL);
+    worksheet1->write_string(CELL("A1"), "Foo" );
 
     int result = workbook->close(); return result;
 }

@@ -14,10 +14,10 @@ int main() {
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_properties05.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    workbook_set_custom_property_string  (workbook, "Location", "Café");
+    workbook->set_custom_property_string ( "Location", "Café");
 
-    worksheet->set_column(0, 0, 70, NULL);
-    worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties." , NULL);
+    worksheet->set_column(0, 0, 70);
+    worksheet->write_string(CELL("A1"), "Select 'Office Button -> Prepare -> Properties' to see the file properties.");
 
     int result = workbook->close(); return result;
 }

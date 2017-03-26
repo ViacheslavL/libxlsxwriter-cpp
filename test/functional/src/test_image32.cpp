@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image32.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    lxw_image_options options = {.x_offset = -100, .y_offset = -100};
+    xlsxwriter::image_options options = {.x_offset = -100, .y_offset = -100};
 
     worksheet_insert_image_opt(worksheet, CELL("B2"), "images/red.png", &options);
 

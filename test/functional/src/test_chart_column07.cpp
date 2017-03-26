@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_column07.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_COLUMN);
+    xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_COLUMN);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart->axis_id_1 = 68810240;
@@ -32,7 +32,7 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    lxw_chart_series *series1 = chart_add_series(chart, NULL, "=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)");
+    xlsxwriter::LXW_CHART_series *series1 = chart->add_series(NULL, "=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)");
 
     worksheet_insert_chart(worksheet, CELL("E9"), chart);
 
@@ -45,7 +45,7 @@ int main() {
         {5, 10, 15}
     };
 
-    lxw_chart_add_data_cache(series1->values, test_data[0], 4, 3, 0);
+    xlsxwriter::LXW_CHART_add_data_cache(series1->values, test_data[0], 4, 3, 0);
 
 
     int result = workbook->close(); return result;

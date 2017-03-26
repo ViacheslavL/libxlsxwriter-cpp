@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink15.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_write_url(worksheet, CELL("B2"), "external:subdir/blank.xlsx", NULL);
+    worksheet->write_url(CELL("B2"), "external:subdir/blank.xlsx", NULL);
 
     int result = workbook->close(); return result;
 }

@@ -15,13 +15,13 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format *unlocked = workbook->add_format();
-    format_set_unlocked(unlocked);
+    unlocked->set_unlocked();
 
     xlsxwriter::format *hidden = workbook->add_format();
-    format_set_unlocked(hidden);
-    format_set_hidden(hidden);
+    hidden->set_unlocked();
+    hidden->set_hidden();
 
-    worksheet_protect(worksheet, "password", NULL);
+    worksheet->protect("password", NULL);
 
     worksheet->write_number(CELL("A1"), 1 , NULL);
     worksheet->write_number(CELL("A2"), 2, unlocked);

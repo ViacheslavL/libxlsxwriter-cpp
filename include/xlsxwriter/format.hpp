@@ -744,8 +744,8 @@ public:
      * @code
      *     format = workbook->add_format();
      *
-     *     format_set_align(format, LXW_ALIGN_CENTER);
-     *     format_set_align(format, LXW_ALIGN_VERTICAL_CENTER);
+     *     format->set_align(LXW_ALIGN_CENTER);
+     *     format->set_align(LXW_ALIGN_VERTICAL_CENTER);
      *
      *     worksheet_set_row(0, 30);
      *     worksheet->write_string(0, 0, "Some Text", format);

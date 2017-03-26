@@ -13,8 +13,8 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_bar03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart1    = workbook_add_chart(workbook, LXW_CHART_BAR);
-    lxw_chart     *chart2    = workbook_add_chart(workbook, LXW_CHART_BAR);
+    xlsxwriter::chart     *chart1    = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
+    xlsxwriter::chart     *chart2    = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart1->axis_id_1 = 64265216;

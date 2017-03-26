@@ -15,11 +15,11 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::format *format = workbook->add_format();
 
-    format_set_align(format, LXW_ALIGN_CENTER);
+    format->set_align(xlsxwriter::LXW_ALIGN_CENTER);
 
     worksheet->write_string(CELL("A1"), "Perl Home", NULL);
 
-    worksheet_merge_range(worksheet, RANGE("C4:E5"), "http://www.perl.org/", format);
+    worksheet->merge_range(RANGE("C4:E5"), "http://www.perl.org/", format);
     worksheet_write_url_opt(worksheet, CELL("C4"), "http://www.perl.org/", format, "Perl Home", NULL);
 
 

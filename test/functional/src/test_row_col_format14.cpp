@@ -11,18 +11,18 @@
 
 int main() {
 
-    lxw_workbook  *workbook     = workbook_new("test_row_col_format14.xlsx");
-    lxw_worksheet *worksheet    = workbook_add_worksheet(workbook, NULL);
-    lxw_row_col_options options = {1, 0, 0};
+    xlsxwriter::workbook *workbook     = new xlsxwriter::workbook("test_row_col_format14.xlsx");
+    xlsxwriter::worksheet *worksheet    = workbook->add_worksheet();
+    xlsxwriter::row_col_options options = {1, 0, 0};
     xlsxwriter::format    *bold         = workbook->add_format();
 
-    format_set_bold(bold);
+    bold->set_bold();
 
     worksheet->set_column(1, 3, 5, NULL);
     worksheet->set_column(5, 5, 8, NULL);
     worksheet->set_column(7, 7, LXW_DEF_COL_WIDTH, bold);
     worksheet->set_column(9, 9, 2, NULL);
-    worksheet_set_column_opt(worksheet, 11, 11, LXW_DEF_COL_WIDTH, NULL, &options);
+    worksheet->set_column_opt(11, 11, LXW_DEF_COL_WIDTH, NULL, options);
 
     int result = workbook->close(); return result;
 }

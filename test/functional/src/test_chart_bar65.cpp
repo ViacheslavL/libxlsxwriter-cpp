@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_bar65.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_BAR);
+    xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart->axis_id_1 = 64264064;
@@ -32,9 +32,9 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col] , NULL);
 
-    lxw_chart_series *series1 = chart_add_series(chart, NULL, "=Sheet1!$A$1:$A$5");
-    lxw_chart_series *series2 = chart_add_series(chart, NULL, NULL);
-    lxw_chart_series *series3 = chart_add_series(chart, NULL, NULL);
+    xlsxwriter::LXW_CHART_series *series1 = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    xlsxwriter::LXW_CHART_series *series2 = chart->add_series(NULL, NULL);
+    xlsxwriter::LXW_CHART_series *series3 = chart->add_series(NULL, NULL);
 
     chart_series_set_values(series1, "Sheet1", 0, 0, 4, 0);
     chart_series_set_values(series2, "Sheet1", 0, 1, 4, 1);

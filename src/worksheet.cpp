@@ -2916,7 +2916,7 @@ void worksheet::assemble_xml_file()
  */
 lxw_error
 worksheet::write_number(lxw_row_t row_num,
-                       lxw_col_t col_num, double value, const format_ptr& format)
+                       lxw_col_t col_num, double value, format* pformat)
 {
     lxw_cell *cell;
     lxw_error err;
@@ -2925,7 +2925,7 @@ worksheet::write_number(lxw_row_t row_num,
     if (err)
         return err;
 
-    cell = _new_number_cell(row_num, col_num, value, format.get());
+    cell = _new_number_cell(row_num, col_num, value, pformat);
 
     _insert_cell(row_num, col_num, cell);
 
@@ -3046,7 +3046,7 @@ lxw_error worksheet::write_array_formula_num(
         lxw_row_t last_row,
         lxw_col_t last_col,
         const std::string& formula,
-        const format_ptr& format, double result)
+        format* pformat, double result)
 {
     lxw_cell *cell;
     lxw_row_t tmp_row;
@@ -3096,7 +3096,7 @@ lxw_error worksheet::write_array_formula_num(
         (*formula_copy)[formula_copy->size() - 1] = '\0';
 
     /* Create a new array formula cell object. */
-    cell = _new_array_formula_cell(first_row, first_col, formula_copy, range, format.get());
+    cell = _new_array_formula_cell(first_row, first_col, formula_copy, range, pformat);
 
     cell->formula_result = result;
 
@@ -3109,7 +3109,7 @@ lxw_error worksheet::write_array_formula_num(
                 if (tmp_row == first_row && tmp_col == first_col)
                     continue;
 
-                write_number(tmp_row, tmp_col, 0, format);
+                write_number(tmp_row, tmp_col, 0, pformat);
             }
         }
     }
@@ -3125,9 +3125,9 @@ lxw_error worksheet::write_array_formula(
                               lxw_col_t first_col,
                               lxw_row_t last_row,
                               lxw_col_t last_col,
-                              const std::string& formula, const format_ptr& format)
+                              const std::string& formula, format* pformat)
 {
-    return write_array_formula_num(first_row, first_col, last_row, last_col, formula, format, 0);
+    return write_array_formula_num(first_row, first_col, last_row, last_col, formula, pformat, 0);
 }
 
 /*
@@ -3416,8 +3416,8 @@ lxw_error worksheet::set_column_opt(
                          lxw_col_t firstcol,
                          lxw_col_t lastcol,
                          double width,
-                         const format_ptr& format,
-                         const lxw_row_col_options& user_options)
+                         format* pformat,
+                         const row_col_options& user_options)
 {
     lxw_col_options *copied_options;
     uint8_t ignore_row = true;
@@ -3438,7 +3438,7 @@ lxw_error worksheet::set_column_opt(
     /* Ensure that the cols are valid and store max and min values.
      * NOTE: The check shouldn't modify the row dimensions and should only
      *       modify the column dimensions in certain cases. */
-    if (format != NULL || (width != LXW_DEF_COL_WIDTH && hidden))
+    if (pformat != NULL || (width != LXW_DEF_COL_WIDTH && hidden))
         ignore_col = false;
 
     err = _check_dimensions(0, firstcol, ignore_row, ignore_col);
@@ -3495,7 +3495,7 @@ lxw_error worksheet::set_column_opt(
     copied_options->firstcol = firstcol;
     copied_options->lastcol = lastcol;
     copied_options->width = width;
-    copied_options->format = format;
+    copied_options->format = pformat;
     copied_options->hidden = hidden;
     copied_options->level = level;
     copied_options->collapsed = collapsed;
@@ -3504,7 +3504,7 @@ lxw_error worksheet::set_column_opt(
 
     /* Store the column formats for use when writing cell data. */
     for (col = firstcol; col <= lastcol; col++) {
-        col_formats[col] = format.get();
+        col_formats[col] = pformat;
     }
 
     /* Store the column change to allow optimizations. */
@@ -3516,15 +3516,15 @@ lxw_error worksheet::set_column_opt(
 /*
  * Set the properties of a single column or a range of columns.
  */
-lxw_error worksheet::set_column(lxw_col_t firstcol, lxw_col_t lastcol, double width, const format_ptr& format)
+lxw_error worksheet::set_column(lxw_col_t firstcol, lxw_col_t lastcol, double width, format* pformat)
 {
-    return set_column_opt(firstcol, lastcol, width, format);
+    return set_column_opt(firstcol, lastcol, width, pformat);
 }
 
 /*
  * Set the properties of a row with options.
  */
-lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, format* pformat, const lxw_row_col_options& user_options)
+lxw_error worksheet::set_row_opt( lxw_row_t row_num, double height, format* pformat, const row_col_options& user_options)
 {
 
     lxw_col_t min_col;
@@ -4274,13 +4274,18 @@ worksheet::set_default_row(double height,
     default_row_set = true;
 }
 
+void worksheet::set_vertical_dpi(size_t dpi)
+{
+    vertical_dpi = dpi;
+}
+
 /*
  * Insert an image into the worksheet.
  */
 lxw_error worksheet::insert_image_opt(
                            lxw_row_t row_num, lxw_col_t col_num,
                            const std::string& filename,
-                           const image_options_ptr& user_options)
+                           image_options* user_options)
 {
     FILE *image_stream;
     std::string short_name;
@@ -4350,7 +4355,7 @@ lxw_error worksheet::insert_image( lxw_row_t row_num, lxw_col_t col_num, const s
 /*
  * Insert an chart into the worksheet.
  */
-lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, const chart_ptr& chart, const image_options_ptr& user_options)
+lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, xlsxwriter::chart* chart, image_options* user_options)
 {
     if (!chart) {
         LXW_WARN("worksheet_insert_chart()/_opt(): chart must be non-NULL.");
@@ -4387,7 +4392,7 @@ lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, cons
     image_options_ptr options = std::make_shared<image_options>();
 
     if (user_options)
-        memcpy(options.get(), user_options.get(), sizeof(image_options));
+        memcpy(options.get(), user_options, sizeof(image_options));
 
     /* Copy other options or set defaults. */
     options->row = row_num;
@@ -4416,7 +4421,7 @@ lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, cons
 /*
  * Insert an image into the worksheet.
  */
-lxw_error worksheet::insert_chart(lxw_row_t row_num, lxw_col_t col_num, const chart_ptr& chart)
+lxw_error worksheet::insert_chart(lxw_row_t row_num, lxw_col_t col_num, xlsxwriter::chart* chart)
 {
     return insert_chart_opt(row_num, col_num, chart, NULL);
 }

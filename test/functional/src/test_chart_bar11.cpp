@@ -13,9 +13,9 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_bar11.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart1 = workbook_add_chart(workbook, LXW_CHART_BAR);
-    lxw_chart     *chart2 = workbook_add_chart(workbook, LXW_CHART_BAR);
-    lxw_chart     *chart3 = workbook_add_chart(workbook, LXW_CHART_BAR);
+    xlsxwriter::chart     *chart1 = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
+    xlsxwriter::chart     *chart2 = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
+    xlsxwriter::chart     *chart3 = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart1->axis_id_1 = 40274944;
@@ -39,9 +39,9 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    worksheet_write_url(worksheet, CELL("A7"), "http://www.perl.com/", NULL);
-    worksheet_write_url(worksheet, CELL("A8"), "http://www.perl.org/", NULL);
-    worksheet_write_url(worksheet, CELL("A9"), "http://www.perl.net/", NULL);
+    worksheet->write_url(CELL("A7"), "http://www.perl.com/", NULL);
+    worksheet->write_url(CELL("A8"), "http://www.perl.org/", NULL);
+    worksheet->write_url(CELL("A9"), "http://www.perl.net/", NULL);
 
     chart_add_series(chart1, NULL, "=Sheet1!$A$1:$A$5");
     chart_add_series(chart1, NULL, "=Sheet1!$B$1:$B$5");

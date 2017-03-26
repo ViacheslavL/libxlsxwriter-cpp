@@ -580,12 +580,12 @@ void workbook::_populate_range(const series_range_ptr& range)
  */
 void workbook::_add_chart_cache_data()
 {
-    std::vector<chart_ptr> charts;
+    std::vector<chart*> charts;
 
     for (const auto& chart : ordered_charts) {
         charts.push_back(chart);
         if (chart->combined)
-            charts.push_back(chart->combined);
+            charts.push_back(chart->combined.get());
     }
 
     for (const auto& chart : charts) {

@@ -56,23 +56,12 @@
 
 #define LXW_DEFINED_NAME_LENGTH 128
 
-/* Define the tree.h RB structs for the red-black head types. */
-RB_HEAD(lxw_worksheet_names, lxw_worksheet_name);
-
 /* Define the queue.h structs for the workbook lists. */
 STAILQ_HEAD(lxw_worksheets, lxw_worksheet);
-STAILQ_HEAD(lxw_charts, lxw_chart);
 TAILQ_HEAD(lxw_defined_names, lxw_defined_name);
 
 namespace xlsxwriter {
 
-/* Struct to represent a worksheet name/pointer pair. */
-typedef struct lxw_worksheet_name {
-    const char *name;
-    lxw_worksheet *worksheet;
-
-    RB_ENTRY (lxw_worksheet_name) tree_pointers;
-} lxw_worksheet_name;
 
 /* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
  * warnings and to avoid portability issues with the _unused attribute. */
@@ -132,7 +121,7 @@ struct doc_properties {
  * @brief Workbook options.
  *
  * Optional parameters when creating a new Workbook object via
- * workbook_new_opt().
+ * new xlsxwriter::workbook_opt().
  *
  * The following properties are supported:
  *
@@ -563,7 +552,7 @@ private:
     std::vector<worksheet_ptr> worksheets;
     std::map<std::string, worksheet_ptr> worksheet_names;
     std::vector<chart_ptr> charts;
-    std::vector<chart_ptr> ordered_charts;
+    std::vector<chart*> ordered_charts;
     std::vector<format_ptr> formats;
     std::vector<defined_name_ptr> defined_names;
     sst_ptr sst;

@@ -18,8 +18,8 @@ int main() {
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
     int result = workbook->close(); return result;
 }

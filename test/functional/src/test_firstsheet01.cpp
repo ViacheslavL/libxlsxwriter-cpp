@@ -12,29 +12,29 @@
 int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_firstsheet01.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet3 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet4 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet5 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet6 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet7 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet8 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet9 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet10 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet11 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet12 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet13 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet14 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet15 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet16 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet17 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet18 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet19 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet20 = workbook_add_worksheet(workbook, NULL);
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet3 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet4 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet5 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet6 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet7 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet8 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet9 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet10 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet11 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet12 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet13 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet14 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet15 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet16 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet17 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet18 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet19 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet20 = workbook->add_worksheet();
 
-    worksheet_set_first_sheet(worksheet8);
-    worksheet_activate(worksheet20);
+    worksheet8->set_first_sheet();
+    worksheet20->activate();
 
     /* Avoid warnings about unused variables. */
     (void)worksheet1;

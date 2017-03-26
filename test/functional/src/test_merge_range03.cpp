@@ -15,11 +15,11 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format *format = workbook->add_format();
-    format_set_align(format, LXW_ALIGN_CENTER);
+    format->set_align(xlsxwriter::LXW_ALIGN_CENTER);
 
-    worksheet_merge_range(worksheet, 1, 1, 1, 2, "Foo", format);
-    worksheet_merge_range(worksheet, 1, 3, 1, 4, "Foo", format);
-    worksheet_merge_range(worksheet, 1, 5, 1, 6, "Foo", format);
+    worksheet->merge_range(1, 1, 1, 2, "Foo", format);
+    worksheet->merge_range(1, 3, 1, 4, "Foo", format);
+    worksheet->merge_range(1, 5, 1, 6, "Foo", format);
 
     int result = workbook->close(); return result;
 }

@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format    *bold      = workbook->add_format();
-    format_set_bold(bold);
+    bold->set_bold();
 
     worksheet->set_column(2, 2, LXW_DEF_COL_WIDTH, bold);
 

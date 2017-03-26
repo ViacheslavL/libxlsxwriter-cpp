@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_sparse01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    lxw_chart     *chart     = workbook_add_chart(workbook, LXW_CHART_BAR);
+    xlsxwriter::chart     *chart     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart->axis_id_1 = 46202880;
@@ -39,12 +39,12 @@ int main() {
     worksheet->write_number(3, 2, 12, NULL);
     worksheet->write_number(4, 2, 15, NULL);
 
-    chart_add_series(chart, 
+    chart->add_series(
          "=Sheet1!$A$1:$A$5",
          "=Sheet1!$B$1:$B$5"
     );
 
-    chart_add_series(chart, 
+    chart->add_series(
          "=Sheet1!$A$1:$A$6",   /* Ranges exceeds the data. */
          "=Sheet1!$C$1:$C$6"
     );

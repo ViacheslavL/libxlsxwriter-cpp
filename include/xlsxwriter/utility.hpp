@@ -72,10 +72,10 @@ namespace xlsxwriter {
  * This is a little syntactic shortcut to help with worksheet layout.
  *
  * @code
- *     worksheet_print_area(worksheet, 0, 0, 41, 10); // A1:K42.
+ *     worksheet->print_area(0, 0, 41, 10); // A1:K42.
  *
  *     // Same as:
- *     worksheet_print_area(worksheet, RANGE("A1:K42"));
+ *     worksheet->print_area(RANGE("A1:K42"));
  * @endcode
  */
 #define RANGE(range) \

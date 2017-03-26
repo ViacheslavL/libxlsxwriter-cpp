@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint8_t row;
 
-    worksheet_set_default_row(worksheet, 15, true);
+    worksheet->set_default_row(15, true);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
     worksheet->write_string(CELL("A10"), "Bar" , NULL);

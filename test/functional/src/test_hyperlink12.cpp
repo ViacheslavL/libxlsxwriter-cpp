@@ -18,8 +18,8 @@ int main() {
     format_set_underline(format, LXW_UNDERLINE_SINGLE);
     format_set_font_color(format, LXW_COLOR_BLUE);
 
-    worksheet_write_url(worksheet, CELL("A1"), "mailto:jmcnamara@cpan.org", format);
-    worksheet_write_url(worksheet, CELL("A3"), "ftp://perl.org/", format);
+    worksheet->write_url(CELL("A1"), "mailto:jmcnamara@cpan.org", format);
+    worksheet->write_url(CELL("A3"), "ftp://perl.org/", format);
 
     int result = workbook->close(); return result;
 }

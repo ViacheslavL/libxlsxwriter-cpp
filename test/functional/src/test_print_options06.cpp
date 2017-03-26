@@ -14,11 +14,11 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_print_options06.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
-    worksheet_print_area(worksheet, RANGE("A1:G20"));
-    worksheet_repeat_rows(worksheet, 0, 0);
+    worksheet->print_area(RANGE("A1:G20"));
+    worksheet->repeat_rows( 0, 0);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

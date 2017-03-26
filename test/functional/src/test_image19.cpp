@@ -14,7 +14,7 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_image19.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_insert_image(worksheet, CELL("C2"), "images/train.jpg");
+    worksheet->insert_image(CELL("C2"), "images/train.jpg");
 
     int result = workbook->close(); return result;
 }

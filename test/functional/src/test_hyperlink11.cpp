@@ -18,7 +18,7 @@ int main() {
     format_set_underline(format, LXW_UNDERLINE_SINGLE);
     format_set_font_color(format, LXW_COLOR_BLUE);
 
-    worksheet_write_url(worksheet, CELL("A1"), "http://www.perl.org/", format);
+    worksheet->write_url(CELL("A1"), "http://www.perl.org/", format);
 
     int result = workbook->close(); return result;
 }

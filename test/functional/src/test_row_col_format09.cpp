@@ -15,14 +15,14 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format    *bold      = workbook->add_format();
-    format_set_bold(bold);
+    bold->set_bold();
 
     xlsxwriter::format    *mixed     = workbook->add_format();
     format_set_bold(mixed);
     format_set_italic(mixed);
 
     xlsxwriter::format    *italic    = workbook->add_format();
-    format_set_italic(italic);
+    italic->set_italic();
 
     /* Manually force the format index order for testing. */
     lxw_workbook_set_default_xf_indices(workbook);

@@ -24,8 +24,8 @@ int main() {
     format_set_font_color(format2, xlsxwriter::LXW_COLOR_RED);
 
 
-    worksheet_write_url(worksheet, CELL("A1"), "http://www.python.org/1", format1);
-    worksheet_write_url(worksheet, CELL("A2"), "http://www.python.org/2", format2);
+    worksheet->write_url(CELL("A1"), "http://www.python.org/1", format1);
+    worksheet->write_url(CELL("A2"), "http://www.python.org/2", format2);
 
     int result = workbook->close(); return result;
 }

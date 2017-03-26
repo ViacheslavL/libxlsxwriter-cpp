@@ -14,10 +14,10 @@ int main() {
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_print_area01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    worksheet_set_paper(worksheet, 9);
-    worksheet->vertical_dpi = 200;
+    worksheet->set_paper(9);
+    worksheet->set_vertical_dpi(200);
 
-    worksheet_print_area(worksheet, 0, 0, 0, 0);
+    worksheet->print_area(0, 0, 0, 0);
 
     worksheet->write_string(CELL("A1"), "Foo" , NULL);
 

@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::format    *bold      = workbook->add_format();
 
-    format_set_bold(bold);
+    bold->set_bold();
 
     worksheet->write_number(0, 1, 0, NULL);
     worksheet->write_number(1, 1, 0, NULL);

@@ -11,11 +11,11 @@
 
 int main() {
 
-    lxw_workbook  *workbook   = new_workbook("test_chart_bar54.xlsx");
-    lxw_worksheet *worksheet1 = workbook_add_worksheet(workbook, NULL);
-    lxw_worksheet *worksheet2 = workbook_add_worksheet(workbook, NULL);
-    lxw_chart     *chart1     = workbook_add_chart(workbook, LXW_CHART_BAR);
-    lxw_chart     *chart2     = workbook_add_chart(workbook, LXW_CHART_BAR);
+    xlsxwriter::workbook *workbook   = new_workbook("test_chart_bar54.xlsx");
+    xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet();
+    xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet();
+    xlsxwriter::chart     *chart1     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
+    xlsxwriter::chart     *chart2     = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
 
     /* For testing, copy the randomly generated axis ids in the target file. */
     chart1->axis_id_1 = 64446848;
@@ -40,12 +40,12 @@ int main() {
         }
 
 
-    lxw_chart_series *series1 = chart_add_series(chart1,
+    xlsxwriter::LXW_CHART_series *series1 = chart_add_series(chart1,
          "=Sheet1!$A$1:$A$5",
          "=Sheet1!$B$1:$B$5"
     );
 
-    lxw_chart_series *series2 = chart_add_series(chart1,
+    xlsxwriter::LXW_CHART_series *series2 = chart_add_series(chart1,
          "=Sheet1!$A$1:$A$5",
          "=Sheet1!$C$1:$C$5"
     );
@@ -53,12 +53,12 @@ int main() {
     worksheet_insert_chart(worksheet1, CELL("E9"), chart1);
 
 
-    lxw_chart_series *series3 = chart_add_series(chart2,
+    xlsxwriter::LXW_CHART_series *series3 = chart_add_series(chart2,
          "=Sheet2!$A$1:$A$5",
          "=Sheet2!$B$1:$B$5"
     );
 
-    lxw_chart_series *series4 = chart_add_series(chart2,
+    xlsxwriter::LXW_CHART_series *series4 = chart_add_series(chart2,
          "=Sheet2!$A$1:$A$5",
          "=Sheet2!$C$1:$C$5"
     );
@@ -67,14 +67,14 @@ int main() {
 
 
     /* Add cache data for testing. */
-    lxw_chart_add_data_cache(series1->categories, data[0], 5, 3, 0);
-    lxw_chart_add_data_cache(series2->categories, data[0], 5, 3, 0);
-    lxw_chart_add_data_cache(series1->values,     data[0], 5, 3, 1);
-    lxw_chart_add_data_cache(series2->values,     data[0], 5, 3, 2);
-    lxw_chart_add_data_cache(series3->categories, data[0], 5, 3, 0);
-    lxw_chart_add_data_cache(series4->categories, data[0], 5, 3, 0);
-    lxw_chart_add_data_cache(series3->values,     data[0], 5, 3, 1);
-    lxw_chart_add_data_cache(series4->values,     data[0], 5, 3, 2);
+    xlsxwriter::LXW_CHART_add_data_cache(series1->categories, data[0], 5, 3, 0);
+    xlsxwriter::LXW_CHART_add_data_cache(series2->categories, data[0], 5, 3, 0);
+    xlsxwriter::LXW_CHART_add_data_cache(series1->values,     data[0], 5, 3, 1);
+    xlsxwriter::LXW_CHART_add_data_cache(series2->values,     data[0], 5, 3, 2);
+    xlsxwriter::LXW_CHART_add_data_cache(series3->categories, data[0], 5, 3, 0);
+    xlsxwriter::LXW_CHART_add_data_cache(series4->categories, data[0], 5, 3, 0);
+    xlsxwriter::LXW_CHART_add_data_cache(series3->values,     data[0], 5, 3, 1);
+    xlsxwriter::LXW_CHART_add_data_cache(series4->values,     data[0], 5, 3, 2);
 
 
     int result = workbook->close(); return result;

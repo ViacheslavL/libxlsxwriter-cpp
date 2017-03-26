@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* URL with whitespace. */
-    worksheet_write_url(worksheet, CELL("A1"), "http://google.com/some link", NULL);
+    worksheet->write_url(CELL("A1"), "http://google.com/some link", NULL);
 
     int result = workbook->close(); return result;
 }

@@ -62,9 +62,9 @@ void void_chart_free_range(series_range *range)
  * Create a new axis object
  */
 /*
-lxw_chart_axis *lxw_axis_new()
+chart_axis *lxw_axis_new()
 {
-    lxw_chart_axis *axis = calloc(1, sizeof(struct lxw_chart_axis));
+    chart_axis *axis = calloc(1, sizeof(struct chart_axis));
     GOTO_LABEL_ON_MEM_ERROR(axis, mem_error);
 
     axis->min_value = NAN;
@@ -477,7 +477,7 @@ void chart::_write_a_lst_style()
 /*
  * Write the <a:bodyPr> element.
  */
-void chart::_write_a_body_pr(lxw_chart_title *title)
+void chart::_write_a_body_pr(chart_title *title)
 {
     xml_attribute_list attributes;
 
@@ -692,7 +692,7 @@ void chart::_write_tx_value(const std::string& name)
 /*
  * Write the <c:tx> element with a simple value such as for series names.
  */
-void chart::_write_tx_formula(lxw_chart_title *title)
+void chart::_write_tx_formula(chart_title *title)
 {
     lxw_xml_start_tag("c:tx");
 
@@ -704,7 +704,7 @@ void chart::_write_tx_formula(lxw_chart_title *title)
 /*
  * Write the <c:txPr> element.
  */
-void chart::_write_tx_pr(lxw_chart_title *title)
+void chart::_write_tx_pr(chart_title *title)
 {
     lxw_xml_start_tag("c:txPr");
 
@@ -723,7 +723,7 @@ void chart::_write_tx_pr(lxw_chart_title *title)
 /*
  * Write the <c:txPr> element for pie chart legends.
  */
-void chart::_write_tx_pr_pie(lxw_chart_title *title)
+void chart::_write_tx_pr_pie(chart_title *title)
 {
     lxw_xml_start_tag("c:txPr");
 
@@ -742,7 +742,7 @@ void chart::_write_tx_pr_pie(lxw_chart_title *title)
 /*
  * Write the <c:rich> element.
  */
-void chart::_write_rich(lxw_chart_title *title)
+void chart::_write_rich(chart_title *title)
 {
     lxw_xml_start_tag("c:rich");
 
@@ -761,7 +761,7 @@ void chart::_write_rich(lxw_chart_title *title)
 /*
  * Write the <c:tx> element.
  */
-void chart::_write_tx_rich(lxw_chart_title *title)
+void chart::_write_tx_rich(chart_title *title)
 {
     lxw_xml_start_tag("c:tx");
 
@@ -774,7 +774,7 @@ void chart::_write_tx_rich(lxw_chart_title *title)
 /*
  * Write the <c:title> element for rich strings.
  */
-void chart::_write_title_rich(lxw_chart_title *title)
+void chart::_write_title_rich(chart_title *title)
 {
     lxw_xml_start_tag("c:title");
 
@@ -790,7 +790,7 @@ void chart::_write_title_rich(lxw_chart_title *title)
 /*
  * Write the <c:title> element for a formula style title
  */
-void chart::_write_title_formula(lxw_chart_title *title)
+void chart::_write_title_formula(chart_title *title)
 {
     lxw_xml_start_tag("c:title");
 
@@ -1560,7 +1560,7 @@ void chart::_write_overlap(int overlap)
 /*
  * Write the <c:title> element.
  */
-void chart::_write_title(lxw_chart_title *title)
+void chart::_write_title(chart_title *title)
 {
     if (!title->name.empty()) {
         /* Write the c:title element. */
@@ -1901,7 +1901,7 @@ void chart::assemble_xml_file()
 /*
  * Add data to a data cache in a range object, for testing only.
  */
-int lxw_chart_add_data_cache(series_range *range, uint8_t *data,
+int chart_add_data_cache(series_range *range, uint8_t *data,
                          uint16_t rows, uint8_t cols, uint8_t col)
 {
     uint16_t i;
