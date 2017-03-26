@@ -233,7 +233,7 @@ int32_t format::get_xf_index()
     /* Look up the format in the hash table. */
     auto result = formats_hash_table->exists(format_key);
 
-    if (!result.second) {
+    if (result.second) {
         /* Format matches existing format with an index. */
         format_ptr existing_format = result.first.first;
         return existing_format->xf_index;

@@ -1045,7 +1045,7 @@ void workbook::workbook_new_opt(const workbook_options& options)
  */
 worksheet* workbook::add_worksheet(const std::string& sheetname)
 {
-    lxw_worksheet_init_data init_data = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    lxw_worksheet_init_data init_data = {};
     std::string new_name;
 
     if (!sheetname.empty()) {

@@ -551,7 +551,6 @@ public:
 /// TODO make this private
     sst_ptr sst;
 private:
-    FILE *file;
     std::vector<worksheet_ptr> worksheets;
     std::map<std::string, worksheet_ptr> worksheet_names;
     std::vector<chart_ptr> charts;
