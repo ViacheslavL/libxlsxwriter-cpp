@@ -15,7 +15,7 @@
 #include "utility.hpp"
 #include "relationships.hpp"
 #include <iostream>
-#include <strstream>
+#include <iomanip>
 
 #define LXW_STR_MAX      32767
 #define LXW_BUFFER_SIZE  4096
@@ -3308,7 +3308,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
                 case ('{'):
                 case ('}'):
                 {
-                    std::strstream ss;
+                    std::stringstream ss;
                     ss << "%" << std::hex << (int)(*url_copy)[i];
                     url_external->append(ss.str());
                     break;

@@ -12,12 +12,14 @@
  * <!-- Copyright 2014-2016, John McNamara, jmcnamara@cpan.org -->
  *
  */
-#ifndef __LXW_COMMON_H__
-#define __LXW_COMMON_H__
+#ifndef __LXW_COMMON_HPP__
+#define __LXW_COMMON_HPP__
 
 #include <time.h>
 #include "xlsxwriter/third_party/queue.h"
 #include "xlsxwriter/third_party/tree.h"
+
+#include <memory>
 
 #ifndef TESTING
 #define STATIC static
@@ -36,14 +38,6 @@ typedef uint32_t lxw_row_t;
  * The maximum column in Excel is 16,384.
  */
 typedef uint16_t lxw_col_t;
-
-/** Boolean values used in libxlsxwriter. */
-enum lxw_boolean {
-    /** False value. */
-    LXW_FALSE,
-    /** True value. */
-    LXW_TRUE
-};
 
 /**
  * @brief Error codes from libxlsxwriter functions.
@@ -108,7 +102,7 @@ typedef enum lxw_error {
  *
  * Struct to represent a date and time in Excel. See @ref working_with_dates.
  */
-typedef struct lxw_datetime {
+struct lxw_datetime {
 
     /** Year     : 1900 - 9999 */
     int year;
@@ -123,7 +117,7 @@ typedef struct lxw_datetime {
     /** Seconds  : 0 - 59.999 */
     double sec;
 
-} lxw_datetime;
+};
 
 enum lxw_custom_property_types {
     LXW_CUSTOM_NONE,
@@ -225,12 +219,6 @@ enum lxw_custom_property_types {
 #define LXW_UINT16_NETWORK(n) (n)
 #endif
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* *INDENT-ON* */
-
 /* Compilers that have a native snprintf() can use it directly. */
 #ifdef _MSC_VER
 #define LXW_HAS_SNPRINTF
@@ -296,22 +284,21 @@ typedef struct lxw_tuple {
 } lxw_tuple;
 
 /* Define custom property used in workbook.c and custom.c. */
-typedef struct lxw_custom_property {
+struct lxw_custom_property {
 
     enum lxw_custom_property_types type;
-    char *name;
+    std::string name;
 
-    union {
-        char *string;
+    struct {
+        std::string string;
         double number;
         int32_t integer;
         uint8_t boolean;
         lxw_datetime datetime;
     } u;
+};
 
-    STAILQ_ENTRY (lxw_custom_property) list_pointers;
-
-} lxw_custom_property;
+typedef std::shared_ptr<lxw_custom_property> custom_property_ptr;
 
 
 /* Declarations required for unit testing. */
@@ -319,10 +306,5 @@ typedef struct lxw_custom_property {
 
 #endif /* TESTING */
 
-/* *INDENT-OFF* */
-#ifdef __cplusplus
-}
-#endif
-/* *INDENT-ON* */
 
 #endif /* __LXW_COMMON_H__ */

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "xmlwriter.hpp"
 #include <list>
+#include <iomanip>
 
 #define LXW_AMP  "&amp;"
 #define LXW_LT   "&lt;"
@@ -111,38 +112,30 @@ void xmlwriter::lxw_xml_data_element(const std::string& tag, const std::string& 
 /*
  * Escape XML characters in attributes.
  */
-char * xmlwriter::_escape_attributes(struct xml_attribute *attribute)
+std::string xmlwriter::_escape_attributes(const std::pair<std::string, std::string>& attribute)
 {
-    char *encoded = (char *) calloc(LXW_MAX_ENCODED_ATTRIBUTE_LENGTH, 1);
-    char *p_encoded = encoded;
-    char *p_attr = attribute->value;
+    std::string encoded;
+    encoded.reserve(LXW_MAX_ENCODED_ATTRIBUTE_LENGTH);
 
-    while (*p_attr) {
-        switch (*p_attr) {
+    for (const auto& ch : attribute.second) {
+        switch (ch) {
             case '&':
-                strncat(p_encoded, LXW_AMP, sizeof(LXW_AMP) - 1);
-                p_encoded += sizeof(LXW_AMP) - 1;
+                encoded += LXW_AMP;
                 break;
             case '<':
-                strncat(p_encoded, LXW_LT, sizeof(LXW_LT) - 1);
-                p_encoded += sizeof(LXW_LT) - 1;
+                encoded += LXW_LT;
                 break;
             case '>':
-                strncat(p_encoded, LXW_GT, sizeof(LXW_GT) - 1);
-                p_encoded += sizeof(LXW_GT) - 1;
+                encoded += LXW_GT;
                 break;
             case '"':
-                strncat(p_encoded, LXW_QUOT, sizeof(LXW_QUOT) - 1);
-                p_encoded += sizeof(LXW_QUOT) - 1;
+                encoded += LXW_QUOT;
                 break;
             default:
-                *p_encoded = *p_attr;
-                p_encoded++;
+                encoded += ch;
                 break;
         }
-        p_attr++;
     }
-
     return encoded;
 }
 
@@ -153,31 +146,25 @@ char * xmlwriter::_escape_attributes(struct xml_attribute *attribute)
  */
 std::string xmlwriter::lxw_escape_data(const std::string& data)
 {
-    size_t encoded_len = (strlen(data) * 5 + 1);
+    size_t encoded_len = (data.size() * 5 + 1);
+    std::string encoded;
+    encoded.reserve(encoded_len);
 
-    char *encoded = (char *) calloc(encoded_len, 1);
-    char *p_encoded = encoded;
-
-    while (*data) {
-        switch (*data) {
+    for (const auto& ch : data) {
+        switch (ch) {
             case '&':
-                strncat(p_encoded, LXW_AMP, sizeof(LXW_AMP) - 1);
-                p_encoded += sizeof(LXW_AMP) - 1;
+                encoded += LXW_AMP;
                 break;
             case '<':
-                strncat(p_encoded, LXW_LT, sizeof(LXW_LT) - 1);
-                p_encoded += sizeof(LXW_LT) - 1;
+                encoded += LXW_LT;
                 break;
             case '>':
-                strncat(p_encoded, LXW_GT, sizeof(LXW_GT) - 1);
-                p_encoded += sizeof(LXW_GT) - 1;
+                encoded += LXW_GT;
                 break;
             default:
-                *p_encoded = *data;
-                p_encoded++;
+                encoded += ch;
                 break;
         }
-        data++;
     }
 
     return encoded;
@@ -186,16 +173,21 @@ std::string xmlwriter::lxw_escape_data(const std::string& data)
 /*
  * Escape control characters in strings with with _xHHHH_.
  */
-std::string xmlwriter::lxw_escape_control_characters(const char *string)
+std::string xmlwriter::lxw_escape_control_characters(const std::string& string)
 {
     size_t escape_len = sizeof("_xHHHH_") - 1;
-    size_t encoded_len = (strlen(string) * escape_len + 1);
+    size_t encoded_len = ((string.size()) * escape_len + 1);
 
+    std::string encoded;
+    encoded.reserve(encoded_len);
+
+    /*
     char *encoded = (char *) calloc(encoded_len, 1);
     char *p_encoded = encoded;
+    */
 
-    while (*string) {
-        switch (*string) {
+    for(char ch : string) {
+        switch (ch) {
             case '\x01':
             case '\x02':
             case '\x03':
@@ -225,15 +217,17 @@ std::string xmlwriter::lxw_escape_control_characters(const char *string)
             case '\x1D':
             case '\x1E':
             case '\x1F':
-                lxw_snprintf(p_encoded, escape_len + 1, "_x%04X_", *string);
-                p_encoded += escape_len;
+            {
+                using namespace std;
+                stringstream ss;
+                ss << "_x" << hex << uppercase << setw(4) << setfill('0') << ch << "_";
+                encoded += ss.str();
                 break;
+            }
             default:
-                *p_encoded = *string;
-                p_encoded++;
+                encoded += ch;
                 break;
         }
-        string++;
     }
 
     return encoded;
@@ -245,33 +239,30 @@ void xmlwriter::_fprint_escaped_attributes(const std::list<std::pair<std::string
     for (const auto& attribute : attributes) {
         fprintf(file, " %s=", attribute.first);
 
-        if (!strpbrk(attribute->value, "&<>\"")) {
+        if (!strpbrk(attribute.second.c_str(), "&<>\"")) {
             fprintf(file, "\"%s\"", attribute.second);
         }
         else {
-            char *encoded = _escape_attributes(attribute);
+            std::string encoded = _escape_attributes(attribute);
 
-            if (encoded) {
+            if (!encoded.empty()) {
                 fprintf(file, "\"%s\"", encoded);
-
-                free(encoded);
             }
         }
     }
 }
 
 /* Write out escaped XML data. */
-void xmlwriter::_fprint_escaped_data(const char *data)
+void xmlwriter::_fprint_escaped_data(const std::string& data)
 {
     /* Escape the data section of the XML element. */
-    if (!strpbrk(data, "&<>")) {
+    if (!strpbrk(data.c_str(), "&<>")) {
         fprintf(file, "%s", data);
     }
     else {
-        char *encoded = lxw_escape_data(data);
-        if (encoded) {
+        std::string encoded = lxw_escape_data(data);
+        if (!encoded.empty()) {
             fprintf(file, "%s", encoded);
-            free(encoded);
         }
     }
 }

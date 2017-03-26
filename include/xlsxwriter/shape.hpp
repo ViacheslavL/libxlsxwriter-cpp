@@ -1,9 +1,11 @@
 #ifndef __LXW_SHAPE_H__
 #define __LXW_SHAPE_H__
 
-#include "common.h"
+#include "common.hpp"
 #include <stdint.h>
-#include "format.h"
+#include "format.hpp"
+
+namespace xlsxwriter {
 
 enum lxw_dash_types {
     LXW_DASH_SOLID,
@@ -97,5 +99,7 @@ typedef struct lxw_shape_properties {
     struct lxw_line line;
     struct lxw_pattern pattern;
 } lxw_shape_properties;
+
+} // namespace xlsxwriter
 
 #endif

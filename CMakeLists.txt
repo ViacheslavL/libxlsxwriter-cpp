@@ -51,7 +51,7 @@ endif()
 
 # for building tests and examples
 function(add_simple_executable ex_name)
-    string(CONCAT ex_source ${ex_name} ".c")
+    string(CONCAT ex_source ${ex_name} ".cpp")
     add_executable(${ex_name} ${ex_source})
     target_link_libraries(${ex_name} xlsxwriter ${ZLIB_LIBRARIES})
 endfunction()
