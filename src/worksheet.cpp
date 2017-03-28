@@ -3214,7 +3214,6 @@ worksheet::write_url_opt(lxw_row_t row_num,
     std::string *url_string = nullptr;
     std::string *tooltip_copy = nullptr;
     lxw_error err;
-    size_t string_size;
     enum cell_types link_type = HYPERLINK_URL;
 
     if (url.empty())
@@ -3353,7 +3352,6 @@ worksheet::write_url_opt(lxw_row_t row_num,
 
         if (idx < url_copy->size()) {
             /* Add the file:/// URI to the url if non-local. */
-            string_size = sizeof("file:///") + url_copy->size();
             url_external = new std::string();
 
             *url_external = "file:///" + *url_copy;
@@ -3870,7 +3868,7 @@ worksheet::set_page_view()
  */
 void worksheet::set_paper(uint8_t paper_size)
 {
-    paper_size = paper_size;
+    this->paper_size = paper_size;
     page_setup_changed = true;
 }
 

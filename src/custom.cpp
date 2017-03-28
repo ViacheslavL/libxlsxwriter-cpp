@@ -23,8 +23,9 @@ namespace xlsxwriter {
 /*
  * Assemble and write the XML file.
  */
-custom::custom(const std::list<custom_property_ptr> &properties) :
-    custom_properties(properties)
+custom::custom(const std::list<custom_property_ptr> &properties)
+    : custom_properties(properties)
+    , pid(0)
 {
 
 }
