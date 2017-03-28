@@ -17,8 +17,7 @@
  * Calculate the hash key using the FNV function. See:
  * http://en.wikipedia.org/wiki/Fowler-Noll-Vo_hash_function
  */
-STATIC size_t
-_generate_hash_key(void *data, size_t data_len, size_t num_buckets)
+size_t _generate_hash_key(void *data, size_t data_len, size_t num_buckets)
 {
     unsigned char *p = (unsigned char*)data;
     size_t hash = 2166136261U;
@@ -219,4 +218,9 @@ lxw_hash_free(lxw_hash_table *lxw_hash)
     free(lxw_hash->order_list);
     free(lxw_hash->buckets);
     free(lxw_hash);
+}
+
+size_t generate_hash_key(const std::__cxx11::string &data)
+{
+    return _generate_hash_key((void*)data.c_str(), data.size(), INT16_MAX);
 }
