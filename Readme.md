@@ -2,4 +2,4 @@
 
 Will be available soon
 
-Sadly, currently the project cannot be built :(
+Currently the project building, but not passing tests.
