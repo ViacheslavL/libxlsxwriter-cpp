@@ -64,7 +64,7 @@ private:
     std::vector<format_ptr> xf_formats;
     std::vector<format_ptr> dxf_formats;
 
-    void _write_num_fmt(uint16_t num_fmt_id, std::string &format_code);
+    void _write_num_fmt(uint16_t num_fmt_id, char* format_code);
     void _write_num_fmts();
     void _write_font_color_rgb(int32_t rgb);
     uint8_t _has_alignment(const format_ptr &format);

@@ -25,8 +25,8 @@ namespace xlsxwriter {
 /*
  * Create a new app object.
  */
-app::app() :
-    properties(nullptr)
+app::app()
+    : properties(nullptr)
 {
 }
 
@@ -131,7 +131,7 @@ void app::_write_vt_variant(const std::string& key, const std::string& value)
 void app::_write_vt_vector_heading_pairs()
 {
     xml_attribute_list attributes = {
-        {"size", std::to_string(num_heading_pairs * 2)},
+        {"size", std::to_string(heading_pairs.size() * 2)},
         {"baseType", "variant"}
     };
 
@@ -150,7 +150,7 @@ void app::_write_vt_vector_heading_pairs()
 void app::_write_vt_vector_lpstr_named_parts()
 {
     xml_attribute_list attributes = {
-        {"size", std::to_string(num_part_names)},
+        {"size", std::to_string(part_names.size())},
         {"baseType", "lpstr"}
     };
 

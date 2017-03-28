@@ -69,6 +69,8 @@ _open_zipfile_win32(const char *filename)
  * Create a new packager object.
  */
 packager::packager(const std::string& filename, const std::string& tmpdir)
+    : chart_count(0)
+    , drawing_count(0)
 {
     this->filename = filename;
     this->tmpdir = tmpdir;

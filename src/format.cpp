@@ -28,6 +28,9 @@ format::format()
 
     xf_index = LXW_PROPERTY_UNSET;
     dxf_index = LXW_PROPERTY_UNSET;
+    memset(font_name, 0, LXW_FORMAT_FIELD_LEN);
+    memset(num_format, 0, LXW_FORMAT_FIELD_LEN);
+    memset(font_scheme, 0, LXW_FORMAT_FIELD_LEN);
 
     num_format_index = 0;
     font_index = 0;
@@ -147,7 +150,7 @@ lxw_font * format::get_font_key()
 {
     lxw_font *key = new lxw_font{};
 
-    key->font_name = font_name;
+    lxw_strcpy(key->font_name, font_name);
     key->font_size = font_size;
     key->bold = bold;
     key->italic = italic;
@@ -252,7 +255,7 @@ int32_t format::get_xf_index()
  */
 void format::set_font_name(const std::string& name)
 {
-    font_name = name;
+    lxw_strcpy(font_name, name);
 }
 
 /*
@@ -338,7 +341,7 @@ void format::set_font_shadow()
  */
 void format::set_num_format(const std::string& format)
 {
-    num_format = format;
+    lxw_strcpy(num_format, format);
 }
 
 /*
@@ -607,7 +610,7 @@ void format::set_font_charset(uint8_t value)
  */
 void format::set_font_scheme(const std::string& value)
 {
-    font_scheme = value;
+    lxw_strcpy(font_scheme, value);
 }
 
 /*

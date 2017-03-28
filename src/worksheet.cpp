@@ -941,10 +941,10 @@ void worksheet::_write_split_panes()
     }
 
     if (x_split > 0.0)
-        attributes.push_back({"xSplit", std::to_string(x_split)});
+        attributes.push_back({"xSplit", to_string(x_split)});
 
     if (y_split > 0.0)
-        attributes.push_back({"ySplit", std::to_string(y_split)});
+        attributes.push_back({"ySplit", to_string(y_split)});
 
     attributes.push_back({"topLeftCell", top_left_cell});
 
@@ -1038,10 +1038,10 @@ void worksheet::_write_sheet_view()
     /* Set the zoom level. */
     if (zoom != 100) {
         if (!page_view) {
-            attributes.push_back({"zoomScale", std::to_string(zoom)});
+            attributes.push_back({"zoomScale", to_string(zoom)});
 
             if (zoom_scale_normal)
-                attributes.push_back({"zoomScaleNormal", std::to_string(zoom)});
+                attributes.push_back({"zoomScaleNormal", to_string(zoom)});
         }
     }
 
@@ -1078,7 +1078,7 @@ worksheet::_write_sheet_views()
 void worksheet::_write_sheet_format_pr()
 {
     xml_attribute_list attributes = {
-        {"defaultRowHeight", std::to_string(default_row_height)}
+        {"defaultRowHeight", to_string(default_row_height)}
     };
 
     if (default_row_height != LXW_DEF_ROW_HEIGHT)
@@ -1146,12 +1146,12 @@ void worksheet::_write_optimized_sheet_data()
 void worksheet::_write_page_margins()
 {
     xml_attribute_list attributes = {
-        {"left", std::to_string(margin_left)},
-        {"right", std::to_string(margin_right)},
-        {"top", std::to_string(margin_top)},
-        {"bottom", std::to_string(margin_bottom)},
-        {"header", std::to_string(margin_header)},
-        {"footer", footer}
+        {"left", to_string(margin_left)},
+        {"right", to_string(margin_right)},
+        {"top", to_string(margin_top)},
+        {"bottom", to_string(margin_bottom)},
+        {"header", to_string(margin_header)},
+        {"footer", to_string(margin_footer)}
     };
     lxw_xml_empty_tag("pageMargins", attributes);
 }

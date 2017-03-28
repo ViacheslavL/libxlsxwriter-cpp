@@ -46,7 +46,7 @@ void workbook::_prepare_fonts()
             /* Look up the format in the hash table. */
             auto result = fonts.exists(key);
 
-            if (!result.second) {
+            if (result.second) {
                 /* Font has already been used. */
                 format->font_index = result.first.second;
                 format->has_font = false;
@@ -81,7 +81,7 @@ void workbook::_prepare_borders()
             /* Look up the format in the hash table. */
             auto result = borders.exists(key);
 
-            if (!result.second) {
+            if (result.second) {
                 /* Border has already been used. */
                 format->border_index = result.first.second;
                 format->has_border = false;

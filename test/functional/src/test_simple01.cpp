@@ -17,5 +17,6 @@ int main() {
     worksheet->write_string(0, 0, "Hello", NULL);
     worksheet->write_number(1, 0, 123,     NULL);
 
-    int result = workbook->close(); return result;
+    int result = workbook->close();
+    return result;
 }

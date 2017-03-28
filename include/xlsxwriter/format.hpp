@@ -327,8 +327,7 @@ enum lxw_format_borders {
  * Struct to represent the font component of a format.
  */
 struct lxw_font {
-
-    std::string font_name;
+    char font_name[LXW_FORMAT_FIELD_LEN];
     uint16_t font_size;
     uint8_t bold;
     uint8_t italic;
@@ -1113,9 +1112,9 @@ private:
     int32_t xf_index;
     int32_t dxf_index;
 
-    std::string num_format;
-    std::string font_name;
-    std::string font_scheme;
+    char num_format[LXW_FORMAT_FIELD_LEN];
+    char font_name[LXW_FORMAT_FIELD_LEN];
+    char font_scheme[LXW_FORMAT_FIELD_LEN];
     uint16_t num_format_index;
     uint16_t font_index;
     bool has_font;
@@ -1128,7 +1127,7 @@ private:
     bool font_strikeout;
     bool font_outline;
     bool font_shadow;
-    bool font_script;
+    uint8_t font_script;
     uint8_t font_family;
     bool font_charset;
     bool font_condense;

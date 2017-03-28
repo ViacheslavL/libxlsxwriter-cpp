@@ -1274,13 +1274,13 @@ void chart::_write_scaling(const std::shared_ptr<chart_axis>& axis)
     _write_orientation();
 
     if (!isnan(axis->min_value)) {
-        attributes.push_back(std::make_pair("val", std::to_string(axis->min_value)));
+        attributes.push_back(std::make_pair("val", to_string(axis->min_value)));
 
         lxw_xml_empty_tag("c:min", attributes);
         attributes.clear();
     }
     if (!isnan(axis->max_value)) {
-        attributes.push_back(std::make_pair("val", std::to_string(axis->max_value)));
+        attributes.push_back(std::make_pair("val", to_string(axis->max_value)));
         lxw_xml_empty_tag("c:max", attributes);
         attributes.clear();
     }

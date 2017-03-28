@@ -146,6 +146,8 @@ void lxw_str_tolower(std::string& str);
 
 FILE *lxw_tmpfile(const char *tmpdir);
 
+std::string to_string(double);
+
 } // namespace xlsxwriter
 
 #endif /* __LXW_UTILITY_H__ */

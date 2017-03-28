@@ -47,7 +47,7 @@ void styles::_write_style_sheet()
 /*
  * Write the <numFmt> element.
  */
-void styles::_write_num_fmt(uint16_t num_fmt_id, std::string& format_code)
+void styles::_write_num_fmt(uint16_t num_fmt_id, char* format_code)
 {
     xml_attribute_list attributes = {
         {"numFmtId", std::to_string(num_fmt_id)},
@@ -238,8 +238,8 @@ void styles::_write_font(const format_ptr& format)
 
     /* Only write the scheme element for the default font type if it
      * is a hyperlink. */
-    if ((format->font_name.empty()
-         || LXW_DEFAULT_FONT_NAME == format->font_name)
+    if ((!*format->font_name
+         || strcmp(LXW_DEFAULT_FONT_NAME, format->font_name) == 0)
         && !format->hyperlink) {
         _write_font_scheme(format->font_scheme);
     }

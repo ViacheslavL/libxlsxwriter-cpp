@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <xlsxwriter/utility.hpp>
+#include <iomanip>
 
 extern "C"
 {
@@ -57,7 +58,6 @@ const std::string& lxw_strerror(lxw_error error_num)
 void
 lxw_col_to_name(std::string& col_name, lxw_col_t col_num, uint8_t absolute)
 {
-    uint8_t pos = 0;
     size_t len;
     size_t symbols_added = 0;
 
@@ -247,7 +247,7 @@ uint32_t
 lxw_name_to_row_2(const std::string& row_str)
 {
     /* Find the : separator in the range. */
-    int result = row_str.find(':');
+    size_t result = row_str.find(':');
     if (result < row_str.size())
         return lxw_name_to_row(row_str.substr(++result));
     else
@@ -261,7 +261,7 @@ uint16_t
 lxw_name_to_col_2(const std::string& col_str)
 {
     /* Find the : separator in the range. */
-    int result = col_str.find(':');
+    size_t result = col_str.find(':');
     if (result < col_str.size())
         return lxw_name_to_col(col_str.substr(++result));
     else
@@ -368,7 +368,7 @@ lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904)
 void
 lxw_str_tolower(std::string& str)
 {
-    for (int i = 0; i < str.size(); ++i)
+    for (size_t i = 0; i < str.size(); ++i)
         str[i] = tolower(str[i]);
 }
 
@@ -435,6 +435,13 @@ lxw_tmpfile(const char *tmpdir)
     (void) tmpdir;
     return tmpfile();
 #endif
+}
+
+std::string to_string(double num)
+{
+    std::stringstream ss;
+    ss << num;
+    return ss.str();
 }
 
 

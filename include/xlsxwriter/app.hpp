@@ -40,9 +40,6 @@ private:
     std::list<std::string> part_names;
     doc_properties* properties;
 
-    uint32_t num_heading_pairs;
-    uint32_t num_part_names;
-
     void _write_titles_of_parts();
     void _write_vt_vector_heading_pairs();
     void _write_vt_variant(const std::string &key, const std::string &value);
