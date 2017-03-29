@@ -1291,7 +1291,7 @@ void worksheet::_write_row(lxw_row *row, const std::string& spans)
         attributes.push_back({"customFormat", "1"});
 
     if (height != LXW_DEF_ROW_HEIGHT)
-        attributes.push_back({"ht", std::to_string(height)});
+        attributes.push_back({"ht", to_string(height)});
 
     if (row->hidden)
         attributes.push_back({"hidden", "1"});
@@ -2246,7 +2246,7 @@ void worksheet::_write_rows()
             if (default_row_set)
                 _write_row(row, "1:1");
             else
-                _write_row(row, NULL);
+                _write_row(row, "");
         }
         else {
             /* Row and cell data. */
@@ -2281,11 +2281,11 @@ void worksheet::write_single_row()
     /* Write the cells if the row contains data. */
     if (!row->data_changed) {
         /* Row data only. No cells. */
-        _write_row(row, NULL);
+        _write_row(row, "");
     }
     else {
         /* Row and cell data. */
-        _write_row(row, NULL);
+        _write_row(row, "");
 
         for (col = dim_colmin; col <= dim_colmax; col++) {
             if (array[col]) {
@@ -3742,8 +3742,8 @@ void worksheet::set_selection(lxw_row_t first_row, lxw_col_t first_col,
 {
     lxw_row_t tmp_row;
     lxw_col_t tmp_col;
-    std::string active_cell("", LXW_MAX_CELL_RANGE_LENGTH);
-    std::string sqref("", LXW_MAX_CELL_RANGE_LENGTH);
+    std::string active_cell;
+    std::string sqref;
 
     /* Only allow selection to be set once to avoid freeing/re-creating it. */
     if (!selections.empty())

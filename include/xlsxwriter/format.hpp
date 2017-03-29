@@ -343,6 +343,8 @@ struct lxw_font {
     uint8_t font_extend;
 };
 
+typedef lxw_font* lxw_font_ptr;
+
 /*
  * Struct to represent the border component of a format.
  */
@@ -363,6 +365,8 @@ struct lxw_border {
 
 };
 
+typedef lxw_border* lxw_border_ptr;
+
 /*
  * Struct to represent the fill component of a format.
  */
@@ -373,6 +377,8 @@ struct lxw_fill {
     uint8_t pattern;
 
 };
+
+typedef lxw_fill* lxw_fill_ptr;
 
 class styles;
 class workbook;
@@ -401,7 +407,7 @@ class workbook;
  * @endcode
  *
  */
-class format : public std::enable_shared_from_this<format>{
+class format {
     friend class styles;
     friend class workbook;
 public:
@@ -1106,7 +1112,7 @@ private:
 
     FILE *file;
 
-    hash_table<std::shared_ptr<format>, std::shared_ptr<format>> *xf_format_indices;
+    hash_table<format*, format*> *xf_format_indices;
     uint16_t *num_xf_formats;
 
     int32_t xf_index;
@@ -1177,11 +1183,10 @@ private:
     bool color_indexed;
     bool font_only;
 
-    STAILQ_ENTRY (format) list_pointers;
     format *_get_format_key();
 };
 
-typedef std::shared_ptr<format> format_ptr;
+typedef format* format_ptr;
 
 } // namespace xlsxwriter
 

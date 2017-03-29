@@ -35,12 +35,12 @@ void workbook::set_default_xf_indices()
 void workbook::_prepare_fonts()
 {
 
-    hash_table<std::shared_ptr<lxw_font>, uint16_t> fonts;
+    hash_table<lxw_font_ptr, uint16_t> fonts;
     uint16_t index = 0;
 
     for (const auto& it : used_xf_formats.order_list) {
         auto format = it.first;
-        std::shared_ptr<lxw_font> key(format->get_font_key());
+        lxw_font_ptr key(format->get_font_key());
 
         if (key) {
             /* Look up the format in the hash table. */
@@ -50,6 +50,7 @@ void workbook::_prepare_fonts()
                 /* Font has already been used. */
                 format->font_index = result.first.second;
                 format->has_font = false;
+                delete key;
             }
             else {
                 /* This is a new font. */
@@ -70,12 +71,12 @@ void workbook::_prepare_fonts()
  */
 void workbook::_prepare_borders()
 {
-    hash_table<std::shared_ptr<lxw_border>, uint16_t> borders;
+    hash_table<lxw_border_ptr, uint16_t> borders;
     uint16_t index = 0;
 
     for (const auto& it : used_xf_formats.order_list) {
         auto format = it.first;
-        std::shared_ptr<lxw_border> key(format->get_border_key());
+        lxw_border_ptr key(format->get_border_key());
 
         if (key) {
             /* Look up the format in the hash table. */
@@ -85,6 +86,7 @@ void workbook::_prepare_borders()
                 /* Border has already been used. */
                 format->border_index = result.first.second;
                 format->has_border = false;
+                delete key;
             }
             else {
                 /* This is a new border. */
@@ -107,11 +109,11 @@ void workbook::_prepare_borders()
 void workbook::_prepare_fills()
 {
 
-    hash_table<std::shared_ptr<lxw_fill>, uint16_t> fills;
+    hash_table<lxw_fill_ptr, uint16_t> fills;
 
     uint16_t index = 2;
-    std::shared_ptr<lxw_fill> default_fill_1 = std::make_shared<lxw_fill>();
-    std::shared_ptr<lxw_fill> default_fill_2 = std::make_shared<lxw_fill>();
+    lxw_fill_ptr default_fill_1 = new lxw_fill();
+    lxw_fill_ptr default_fill_2 = new lxw_fill();
     uint16_t fill_index1 = 0;
     uint16_t fill_index2 = 1;
 
@@ -130,7 +132,7 @@ void workbook::_prepare_fills()
 
     for (const auto& it : used_xf_formats.order_list) {
         auto format = it.first;
-        std::shared_ptr<lxw_fill> key(format->get_fill_key());
+        lxw_fill_ptr key(format->get_fill_key());
 
         /* The following logical statements jointly take care of special */
         /* cases in relation to cell colors and patterns:                */
@@ -166,10 +168,11 @@ void workbook::_prepare_fills()
             /* Look up the format in the hash table. */
             auto result = fills.exists(key);
 
-            if (!result.second) {
+            if (result.second) {
                 /* Fill has already been used. */
                 format->fill_index = result.first.second;
                 format->has_fill = false;
+                delete key;
             }
             else {
                 /* This is a new fill. */
@@ -1022,6 +1025,15 @@ workbook::workbook(const std::string& file, const workbook_options& options) : f
     workbook_new_opt(options);
 }
 
+workbook::~workbook()
+{
+    for(auto p : used_xf_formats.order_list)
+    {
+        delete p.first;
+        delete p.second;
+    }
+}
+
 /*
  * Create a new workbook object with options.
  */
@@ -1150,14 +1162,14 @@ chart* workbook::add_chart(uint8_t type)
 format* workbook::add_format()
 {
     /* Create a new format object. */
-    format_ptr format = std::make_shared<xlsxwriter::format>();
+    format_ptr format = new xlsxwriter::format();
 
     format->xf_format_indices = &used_xf_formats;
     format->num_xf_formats = &num_xf_formats;
 
     formats.push_back(format);
 
-    return format.get();
+    return format;
 }
 
 /*

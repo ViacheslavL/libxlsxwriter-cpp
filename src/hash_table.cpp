@@ -220,7 +220,7 @@ lxw_hash_free(lxw_hash_table *lxw_hash)
     free(lxw_hash);
 }
 
-size_t generate_hash_key(const std::__cxx11::string &data)
+size_t generate_hash_key(const std::string &data)
 {
     return _generate_hash_key((void*)data.c_str(), data.size(), INT16_MAX);
 }

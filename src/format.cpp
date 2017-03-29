@@ -138,7 +138,6 @@ format* format::_get_format_key()
     /* Set pointer members to NULL since they aren't part of the comparison. */
     key->xf_format_indices = NULL;
     key->num_xf_formats = NULL;
-    key->list_pointers.stqe_next = NULL;
 
     return key;
 }
@@ -237,6 +236,7 @@ int32_t format::get_xf_index()
     auto result = formats_hash_table->exists(format_key);
 
     if (result.second) {
+        delete format_key;
         /* Format matches existing format with an index. */
         format_ptr existing_format = result.first.first;
         return existing_format->xf_index;
@@ -245,7 +245,7 @@ int32_t format::get_xf_index()
         /* New format requiring an index. */
         index = formats_hash_table->order_list.size();
         xf_index = index;
-        formats_hash_table->insert(format_key, shared_from_this());
+        formats_hash_table->insert(format_key, this);
         return index;
     }
 }

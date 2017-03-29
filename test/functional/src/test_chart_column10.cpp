@@ -19,7 +19,7 @@ int main() {
     chart->axis_id_1 = 45686144;
     chart->axis_id_2 = 45722240;
 
-    char   *data_1[5] = { "A", "B", "C", "D", "E"};
+    std::string data_1[5] = { "A", "B", "C", "D", "E"};
     uint8_t data_2[5] = {  1,   2,   3,   2,   1 };
 
     int row;

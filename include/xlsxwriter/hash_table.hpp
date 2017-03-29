@@ -53,9 +53,9 @@ typedef struct lxw_hash_element {
 size_t _generate_hash_key(void *data, size_t data_len, size_t num_buckets);
 
 template <class T>
-size_t generate_hash_key(const std::shared_ptr<T>& data)
+size_t generate_hash_key(const T* data)
 {
-    return _generate_hash_key((void*)data.get(), sizeof(T), INT16_MAX);
+    return _generate_hash_key((void*)data, sizeof(T), INT16_MAX);
 }
 size_t generate_hash_key(const std::string& data);
 

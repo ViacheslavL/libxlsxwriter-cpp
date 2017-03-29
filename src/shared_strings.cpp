@@ -16,30 +16,6 @@
 
 namespace xlsxwriter {
 
-/*
- * Forward declarations.
- */
-
-//STATIC int _element_cmp(struct sst_element *element1,
-//                        struct sst_element *element2);
-
-//LXW_RB_GENERATE_ELEMENT(sst_rb_tree, sst_element, sst_tree_pointers,
-//                        _element_cmp);
-
-///*****************************************************************************
-// *
-// * Private functions.
-// *
-// ****************************************************************************/
-
-///*
-// * Comparator for the element structure
-// */
-//STATIC int
-//_element_cmp(struct sst_element *element1, struct sst_element *element2)
-//{
-//    return strcmp(element1->string, element2->string);
-//}
 
 /*****************************************************************************
  *
@@ -177,6 +153,11 @@ sst_element *sst::get_sst_index(const std::string& string)
     string_count++;
     unique_count++;
     return element.get();
+}
+
+bool sst_element::equals(const std::shared_ptr<sst_element> &lhs, const std::shared_ptr<sst_element> &rhs)
+{
+    return lhs->string == rhs->string;
 }
 
 } // namespace xlsxwriter

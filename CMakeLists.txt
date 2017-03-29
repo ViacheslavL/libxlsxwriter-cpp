@@ -36,7 +36,7 @@ set(CMAKE_EXPORT_ALL_SYMBOLS TRUE)
 
 # set default compiler flags
 if (NOT MSVC)
-    set(tmp "-fPIC -Wall -Wextra")
+    set(tmp "-fPIC -Wall -Wextra -O0")
     if (NOT ((APPLE) AND ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang"))
         AND ("${CMAKE_BUILD_TYPE}" MATCHES "Release"))
         set(tmp "${tmp} -march=native -mtune=native")

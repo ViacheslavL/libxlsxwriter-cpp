@@ -103,11 +103,11 @@ void drawing::_write_from(lxw_drawing_coords *coords)
 
     _write_col(std::to_string(coords->col));
 
-    _write_col_off(to_string(coords->col_offset));
+    _write_col_off(std::to_string((int)coords->col_offset));
 
     _write_row(std::to_string(coords->row));
 
-    _write_row_off(to_string(coords->row_offset));
+    _write_row_off(std::to_string((int)coords->row_offset));
 
     lxw_xml_end_tag("xdr:from");
 }
@@ -120,11 +120,11 @@ void drawing::_write_to(lxw_drawing_coords *coords)
     lxw_xml_start_tag("xdr:to");
     _write_col(std::to_string(coords->col));
 
-    _write_col_off(to_string(coords->col_offset));
+    _write_col_off(std::to_string((int)coords->col_offset));
 
     _write_row(std::to_string(coords->row));
 
-    _write_row_off(to_string(coords->row_offset));
+    _write_row_off(std::to_string((int)coords->row_offset));
 
     lxw_xml_end_tag("xdr:to");
 }
@@ -135,7 +135,7 @@ void drawing::_write_to(lxw_drawing_coords *coords)
 void drawing::_write_c_nv_pr(const std::string& object_name, uint16_t index, const drawing_object_ptr& drawing_object)
 {
     char name[LXW_OBJ_NAME_LENGTH];
-    lxw_snprintf(name, LXW_OBJ_NAME_LENGTH, "%s %d", object_name, index);
+    lxw_snprintf(name, LXW_OBJ_NAME_LENGTH, "%s %d", object_name.c_str(), index);
 
     xml_attribute_list attributes = {
         {"id", std::to_string(index + 1)},

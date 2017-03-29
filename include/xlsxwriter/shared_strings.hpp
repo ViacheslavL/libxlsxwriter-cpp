@@ -44,14 +44,16 @@ struct sst_element {
     uint32_t index;
     std::string string;
 
-    STAILQ_ENTRY (sst_element) sst_order_pointers;
-    RB_ENTRY (sst_element) sst_tree_pointers;
-
-    bool operator()( const std::shared_ptr<sst_element>& lhs, const std::shared_ptr<sst_element>& rhs );
+    static bool equals( const std::shared_ptr<sst_element>& lhs, const std::shared_ptr<sst_element>& rhs );
 };
 
 typedef std::shared_ptr<sst_element> sst_element_ptr;
 
+
+struct sst_equal
+{
+    bool operator()(const sst_element_ptr& a, const sst_element_ptr& b) const { return sst_element::equals(a, b); }
+};
 
 class packager;
 inline size_t hash(const sst_element_ptr& element)
@@ -77,7 +79,7 @@ public:
 private:
 
     uint32_t unique_count;
-    std::unordered_set<sst_element_ptr> strings;
+    std::unordered_set<sst_element_ptr, std::hash<sst_element_ptr>, sst_equal> strings;
     std::vector<sst_element_ptr> order_list;
     /*
 

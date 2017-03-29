@@ -216,6 +216,7 @@ lxw_name_to_row(const std::string& row_str)
         if (isdigit(row_str[i]))
         {
             row_num = std::stoi(row_str.substr(i));
+            break;
         }
     }
 
@@ -236,6 +237,8 @@ lxw_name_to_col(const std::string& col_str)
             if (col_str[i] != '$')
                 col_num = (col_num * 26) + (col_str[i] - 'A' + 1);
         }
+        else
+            break;
     }
 
     return col_num - 1;

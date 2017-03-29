@@ -200,6 +200,7 @@ public:
      */
 
     workbook(const std::string& filename, const workbook_options &options = workbook_options());
+    ~workbook();
 
     /**
      * @brief get_worksheets
@@ -581,8 +582,8 @@ private:
     bool has_bmp;
 
     hash_table<format_ptr, format_ptr> used_xf_formats;
-    //std::unordered_set<std::shared_ptr<format>> used_xf_formats;
-    //std::vector<std::shared_ptr<format>> ordered_used_xf_formats;
+    //std::unordered_set<format_ptr> used_xf_formats;
+    //std::vector<format_ptr> ordered_used_xf_formats;
 
     /* Declarations required for unit testing. */
 //#ifdef TESTING
