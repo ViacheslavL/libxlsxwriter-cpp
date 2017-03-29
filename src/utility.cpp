@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <xlsxwriter/utility.hpp>
+#include <xlsxwriter/xmlwriter.hpp>
 #include <iomanip>
 
 extern "C"
@@ -439,9 +440,10 @@ lxw_tmpfile(const char *tmpdir)
 
 std::string to_string(double num)
 {
-    std::stringstream ss;
-    ss << num;
-    return ss.str();
+    char str[LXW_MAX_ATTRIBUTE_LENGTH];
+    memset(str, 0, LXW_MAX_ATTRIBUTE_LENGTH);
+    sprintf(str, "%.16g", num);
+    return std::string(str);
 }
 
 

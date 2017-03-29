@@ -2352,7 +2352,7 @@ void worksheet::_write_col_info(lxw_col_options *options)
     xml_attribute_list attributes = {
         {"min", std::to_string(1 + options->firstcol)},
         {"max", std::to_string(1 + options->lastcol)},
-        {"width", std::to_string(width)}
+        {"width", to_string(width)}
     };
 
     if (xf_index)
@@ -4129,7 +4129,7 @@ worksheet::fit_to_pages(uint16_t width, uint16_t height)
 void
 worksheet::set_start_page(uint16_t start_page)
 {
-    page_start = start_page;
+    this->page_start = start_page;
 }
 
 /*

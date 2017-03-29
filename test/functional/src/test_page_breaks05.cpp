@@ -13,7 +13,7 @@ int main() {
 
     xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_page_breaks05.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
-    std::vector<lxw_col_t> breaks = {1, 3, 8, 0};
+    std::vector<lxw_col_t> breaks = {1, 3, 8};
 
     worksheet->set_paper(9);
     worksheet->set_vertical_dpi(200);

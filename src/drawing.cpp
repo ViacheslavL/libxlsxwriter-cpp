@@ -103,11 +103,11 @@ void drawing::_write_from(lxw_drawing_coords *coords)
 
     _write_col(std::to_string(coords->col));
 
-    _write_col_off(std::to_string(coords->col_offset));
+    _write_col_off(to_string(coords->col_offset));
 
     _write_row(std::to_string(coords->row));
 
-    _write_row_off(std::to_string(coords->row_offset));
+    _write_row_off(to_string(coords->row_offset));
 
     lxw_xml_end_tag("xdr:from");
 }
@@ -120,11 +120,11 @@ void drawing::_write_to(lxw_drawing_coords *coords)
     lxw_xml_start_tag("xdr:to");
     _write_col(std::to_string(coords->col));
 
-    _write_col_off(std::to_string(coords->col_offset));
+    _write_col_off(to_string(coords->col_offset));
 
     _write_row(std::to_string(coords->row));
 
-    _write_row_off(std::to_string(coords->row_offset));
+    _write_row_off(to_string(coords->row_offset));
 
     lxw_xml_end_tag("xdr:to");
 }
