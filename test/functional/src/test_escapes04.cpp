@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_escapes04.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_escapes04.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_url(CELL("A1"), "http://www.perl.com/?a=1&b=2" , NULL);

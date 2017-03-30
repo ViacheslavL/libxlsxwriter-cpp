@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_hyperlink19.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_hyperlink19.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* This test requires that we check if the cell that the hyperlink refers

@@ -1166,7 +1166,7 @@ public:
      *     chart_ptr chart = workbook->add_chart(LXW_CHART_LINE);
      *
      *     // Add a data series to the chart.
-     *     chart->add_series(NULL, "=Sheet1!$A$1:$A$6");
+     *     chart->add_series("", "=Sheet1!$A$1:$A$6");
      *
      *     // Insert the chart into the worksheet
      *     worksheet->insert_chart(0, 2, chart);

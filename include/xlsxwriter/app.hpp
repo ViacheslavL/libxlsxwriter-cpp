@@ -36,7 +36,7 @@ public:
 
 private:
 
-    std::map<std::string, std::string> heading_pairs;
+    std::vector<std::pair<std::string, std::string>> heading_pairs;
     std::list<std::string> part_names;
     doc_properties* properties;
 

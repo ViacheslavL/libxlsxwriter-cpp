@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_defined_name02.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_defined_name02.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet( "sheet One");
 
     workbook->define_name("Sales", "='sheet One'!$G$1:$H$10");

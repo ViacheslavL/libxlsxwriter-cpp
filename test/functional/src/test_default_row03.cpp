@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_default_row03.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_default_row03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint8_t row;
 

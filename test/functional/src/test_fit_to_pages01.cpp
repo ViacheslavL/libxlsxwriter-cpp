@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_fit_to_pages01.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_fit_to_pages01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->fit_to_pages(1, 1);

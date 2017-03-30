@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_format12.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_format12.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format *top_left_bottom = workbook->add_format();

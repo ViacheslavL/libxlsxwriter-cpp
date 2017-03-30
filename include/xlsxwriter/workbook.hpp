@@ -52,6 +52,7 @@
 #include "common.hpp"
 
 #include <map>
+#include <set>
 #include <unordered_set>
 
 #define LXW_DEFINED_NAME_LENGTH 128
@@ -78,6 +79,23 @@ struct defined_name {
 };
 
 typedef std::shared_ptr<defined_name> defined_name_ptr;
+
+struct sort_defined_names
+{
+    bool operator ()(const defined_name_ptr& lhs, const defined_name_ptr& rhs) const
+    {
+        bool res = lhs->normalised_name < rhs->normalised_name;
+
+        /* Primary comparison based on defined name. */
+        if (res)
+            return res;
+
+        /* Secondary comparison based on worksheet name. */
+        return lhs->normalised_sheetname < rhs->normalised_sheetname;
+    }
+};
+
+
 
 /**
  * Workbook document properties.
@@ -287,9 +305,9 @@ public:
      *     chart_ptr chart = workbook->add_chart(LXW_CHART_COLUMN);
      *
      *     // Add data series to the chart.
-     *     chart->add_series(NULL, "Sheet1!$A$1:$A$5");
-     *     chart->add_series(NULL, "Sheet1!$B$1:$B$5");
-     *     chart->add_series(NULL, "Sheet1!$C$1:$C$5");
+     *     chart->add_series("", "Sheet1!$A$1:$A$5");
+     *     chart->add_series("", "Sheet1!$B$1:$B$5");
+     *     chart->add_series("", "Sheet1!$C$1:$C$5");
      *
      *     // Insert the chart into the worksheet
      *     worksheet->insert_chart(CELL("B7"), chart);
@@ -557,7 +575,7 @@ private:
     std::vector<chart_ptr> charts;
     std::vector<chart*> ordered_charts;
     std::vector<format_ptr> formats;
-    std::vector<defined_name_ptr> defined_names;
+    std::set<defined_name_ptr, sort_defined_names> defined_names;
 
     doc_properties properties;
     std::list<custom_property_ptr> custom_properties;

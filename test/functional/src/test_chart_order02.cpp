@@ -49,10 +49,10 @@ int main() {
             worksheet3->write_number(row, col, data[row][col], NULL);
         }
 
-    chart1->add_series(NULL, "=Sheet1!$A$1:$A$5");
-    chart2->add_series(NULL, "=Sheet2!$A$1:$A$5");
-    chart3->add_series(NULL, "=Sheet3!$A$1:$A$5");
-    chart4->add_series(NULL, "=Sheet1!$B$1:$B$5");
+    chart1->add_series("", "=Sheet1!$A$1:$A$5");
+    chart2->add_series("", "=Sheet2!$A$1:$A$5");
+    chart3->add_series("", "=Sheet3!$A$1:$A$5");
+    chart4->add_series("", "=Sheet1!$B$1:$B$5");
 
     worksheet1->insert_chart(CELL("E9"),  chart1);
     worksheet2->insert_chart(CELL("E9"),  chart2);

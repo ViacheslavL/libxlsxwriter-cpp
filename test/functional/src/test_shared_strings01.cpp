@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_shared_strings01.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_shared_strings01.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     uint8_t i;
     char c[] = {0x00, 0x00};

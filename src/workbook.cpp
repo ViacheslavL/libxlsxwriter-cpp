@@ -372,36 +372,42 @@ lxw_error workbook::_store_defined_name(
     else
         defined_name->formula = formula;
 
-    /* We add the defined name to the list in sorted order. */
-    if (defined_names.empty())
-        return LXW_NO_ERROR;
+    defined_names.insert(defined_name);
 
-    defined_name_ptr list_defined_name = defined_names.front();
+//    /* We add the defined name to the list in sorted order. */
+//    if (defined_names.empty()) {
+//        defined_names.push_back(defined_name);
+//        return LXW_NO_ERROR;
+//    }
 
-    if (_compare_defined_names(defined_name, list_defined_name) < 1) {
-        /* List is empty or defined name goes to the head. */
-        defined_names.insert(defined_names.begin(), defined_name);
-        return LXW_NO_ERROR;
-    }
+//    /*
+//    defined_name_ptr list_defined_name = defined_names.front();
 
-    for ( size_t i = 0; i < defined_names.size(); ++i) {
-        const auto& list_defined_name = defined_names[i];
-        int res = _compare_defined_names(defined_name, list_defined_name);
+//    if (_compare_defined_names(defined_name, list_defined_name) < 1) {
+//        /* List is empty or defined name goes to the head. */
+//        defined_names.insert(defined_names.begin(), defined_name);
+//        return LXW_NO_ERROR;
+//    }
 
-        /* The entry already exists. We exit and don't overwrite. */
-        if (res == 0)
-            return LXW_ERROR_MEMORY_MALLOC_FAILED;
+//    for ( size_t i = 0; i < defined_names.size(); ++i) {
+//        const auto& list_defined_name = defined_names[i];
+//        int res = _compare_defined_names(defined_name, list_defined_name);
 
-        /* New defined name is inserted in sorted order before other entries. */
-        if (res < 0) {
-            defined_names.insert(defined_names.begin() + i, defined_name);
-            return LXW_NO_ERROR;
-        }
-    }
+//        /* The entry already exists. We exit and don't overwrite. */
+//        if (res == 0)
+//            return LXW_ERROR_MEMORY_MALLOC_FAILED;
 
-    /* If the entry wasn't less than any of the entries in the list we add it
-     * to the end. */
-    defined_names.push_back(defined_name);
+//        /* New defined name is inserted in sorted order before other entries. */
+//        if (res < 0) {
+//            defined_names.insert(defined_names.begin() + i + 1, defined_name);
+//            return LXW_NO_ERROR;
+//        }
+//    }
+
+//    /* If the entry wasn't less than any of the entries in the list we add it
+//     * to the end. */
+//    defined_names.push_back(defined_name);
+//    */
     return LXW_NO_ERROR;
 }
 
@@ -1248,7 +1254,7 @@ lxw_error workbook::close()
  */
 lxw_error workbook::define_name(const std::string& name, const std::string& formula)
 {
-    return _store_defined_name(name, NULL, formula, -1, false);
+    return _store_defined_name(name, "", formula, -1, false);
 }
 
 /*

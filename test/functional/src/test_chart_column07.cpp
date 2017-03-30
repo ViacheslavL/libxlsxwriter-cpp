@@ -32,7 +32,7 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    xlsxwriter::chart_series *series1 = chart->add_series(NULL, "=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)");
+    xlsxwriter::chart_series *series1 = chart->add_series("", "=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)");
 
     worksheet->insert_chart(CELL("E9"), chart);
 

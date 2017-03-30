@@ -43,9 +43,9 @@
  *
  *     // In the simplest case we just add some value data series.
  *     // The NULL categories will default to 1 to 5 like in Excel.
- *     chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
- *     chart->add_series(NULL, "=Sheet1!$B$1:$B$5");
- *     chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
+ *     chart->add_series("", "=Sheet1!$A$1:$A$5");
+ *     chart->add_series("", "=Sheet1!$B$1:$B$5");
+ *     chart->add_series("", "=Sheet1!$C$1:$C$5");
  *
  *     // Insert the chart into the worksheet
  *     worksheet->insert_chart(CELL("B7"), chart);
@@ -534,7 +534,7 @@ public:
      *
      * @code
      *     // The NULL category will default to 1 to 5 like in Excel.
-     *     add_series(NULL, "Sheet1!$A$1:$A$5");
+     *     add_series("", "Sheet1!$A$1:$A$5");
      * @endcode
      *
      *  - `values`: This is the most important property of a series and is the

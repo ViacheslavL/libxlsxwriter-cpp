@@ -30,8 +30,8 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col] , NULL);
 
-    series1 = chart->add_series(NULL, "Sheet1!$A$1:$A$5");
-    series2 = chart->add_series(NULL, "Sheet1!$B$1:$B$5");
+    series1 = chart->add_series("", "Sheet1!$A$1:$A$5");
+    series2 = chart->add_series("", "Sheet1!$B$1:$B$5");
 
 
     /* Add the cached data for testing. */

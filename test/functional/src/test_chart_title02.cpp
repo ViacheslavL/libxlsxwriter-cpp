@@ -32,7 +32,7 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    chart->add_series("", "=Sheet1!$A$1:$A$5");
 
     chart->title_set_name("Title!");
 

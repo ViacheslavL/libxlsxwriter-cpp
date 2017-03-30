@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_escapes05.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_escapes05.xlsx");
     xlsxwriter::worksheet *worksheet1 = workbook->add_worksheet("Start");
     xlsxwriter::worksheet *worksheet2 = workbook->add_worksheet("A & B");
 

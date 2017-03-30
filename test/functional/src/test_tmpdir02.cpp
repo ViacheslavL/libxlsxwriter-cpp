@@ -16,7 +16,7 @@ int main() {
     options.constant_memory = true;
     options.tmpdir = ".";
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_tmpdir02.xlsx", options);
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_tmpdir02.xlsx", options);
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_string(0, 0, "Hello", NULL);

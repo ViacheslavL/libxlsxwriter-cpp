@@ -34,7 +34,7 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col], NULL);
 
-    series = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
+    series = chart->add_series("", "=Sheet1!$A$1:$A$5");
 
     series->set_name("Foo");
     chart->title_off();

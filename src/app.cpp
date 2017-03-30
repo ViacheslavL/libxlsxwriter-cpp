@@ -303,7 +303,7 @@ void app::add_part_name(const std::string& name)
  */
 void app::add_heading_pair(const std::string& key, const std::string& value)
 {
-    heading_pairs.insert(std::make_pair(key, value));
+    heading_pairs.push_back(std::make_pair(key, value));
 }
 
 } // namespace xlsxwriter

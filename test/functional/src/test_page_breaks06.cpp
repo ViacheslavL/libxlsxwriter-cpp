@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook  *workbook  = new xlsxwriter::workbook("test_page_breaks06.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_page_breaks06.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     std::vector<lxw_row_t> hbreaks = {1, 5, 8, 13};
     std::vector<lxw_col_t> vbreaks = {1, 3, 8};

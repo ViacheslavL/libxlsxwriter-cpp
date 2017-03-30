@@ -1935,6 +1935,9 @@ chart_series* chart::add_series(const std::string& categories, const std::string
     series->marker.marker_type = LXW_MARKER_NONE;
 
     if (!categories.empty()) {
+
+        series->categories = std::make_shared<series_range>();
+
         if (categories[0] == '=')
             series->categories->formula = categories.substr(1);
         else
@@ -1942,6 +1945,7 @@ chart_series* chart::add_series(const std::string& categories, const std::string
     }
 
     if (!values.empty()) {
+        series->values = std::make_shared<series_range>();
         if (values[0] == '=')
             series->values->formula = values.substr(1);
         else

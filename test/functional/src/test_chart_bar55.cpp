@@ -32,9 +32,9 @@ int main() {
         for (col = 0; col < 3; col++)
             worksheet->write_number(row, col, data[row][col] , NULL);
 
-    xlsxwriter::chart_series *series1 = chart->add_series(NULL, "=Sheet1!$A$1:$A$5");
-    xlsxwriter::chart_series *series2 = chart->add_series(NULL, "=Sheet1!$B$1:$B$5");
-    xlsxwriter::chart_series *series3 = chart->add_series(NULL, "=Sheet1!$C$1:$C$5");
+    xlsxwriter::chart_series *series1 = chart->add_series("", "=Sheet1!$A$1:$A$5");
+    xlsxwriter::chart_series *series2 = chart->add_series("", "=Sheet1!$B$1:$B$5");
+    xlsxwriter::chart_series *series3 = chart->add_series("", "=Sheet1!$C$1:$C$5");
 
     /* Add cache data for testing. */
     chart_add_data_cache(series1->values.get(), data[0], 5, 3, 0);

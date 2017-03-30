@@ -408,19 +408,17 @@ std::string lxw_quote_sheetname(const std::string& str)
     else {
         /* Add single quotes to the start and end of the string. */
         std::string quoted_name;
-        quoted_name.reserve(len + number_of_quotes + 1);
         quoted_name.push_back('\'');
 
         for (i = 0, j = 1; i < len; i++, j++) {
-            quoted_name[j] = str[i];
+            quoted_name.push_back(str[i]);
 
             /* Double quote inline single quotes. */
             if (str[i] == '\'') {
-                quoted_name[++j] = '\'';
+                quoted_name.push_back('\'');
             }
         }
-        quoted_name[j++] = '\'';
-        quoted_name[j++] = '\0';
+        quoted_name.push_back('\'');
 
         return quoted_name;
     }
