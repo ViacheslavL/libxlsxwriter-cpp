@@ -19,12 +19,12 @@ int main() {
     (void)worksheet2;
     (void)worksheet3;
 
-    worksheet1->write_url_opt(CELL("A1"),  "internal:Sheet2!A1",       NULL, NULL,        NULL);
-    worksheet1->write_url_opt(CELL("A3"),  "internal:Sheet2!A1:A5",    NULL, NULL,        NULL);
-    worksheet1->write_url_opt(CELL("A5"),  "internal:'Data Sheet'!D5", NULL, "Some text", NULL);
-    worksheet1->write_url_opt(CELL("E12"), "internal:Sheet1!J1",       NULL, NULL,        NULL);
-    worksheet1->write_url_opt(CELL("G17"), "internal:Sheet2!A1",       NULL, "Some text", NULL);
-    worksheet1->write_url_opt(CELL("A18"), "internal:Sheet2!A1",       NULL, NULL,        "Tool Tip 1");
+    worksheet1->write_url_opt(CELL("A1"),  "internal:Sheet2!A1",       NULL, "");
+    worksheet1->write_url_opt(CELL("A3"),  "internal:Sheet2!A1:A5",    NULL, "");
+    worksheet1->write_url_opt(CELL("A5"),  "internal:'Data Sheet'!D5", NULL, "Some text");
+    worksheet1->write_url_opt(CELL("E12"), "internal:Sheet1!J1",       NULL, "");
+    worksheet1->write_url_opt(CELL("G17"), "internal:Sheet2!A1",       NULL, "Some text");
+    worksheet1->write_url_opt(CELL("A18"), "internal:Sheet2!A1",       NULL, "",        "Tool Tip 1");
     worksheet1->write_url_opt(CELL("A20"), "internal:Sheet2!A1",       NULL, "More text", "Tool Tip 2");
 
     int result = workbook->close(); return result;

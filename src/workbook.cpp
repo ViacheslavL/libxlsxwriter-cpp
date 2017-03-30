@@ -249,24 +249,6 @@ void workbook::_prepare_workbook()
 }
 
 /*
- * Compare two defined_name structures.
- */
-static int
-_compare_defined_names(const defined_name_ptr& a, const defined_name_ptr& b)
-{
-    int res = strcmp(a->normalised_name.c_str(), b->normalised_name.c_str());
-
-    /* Primary comparison based on defined name. */
-    if (res)
-        return res;
-
-    /* Secondary comparison based on worksheet name. */
-    res = strcmp(a->normalised_sheetname.c_str(), b->normalised_sheetname.c_str());
-
-    return res;
-}
-
-/*
  * Process and store the defined names. The defined names are stored with
  * the Workbook.xml but also with the App.xml if they refer to a sheet
  * range like "Sheet1!:A1". The defined names are store in sorted
@@ -373,41 +355,6 @@ lxw_error workbook::_store_defined_name(
         defined_name->formula = formula;
 
     defined_names.insert(defined_name);
-
-//    /* We add the defined name to the list in sorted order. */
-//    if (defined_names.empty()) {
-//        defined_names.push_back(defined_name);
-//        return LXW_NO_ERROR;
-//    }
-
-//    /*
-//    defined_name_ptr list_defined_name = defined_names.front();
-
-//    if (_compare_defined_names(defined_name, list_defined_name) < 1) {
-//        /* List is empty or defined name goes to the head. */
-//        defined_names.insert(defined_names.begin(), defined_name);
-//        return LXW_NO_ERROR;
-//    }
-
-//    for ( size_t i = 0; i < defined_names.size(); ++i) {
-//        const auto& list_defined_name = defined_names[i];
-//        int res = _compare_defined_names(defined_name, list_defined_name);
-
-//        /* The entry already exists. We exit and don't overwrite. */
-//        if (res == 0)
-//            return LXW_ERROR_MEMORY_MALLOC_FAILED;
-
-//        /* New defined name is inserted in sorted order before other entries. */
-//        if (res < 0) {
-//            defined_names.insert(defined_names.begin() + i + 1, defined_name);
-//            return LXW_NO_ERROR;
-//        }
-//    }
-
-//    /* If the entry wasn't less than any of the entries in the list we add it
-//     * to the end. */
-//    defined_names.push_back(defined_name);
-//    */
     return LXW_NO_ERROR;
 }
 

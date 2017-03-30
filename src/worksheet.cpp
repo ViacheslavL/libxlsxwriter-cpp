@@ -2627,8 +2627,8 @@ void worksheet::_write_auto_filter()
  * Write the <hyperlink> element for external links.
  */
 void worksheet::_write_hyperlink_external(lxw_row_t row_num,
-                                    lxw_col_t col_num, const std::string& location,
-                                    const std::string& tooltip, uint16_t id)
+                                    lxw_col_t col_num, const std::string* location,
+                                    const std::string* tooltip, uint16_t id)
 {
     std::string ref;
     char r_id[LXW_MAX_ATTRIBUTE_LENGTH];
@@ -2641,11 +2641,11 @@ void worksheet::_write_hyperlink_external(lxw_row_t row_num,
     attributes.push_back({"ref", ref});
     attributes.push_back({"r:id", r_id});
 
-    if (!location.empty())
-        attributes.push_back({"location", location});
+    if (location && !location->empty())
+        attributes.push_back({"location", *location});
 
-    if (!tooltip.empty())
-        attributes.push_back({"tooltip", tooltip});
+    if (tooltip && !tooltip->empty())
+        attributes.push_back({"tooltip", *tooltip});
 
     lxw_xml_empty_tag("hyperlink", attributes);
 
@@ -2656,8 +2656,8 @@ void worksheet::_write_hyperlink_external(lxw_row_t row_num,
  * Write the <hyperlink> element for internal links.
  */
 void worksheet::_write_hyperlink_internal(lxw_row_t row_num,
-                                    lxw_col_t col_num, const std::string& location,
-                                    const std::string& display, const std::string& tooltip)
+                                    lxw_col_t col_num, const std::string* location,
+                                    const std::string* display, const std::string* tooltip)
 {
     std::string ref;
 
@@ -2667,14 +2667,14 @@ void worksheet::_write_hyperlink_internal(lxw_row_t row_num,
         {"ref", ref}
     };
 
-    if (!location.empty())
-        attributes.push_back({"location", location});
+    if (location && !location->empty())
+        attributes.push_back({"location", *location});
 
-    if (!tooltip.empty())
-        attributes.push_back({"tooltip", tooltip});
+    if (tooltip && !tooltip->empty())
+        attributes.push_back({"tooltip", *tooltip});
 
-    if (!display.empty())
-        attributes.push_back({"display", display});
+    if (display && !display->empty())
+        attributes.push_back({"display", *display});
 
     lxw_xml_empty_tag("hyperlink", attributes);
 }
@@ -2717,8 +2717,8 @@ void worksheet::_write_hyperlinks()
 
                _write_hyperlink_external(link->row_num,
                                                     link->col_num,
-                                                    *link->user_data1,
-                                                    *link->user_data2,
+                                                    link->user_data1,
+                                                    link->user_data2,
                                                     rel_count);
             }
 
@@ -2726,9 +2726,9 @@ void worksheet::_write_hyperlinks()
 
                _write_hyperlink_internal(link->row_num,
                                                     link->col_num,
-                                                    *link->u.string,
-                                                    *link->user_data1,
-                                                    *link->user_data2);
+                                                    link->u.string,
+                                                    link->user_data1,
+                                                    link->user_data2);
             }
 
         }

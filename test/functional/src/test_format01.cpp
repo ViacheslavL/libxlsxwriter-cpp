@@ -41,10 +41,10 @@ int main() {
 
 
     /* For testing. This doesn't have a string or format and should be ignored. */
-    worksheet1->write_string(0, 0, NULL, NULL);
+    worksheet1->write_string(0, 0, "", NULL);
 
     /* For testing. This doesn't have a formula and should be ignored. */
-    worksheet1->write_formula(0, 0, NULL, NULL);
+    worksheet1->write_formula(0, 0, "", NULL);
 
     int result = workbook->close(); return result;
 }

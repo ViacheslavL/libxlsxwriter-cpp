@@ -539,8 +539,8 @@ uint8_t styles::_apply_alignment(const format_ptr& format)
         || format->text_v_align != LXW_ALIGN_NONE
         || format->indent != 0
         || format->rotation != 0
-        || format->text_wrap != 0
-        || format->shrink != 0 || format->reading_order != 0;
+        || format->text_wrap
+        || format->shrink || format->reading_order != 0;
 }
 
 /*
@@ -656,7 +656,7 @@ void styles::_write_alignment(const format_ptr& format)
     if (format->reading_order == 2)
         attributes.push_back({"readingOrder", "2"});
 
-    if (attributes.empty())
+    if (!attributes.empty())
         lxw_xml_empty_tag("alignment", attributes);
 }
 

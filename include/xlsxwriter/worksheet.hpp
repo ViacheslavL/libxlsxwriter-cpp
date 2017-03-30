@@ -2535,9 +2535,9 @@ private:
     void _write_split_panes();
     void _write_selection(const std::shared_ptr<lxw_selection> &selection);
     int32_t _size_col(lxw_col_t col_num);
-    void _write_hyperlink_external(lxw_row_t row_num, lxw_col_t col_num, const std::string &location, const std::string &tooltip, uint16_t id);
+    void _write_hyperlink_external(lxw_row_t row_num, lxw_col_t col_num, const std::string* location, const std::string *tooltip, uint16_t id);
     void _write_hyperlinks();
-    void _write_hyperlink_internal(lxw_row_t row_num, lxw_col_t col_num, const std::string &location, const std::string &display, const std::string &tooltip);
+    void _write_hyperlink_internal(lxw_row_t row_num, lxw_col_t col_num, const std::string* location, const std::string *display, const std::string *tooltip);
     void _write_page_set_up_pr();
     void _write_cols();
     int32_t _size_row(lxw_row_t row_num);

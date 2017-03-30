@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     /* Test an already escaped string. */
-    worksheet->write_url_opt(CELL("A1"), "http://example.com/%5b0%5d", NULL, "http://example.com/[0]", NULL);
+    worksheet->write_url_opt(CELL("A1"), "http://example.com/%5b0%5d", NULL, "http://example.com/[0]");
 
     int result = workbook->close(); return result;
 }

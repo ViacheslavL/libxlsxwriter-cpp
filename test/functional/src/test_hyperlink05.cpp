@@ -15,7 +15,7 @@ int main() {
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_url(CELL("A1"), "http://www.perl.org/", NULL);
-    worksheet->write_url_opt(CELL("A3"), "http://www.perl.org/", NULL, "Perl home", NULL);
+    worksheet->write_url_opt(CELL("A3"), "http://www.perl.org/", NULL, "Perl home");
     worksheet->write_url_opt(CELL("A5"), "http://www.perl.org/", NULL, "Perl home", "Tool Tip");
     worksheet->write_url_opt(CELL("A7"), "http://www.cpan.org/", NULL, "CPAN",      "Download");
 

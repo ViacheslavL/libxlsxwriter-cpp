@@ -17,7 +17,7 @@ int main() {
 
     (void)worksheet2;
 
-    worksheet1->write_url_opt(CELL("A1"), "internal:'A & B'!A1", NULL, "Jump to A & B");
+    worksheet1->write_url_opt(CELL("A1"), "internal:'A & B'!A1", nullptr, "Jump to A & B");
 
     int result = workbook->close(); return result;
 }

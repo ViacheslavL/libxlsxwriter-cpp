@@ -20,7 +20,7 @@ int main() {
     worksheet->write_string(CELL("A1"), "Perl Home", NULL);
 
     worksheet->merge_range(RANGE("C4:E5"), "http://www.perl.org/", format);
-    worksheet->write_url_opt(CELL("C4"), "http://www.perl.org/", format, "Perl Home", NULL);
+    worksheet->write_url_opt(CELL("C4"), "http://www.perl.org/", format, "Perl Home");
 
 
     int result = workbook->close(); return result;
