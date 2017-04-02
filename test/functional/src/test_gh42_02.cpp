@@ -14,7 +14,7 @@ int main() {
     std::shared_ptr<xlsxwriter::workbook> workbook  = std::make_shared<xlsxwriter::workbook>("test_gh42_02.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
-    std::string string = "\0xe5\0x9b\0xbe\0x20\0xe5\0x9b\0xbe\0x00";
+    std::string string = "\xe5\x9b\xbe\x20\xe5\x9b\xbe\x00";
 
     worksheet->write_string(0, 0, string, NULL);
 

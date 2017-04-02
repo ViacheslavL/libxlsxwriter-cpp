@@ -220,7 +220,7 @@ std::string xmlwriter::lxw_escape_control_characters(const std::string& string)
             {
                 using namespace std;
                 stringstream ss;
-                ss << "_x" << hex << uppercase << setw(4) << setfill('0') << ch << "_";
+                ss << "_x" << hex<<uppercase << setw(4) << setfill('0') << (int)ch << "_";
                 encoded += ss.str();
                 break;
             }

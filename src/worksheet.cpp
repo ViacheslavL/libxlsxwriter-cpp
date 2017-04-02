@@ -3322,6 +3322,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
     }
 
     if (link_type == HYPERLINK_EXTERNAL) {
+        url_string = new std::string();
         /* External Workbook links need to be modified into the right format.
          * The URL will look something like "c:\temp\file.xlsx#Sheet!A1".
          * We need the part to the left of the # as the URL and the part to

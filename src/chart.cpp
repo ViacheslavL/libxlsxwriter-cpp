@@ -127,6 +127,8 @@ chart::chart(uint8_t type)
 
     series_overlap_1 = 100;
 
+    is_secondary = false;
+
     has_horiz_cat_axis = false;
     has_horiz_val_axis = true;
 }
@@ -2017,6 +2019,8 @@ void chart_series::set_categories(const std::string& sheetname,
                  "sheetname must be specified");
         return;
     }
+    if (!categories)
+        categories = std::make_shared<series_range>();
 
     chart::set_range(categories, sheetname, first_row, first_col, last_row, last_col);
 }
@@ -2032,6 +2036,8 @@ void chart_series::set_values(const std::string& sheetname,
         LXW_WARN("series->set_values(): sheetname must be specified");
         return;
     }
+    if (!values)
+        values = std::make_shared<series_range>();
 
     chart::set_range(values, sheetname, first_row, first_col, last_row, last_col);
 }
