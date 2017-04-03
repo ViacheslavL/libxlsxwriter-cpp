@@ -1631,7 +1631,7 @@ void worksheet::prepare_image(uint16_t image_ref_id, uint16_t drawing_id,
 
     relationship->target = filename;
 
-    drawing_links.push_front(relationship);
+    drawing_links.push_back(relationship);
 }
 
 /*
