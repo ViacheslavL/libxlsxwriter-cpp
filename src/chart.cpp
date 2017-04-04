@@ -86,6 +86,8 @@ chart::chart(uint8_t type)
 
     cross_between = 0;
 
+    series_index = 0;
+
     cat_has_num_fmt = false;
 
     x_axis = std::make_shared<chart_axis>();
