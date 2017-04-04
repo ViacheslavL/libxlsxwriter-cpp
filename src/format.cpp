@@ -98,8 +98,7 @@ format::format()
 /*
  * Check a user input color.
  */
-STATIC lxw_color_t
-_check_color(lxw_color_t color)
+lxw_color_t _check_color(lxw_color_t color)
 {
     if (color == LXW_COLOR_UNSET)
         return color;
@@ -110,8 +109,7 @@ _check_color(lxw_color_t color)
 /*
  * Check a user input border.
  */
-STATIC uint8_t
-_check_border(uint8_t border)
+uint8_t _check_border(uint8_t border)
 {
     if (border >= LXW_BORDER_THIN && border <= LXW_BORDER_SLANT_DASH_DOT)
         return border;
@@ -187,9 +185,6 @@ lxw_border * format::get_border_key()
     key->diag_color = diag_color;
 
     return key;
-
-mem_error:
-    return NULL;
 }
 
 /*
@@ -255,7 +250,7 @@ int32_t format::get_xf_index()
  */
 void format::set_font_name(const std::string& name)
 {
-    lxw_strcpy(font_name, name);
+    lxw_strcpy(font_name, name.c_str());
 }
 
 /*
@@ -341,7 +336,7 @@ void format::set_font_shadow()
  */
 void format::set_num_format(const std::string& format)
 {
-    lxw_strcpy(num_format, format);
+    lxw_strcpy(num_format, format.c_str());
 }
 
 /*
@@ -610,7 +605,7 @@ void format::set_font_charset(uint8_t value)
  */
 void format::set_font_scheme(const std::string& value)
 {
-    lxw_strcpy(font_scheme, value);
+    lxw_strcpy(font_scheme, value.c_str());
 }
 
 /*

@@ -211,7 +211,7 @@ void workbook::_prepare_num_formats()
             /* Look up the num_format in the hash table. */
             auto result = num_formats.exists(num_format);
 
-            if (!result.second) {
+            if (result.second) {
                 /* Num_Format has already been used. */
                 format->num_format_index = result.first.second;
             }
