@@ -56,10 +56,13 @@ struct sst_equal
 };
 
 class packager;
-inline size_t hash(const sst_element_ptr& element)
-{
-    return std::hash<std::string>()(element->string);
-}
+
+struct sst_hash_by_string {
+    inline size_t operator()(const sst_element_ptr& element) const
+    {
+        return std::hash<std::string>()(element->string);
+    }
+};
 
 /*
  * Struct to represent a sst.
@@ -79,7 +82,7 @@ public:
 private:
 
     uint32_t unique_count;
-    std::unordered_set<sst_element_ptr, std::hash<sst_element_ptr>, sst_equal> strings;
+    std::unordered_set<sst_element_ptr, sst_hash_by_string, sst_equal> strings;
     std::vector<sst_element_ptr> order_list;
     /*
 
