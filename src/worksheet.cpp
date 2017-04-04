@@ -3348,7 +3348,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
 
         /* Look for Windows style "C:/" link or Windows share "\\" link. */
         idx  = url_copy->find(':');
-        if (idx == url_copy->size())
+        if (!(idx < url_copy->size()))
             idx = url_copy->find("\\\\");
 
         if (idx < url_copy->size()) {
@@ -3361,13 +3361,11 @@ worksheet::write_url_opt(lxw_row_t row_num,
 
         /* Convert a ./dir/file.xlsx link to dir/file.xlsx. */
         idx = url_copy->find(".\\");
-        if (idx < url_copy->size())
+        if (idx == 0)
             *url_copy = url_copy->substr(2);
 
         if (url_external) {
             url_copy = url_external;
-
-            delete url_external;
             url_external = NULL;
         }
 
