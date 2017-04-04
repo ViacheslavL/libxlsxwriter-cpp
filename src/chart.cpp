@@ -2264,7 +2264,7 @@ void chart_bar::write_chart_type(bool primary_axes)
     {
         writable_series = _get_secondary_axes_series();
     }
-    if (series_list.empty())
+    if (writable_series.empty())
         return;
 
     lxw_xml_start_tag("c:barChart");
