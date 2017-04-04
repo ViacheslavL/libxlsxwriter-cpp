@@ -82,6 +82,7 @@ mem_error:
  */
 chart::chart(uint8_t type)
 {
+    id = 0;
 
     x_axis = std::make_shared<chart_axis>();
 
@@ -125,9 +126,15 @@ chart::chart(uint8_t type)
     x2_axis->position = LXW_CHART_TOP;
     y2_axis->position = LXW_CHART_RIGHT;
 
+    axis_id_1 = 0;
+    axis_id_2 = 0;
+    axis_id_3 = 0;
+    axis_id_4 = 0;
+
     series_overlap_1 = 100;
 
     is_secondary = false;
+    in_use = false;
 
     has_horiz_cat_axis = false;
     has_horiz_val_axis = true;
@@ -146,7 +153,7 @@ chart::~chart()
 void chart::_add_axis_ids(bool primary)
 {
     uint32_t chart_id = 50010000 + id;
-    uint32_t axis_count = 1 + (axis_id_1 > 0) + (axis_id_2 > 0) + (axis_id_3 > 0) + (axis_id_4 > 0);
+    uint32_t axis_count = 1 + (axis_id_1 > 0 ? 1 : 0) + (axis_id_2 > 0 ? 1 : 0) + (axis_id_3 > 0 ? 1 : 0) + (axis_id_4 > 0 ? 1 : 0);
 
     uint32_t id_1 = chart_id + axis_count;
     uint32_t id_2 = id_1 + 1;
@@ -2010,6 +2017,12 @@ void chart_series::set_name_range(const std::string& sheetname,
 /*
  * Set the categories range for a series.
  */
+chart_series::chart_series()
+{
+    categories = std::make_shared<series_range>();
+    values = std::make_shared<series_range>();
+}
+
 void chart_series::set_categories(const std::string& sheetname,
                             lxw_row_t first_row, lxw_col_t first_col,
                             lxw_row_t last_row, lxw_col_t last_col)
@@ -2019,8 +2032,6 @@ void chart_series::set_categories(const std::string& sheetname,
                  "sheetname must be specified");
         return;
     }
-    if (!categories)
-        categories = std::make_shared<series_range>();
 
     chart::set_range(categories, sheetname, first_row, first_col, last_row, last_col);
 }
@@ -2036,8 +2047,6 @@ void chart_series::set_values(const std::string& sheetname,
         LXW_WARN("series->set_values(): sheetname must be specified");
         return;
     }
-    if (!values)
-        values = std::make_shared<series_range>();
 
     chart::set_range(values, sheetname, first_row, first_col, last_row, last_col);
 }
@@ -2047,7 +2056,7 @@ void chart_series::set_values(const std::string& sheetname,
  */
 chart_axis::chart_axis()
 {
-
+    title.range = std::make_shared<series_range>();
 }
 
 void chart_axis::set_name(const std::string& name)

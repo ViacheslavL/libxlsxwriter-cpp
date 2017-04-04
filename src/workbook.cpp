@@ -302,7 +302,7 @@ lxw_error workbook::_store_defined_name(
          * and map it to a sheet index. */
 
         /* Split the into the worksheet name and defined name. */
-        worksheet_name = name_copy;
+        worksheet_name = name_copy.substr(0, idx);
 
         /* Remove any worksheet quoting. */
         if (worksheet_name[0] == '\'')

@@ -280,14 +280,14 @@ uint8_t packager::_write_app_file()
 {
     std::shared_ptr<xlsxwriter::app> app = std::make_shared<xlsxwriter::app>();
     uint16_t named_range_count = 0;
-    char number[LXW_ATTR_32] = { 0 };
+    std::string number;
     int err;
 
     app->file = lxw_tmpfile(tmpdir.c_str());
     if (!app->file)
         return LXW_ERROR_CREATING_TMPFILE;
 
-    lxw_snprintf(number, LXW_ATTR_32, "%d", workbook->num_sheets);
+    number = std::to_string( workbook->num_sheets);
 
     app->add_heading_pair("Worksheets", number);
 
@@ -309,7 +309,7 @@ uint8_t packager::_write_app_file()
 
     /* Add the Named Range heading pairs. */
     if (named_range_count) {
-        lxw_snprintf(number, LXW_ATTR_32, "%d", named_range_count);
+        number = std::to_string(named_range_count);
         app->add_heading_pair("Named Ranges", number);
     }
 

@@ -264,6 +264,8 @@ struct chart_series {
     friend class worksheet;
 public:
 
+    chart_series();
+
     /**
      * @brief Set a series "categories" range using row and column values.
      *
