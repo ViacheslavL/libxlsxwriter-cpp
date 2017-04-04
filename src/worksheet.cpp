@@ -3289,19 +3289,19 @@ worksheet::write_url_opt(lxw_row_t row_num,
         if (not_escaped) {
             url_external = new std::string();
 
-            for (size_t i = 0; i <= url_copy->size(); i++) {
+            for (size_t i = 0; i < url_copy->size(); i++) {
                 switch ((*url_copy)[i]) {
-                case (' '):
-                case ('"'):
-                case ('%'):
-                case ('<'):
-                case ('>'):
-                case ('['):
-                case (']'):
-                case ('`'):
-                case ('^'):
-                case ('{'):
-                case ('}'):
+                case ' ':
+                case '"':
+                case '%':
+                case '<':
+                case '>':
+                case '[':
+                case ']':
+                case '`':
+                case '^':
+                case '{':
+                case '}':
                 {
                     std::stringstream ss;
                     ss << "%" << std::hex << (int)(*url_copy)[i];
