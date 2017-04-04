@@ -84,6 +84,10 @@ chart::chart(uint8_t type)
 {
     id = 0;
 
+    cross_between = 0;
+
+    cat_has_num_fmt = false;
+
     x_axis = std::make_shared<chart_axis>();
 
     y_axis = std::make_shared<chart_axis>();
@@ -91,8 +95,6 @@ chart::chart(uint8_t type)
     x2_axis = std::make_shared<chart_axis>();
 
     y2_axis = std::make_shared<chart_axis>();
-
-    title.range = std::make_shared<series_range>();
 
     this->type = type;
     style_id = 2;
@@ -126,12 +128,15 @@ chart::chart(uint8_t type)
     x2_axis->position = LXW_CHART_TOP;
     y2_axis->position = LXW_CHART_RIGHT;
 
+    grouping =
+
     axis_id_1 = 0;
     axis_id_2 = 0;
     axis_id_3 = 0;
     axis_id_4 = 0;
 
     series_overlap_1 = 100;
+    has_overlap = false;
 
     is_secondary = false;
     in_use = false;
@@ -155,8 +160,8 @@ void chart::_add_axis_ids(bool primary)
     uint32_t chart_id = 50010000 + id;
     uint32_t axis_count = 1 + (axis_id_1 > 0 ? 1 : 0) + (axis_id_2 > 0 ? 1 : 0) + (axis_id_3 > 0 ? 1 : 0) + (axis_id_4 > 0 ? 1 : 0);
 
-    uint32_t id_1 = chart_id + axis_count;
-    uint32_t id_2 = id_1 + 1;
+    uint32_t id_1 = axis_id_1 > 0 ? axis_id_1 : chart_id + axis_count;
+    uint32_t id_2 = axis_id_2 > 0 ? axis_id_2 : id_1 + 1;
 
     if (primary)
     {
@@ -2056,6 +2061,8 @@ void chart_series::set_values(const std::string& sheetname,
  */
 chart_axis::chart_axis()
 {
+    min_value = NAN;
+    max_value = NAN;
     title.range = std::make_shared<series_range>();
 }
 
@@ -2684,6 +2691,17 @@ void chart_doughtnut::write_chart_type(bool primary_axes)
 void chart_doughtnut::_initialize()
 {
     has_markers = false;
+}
+
+chart_title::chart_title() : off(false), is_horizontal(false), ignore_cache(false) {
+    range = std::make_shared<series_range>();
+}
+
+series_range::series_range()
+{
+    has_string_cache = false;
+    ignore_cache = false;
+    num_data_points = 0;
 }
 
 } //namespace xlsxwriter

@@ -204,13 +204,14 @@ struct series_data_point {
 };
 
 struct series_range {
+    series_range();
     std::string formula;
     std::string sheetname;
     lxw_row_t first_row;
     lxw_row_t last_row;
     lxw_col_t first_col;
     lxw_col_t last_col;
-    uint8_t ignore_cache;
+    bool ignore_cache;
 
     bool has_string_cache;
     uint16_t num_data_points;
@@ -227,11 +228,13 @@ struct chart_font {
 
 struct chart_title {
 
+    chart_title();
+
     std::string name;
     lxw_row_t row;
     lxw_col_t col;
     chart_font font;
-    uint8_t off;
+    bool off;
     bool is_horizontal;
     bool ignore_cache;
 
@@ -730,7 +733,7 @@ protected:
 
     bool in_use;
     bool is_scatter;
-    uint8_t cat_has_num_fmt;
+    bool cat_has_num_fmt;
 
     uint8_t has_horiz_cat_axis;
     uint8_t has_horiz_val_axis;
