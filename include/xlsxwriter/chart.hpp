@@ -857,7 +857,6 @@ protected:
     void _write_print_settings();
     void _write_chart();
     void _write_bar_dir(const std::string &type);
-    void _initialize(uint8_t type);
 };
 
 typedef std::shared_ptr<chart> chart_ptr;

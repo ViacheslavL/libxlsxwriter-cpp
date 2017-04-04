@@ -95,7 +95,7 @@ struct lxw_shape_fill {
 };
 
 struct lxw_shape_properties {
-    lxw_shape_properties() { fill = {}; line = {}; pattern = {}; line.none = true;}
+    lxw_shape_properties() { fill = {}; line = {}; pattern = {}; line = {};}
     lxw_shape_fill fill;
     lxw_line line;
     lxw_pattern pattern;

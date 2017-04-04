@@ -128,7 +128,7 @@ chart::chart(uint8_t type)
     x2_axis->position = LXW_CHART_TOP;
     y2_axis->position = LXW_CHART_RIGHT;
 
-    grouping =
+    grouping = LXW_GROUPING_CLUSTERED;
 
     axis_id_1 = 0;
     axis_id_2 = 0;
@@ -1819,71 +1819,12 @@ void chart::_write_chart()
 }
 
 /*
- * Initialize the chart specific properties.
- */
-void chart::_initialize(uint8_t /*type*/)
-{
-    /*
-    switch (type) {
-
-        case LXW_CHART_AREA:
-        case LXW_CHART_AREA_STACKED:
-        case LXW_CHART_AREA_STACKED_PERCENT:
-            _initialize_area_chart(type);
-            break;
-
-        case LXW_CHART_BAR:
-        case LXW_CHART_BAR_STACKED:
-        case LXW_CHART_BAR_STACKED_PERCENT:
-            _initialize_bar_chart(type);
-            break;
-
-        case LXW_CHART_COLUMN:
-        case LXW_CHART_COLUMN_STACKED:
-        case LXW_CHART_COLUMN_STACKED_PERCENT:
-            _initialize_column_chart(type);
-            break;
-
-        case LXW_CHART_DOUGHNUT:
-            _initialize_doughnut_chart();
-            break;
-
-        case LXW_CHART_LINE:
-            _initialize_line_chart();
-            break;
-
-        case LXW_CHART_PIE:
-            _initialize_pie_chart();
-            break;
-
-        case LXW_CHART_SCATTER:
-        case LXW_CHART_SCATTER_STRAIGHT:
-        case LXW_CHART_SCATTER_STRAIGHT_WITH_MARKERS:
-        case LXW_CHART_SCATTER_SMOOTH:
-        case LXW_CHART_SCATTER_SMOOTH_WITH_MARKERS:
-            _initialize_scatter_chart();
-            break;
-
-        case LXW_CHART_RADAR:
-        case LXW_CHART_RADAR_WITH_MARKERS:
-        case LXW_CHART_RADAR_FILLED:
-            _initialize_radar_chart(type);
-            break;
-
-        default:
-            LXW_WARN_FORMAT1("workbook_add_chart(): "
-                             "unhandled chart type '%d'", type);
-    }
-    */
-}
-
-/*
  * Assemble and write the XML file.
  */
 void chart::assemble_xml_file()
 {
     /* Initialize the chart specific properties. */
-    _initialize(type);
+    _initialize();
 
     /* Write the XML declaration. */
     _xml_declaration();
@@ -2467,11 +2408,8 @@ void chart_line::write_chart_type(bool primary_axes)
         _write_ser(series);
     }
 
-    /*
-    lxw_marker marker = {0};
-     Write the c:marker element.
-    _chart_write_marker(&marker);
-    */
+    _write_marker_value();
+
 
     /* Write the c:axId elements. */
     _write_axis_ids(primary_axes);
