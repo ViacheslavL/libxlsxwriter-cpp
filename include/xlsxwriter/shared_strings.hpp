@@ -21,20 +21,6 @@
 
 namespace xlsxwriter {
 
-/* Define a tree.h RB structure for storing shared strings. */
-RB_HEAD(sst_rb_tree, sst_element);
-
-/* Define a queue.h structure for storing shared strings in insertion order. */
-STAILQ_HEAD(sst_order_list, sst_element);
-
-/* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
- * warnings and to avoid portability issues with the _unused attribute. */
-#define LXW_RB_GENERATE_ELEMENT(name, type, field, cmp) \
-    RB_GENERATE_INSERT_COLOR(name, type, field, static) \
-    RB_GENERATE_INSERT(name, type, field, cmp, static)  \
-    /* Add unused struct to allow adding a semicolon */ \
-    struct lxw_rb_generate_element{int unused;}
-
 /*
  * Elements of the SST table. They contain pointers to allow them to
  * be stored in a RB tree and also pointers to track the insertion order
@@ -84,11 +70,6 @@ private:
     uint32_t unique_count;
     std::unordered_set<sst_element_ptr, sst_hash_by_string, sst_equal> strings;
     std::vector<sst_element_ptr> order_list;
-    /*
-
-
-    struct sst_rb_tree *rb_tree;
-    */
 
     void _write_t(const std::string &string);
     void _write_si(const std::string &string);
