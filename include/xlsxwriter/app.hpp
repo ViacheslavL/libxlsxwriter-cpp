@@ -57,8 +57,6 @@ private:
     void _write_hyperlink_base();
     void _write_hyperlinks_changed();
     void _write_app_version();
-    void _app_add_part_name(const std::string &name);
-    void _app_add_heading_pair(const std::string &key, const std::string &value);
     void _write_company();
 };
 
