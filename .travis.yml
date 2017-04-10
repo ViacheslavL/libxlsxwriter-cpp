@@ -26,4 +26,5 @@ script:
   - cd build
   - cmake -DBUILD_TESTING=1 ../
   - make 
+  - cd ./bin/test_functional
   - py.test . -v --exec_dir=. --data_dir=./xlsx_files
