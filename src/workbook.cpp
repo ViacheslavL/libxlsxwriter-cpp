@@ -308,7 +308,7 @@ lxw_error workbook::_store_defined_name(
         if (worksheet_name[0] == '\'')
             worksheet_name = worksheet_name.substr(1);
         if (worksheet_name[worksheet_name.size() - 1] == '\'')
-            worksheet_name.pop_back();
+            worksheet_name.erase(worksheet_name.size() - 1, 1);
 
         /* Search for worksheet name to get the equivalent worksheet index. */
         for (const auto& worksheet : worksheets) {
