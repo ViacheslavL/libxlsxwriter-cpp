@@ -44,7 +44,7 @@ if (NOT MSVC)
     set(CMAKE_C_FLAGS "${tmp}"
         CACHE STRING "c-libraries flags compile"
         FORCE)
-    set(CMAKE_CXX_FLAGS "${tmp} -std=c++0x"
+    set(CMAKE_CXX_FLAGS "${tmp} -std=c++0x -march=native"
         CACHE STRING "libxlsxwriter compile flags"
         FORCE)
 else()
