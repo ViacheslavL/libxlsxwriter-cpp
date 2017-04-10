@@ -13,6 +13,7 @@
 #include <xlsxwriter/xmlwriter.hpp>
 #include <list>
 #include <iomanip>
+#include <sstream>
 
 #define LXW_AMP  "&amp;"
 #define LXW_LT   "&lt;"

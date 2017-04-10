@@ -15,6 +15,7 @@
 #include <xlsxwriter/utility.hpp>
 #include <xlsxwriter/relationships.hpp>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 #define LXW_STR_MAX      32767
