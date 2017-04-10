@@ -243,6 +243,8 @@ typedef std::shared_ptr<image_options> image_options_ptr;
  *
  */
 struct lxw_header_footer_options {
+    lxw_header_footer_options() {}
+    lxw_header_footer_options(double m) : margin(m) {}
     /** Header or footer margin in inches. Excel default is 0.3. */
     double margin;
 };
@@ -1850,7 +1852,7 @@ public:
      * @endcode
      *
      */
-    lxw_error set_header_opt(const std::string& header_string, const lxw_header_footer_options& options = {0});
+    lxw_error set_header_opt(const std::string& header_string, const lxw_header_footer_options& options = lxw_header_footer_options(0));
 
     /**
      * @brief Set the printed page footer caption with additional options.
@@ -1863,7 +1865,7 @@ public:
      * The syntax of this function is the same as set_header_opt().
      *
      */
-    lxw_error set_footer_opt(const std::string& footer_string, const lxw_header_footer_options& options = {0});
+    lxw_error set_footer_opt(const std::string& footer_string, const lxw_header_footer_options& options = lxw_header_footer_options(0));
 
     /**
      * @brief Set the horizontal page breaks on a worksheet.
