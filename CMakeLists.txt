@@ -39,12 +39,12 @@ if (NOT MSVC)
     set(tmp "-fPIC -Wall -Wextra -O0")
     if (NOT ((APPLE) AND ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang"))
         AND ("${CMAKE_BUILD_TYPE}" MATCHES "Release"))
-        set(tmp "${tmp} -march=native -mtune=native")
+        set(tmp "${tmp} -mtune=native")
     endif()
     set(CMAKE_C_FLAGS "${tmp}"
         CACHE STRING "c-libraries flags compile"
         FORCE)
-    set(CMAKE_CXX_FLAGS "${tmp} -std=c++0x -march=native"
+    set(CMAKE_CXX_FLAGS "${tmp} -std=c++0x"
         CACHE STRING "libxlsxwriter compile flags"
         FORCE)
 else()
