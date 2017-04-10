@@ -125,6 +125,8 @@ struct lxw_table_rows {
  * * `collapsed`
  */
 struct row_col_options {
+    row_col_options() {}
+    row_col_options(bool h, uint8_t l, bool c) : hidden(h), level(l), collapsed(c){}
     /** Hide the row/column */
     bool hidden;
     uint8_t level;
@@ -941,7 +943,7 @@ public:
     lxw_error set_row_opt(lxw_row_t row,
                           double height,
                           format* pformat,
-                          const row_col_options& options = {false, 0, false});
+                          const row_col_options& options = row_col_options(false, 0, false));
 
     /**
      * @brief Set the properties for one or more columns of cells.
@@ -1077,7 +1079,7 @@ public:
                              lxw_col_t last_col,
                              double width,
                              format* pformat,
-                             const row_col_options& options = {false, 0, false});
+                             const row_col_options& options = row_col_options(false, 0, false));
 
     /**
      * @brief Insert an image in a worksheet cell.
