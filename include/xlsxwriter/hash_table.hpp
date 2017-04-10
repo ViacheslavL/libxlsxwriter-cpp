@@ -12,6 +12,7 @@
 
 #include "common.hpp"
 #include <list>
+#include <stdint.h>
 #include <unordered_map>
 
 /* Macro to loop over hash table elements in insertion order. */
