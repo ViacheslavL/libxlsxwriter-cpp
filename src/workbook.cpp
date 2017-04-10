@@ -670,6 +670,7 @@ void workbook::_prepare_defined_names()
                         + ":$" + std::to_string(worksheet->print_area_.last_row + 1);
             }
             else {
+                area.clear();
                 lxw_rowcol_to_range_abs(area,
                                         worksheet->print_area_.first_row,
                                         worksheet->print_area_.first_col,

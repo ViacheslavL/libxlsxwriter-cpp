@@ -87,7 +87,7 @@ struct sort_defined_names
         bool res = lhs->normalised_name < rhs->normalised_name;
 
         /* Primary comparison based on defined name. */
-        if (res)
+        if (lhs->normalised_name != rhs->normalised_name)
             return res;
 
         /* Secondary comparison based on worksheet name. */
