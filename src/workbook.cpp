@@ -1046,7 +1046,7 @@ worksheet* workbook::add_worksheet(const std::string& sheetname)
     }
     else {
         /* Use the default SheetN name. */
-        new_name = "Sheet" + std::to_string(num_sheets + 1);
+        new_name = "Sheet" + std::to_string(worksheets.size() + 1);
         init_data.name = new_name;
         init_data.quoted_name = new_name;
     }
@@ -1060,7 +1060,7 @@ worksheet* workbook::add_worksheet(const std::string& sheetname)
 
     /* Initialize the metadata to pass to the worksheet. */
     init_data.hidden = 0;
-    init_data.index = num_sheets;
+    init_data.index = worksheets.size();
     init_data.sst = sst;
     init_data.optimize = options.constant_memory;
     init_data.active_sheet = &active_sheet;
@@ -1070,7 +1070,6 @@ worksheet* workbook::add_worksheet(const std::string& sheetname)
     /* Create a new worksheet object. */
     worksheet_ptr worksheet = std::make_shared<xlsxwriter::worksheet>(&init_data);
 
-    num_sheets++;
     worksheets.push_back(worksheet);
 
     /* Store the worksheet so we can look it up by name. */    

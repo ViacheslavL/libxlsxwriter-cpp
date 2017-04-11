@@ -583,7 +583,6 @@ private:
     std::string filename;
     workbook_options options;
 
-    uint16_t num_sheets;
     uint16_t first_sheet;
     uint16_t active_sheet;
     uint16_t num_xf_formats;

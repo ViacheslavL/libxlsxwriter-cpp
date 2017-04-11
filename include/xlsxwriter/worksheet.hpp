@@ -125,7 +125,7 @@ struct lxw_table_rows {
  * * `collapsed`
  */
 struct row_col_options {
-    row_col_options() {}
+    row_col_options() : hidden(false), level(0), collapsed(false) {}
     row_col_options(bool h, uint8_t l, bool c) : hidden(h), level(l), collapsed(c){}
     /** Hide the row/column */
     bool hidden;
@@ -134,6 +134,15 @@ struct row_col_options {
 };
 
 struct lxw_col_options {
+    lxw_col_options()
+        : firstcol(0)
+        , lastcol(0)
+        , width(0.0)
+        , format(nullptr)
+        , hidden(0)
+        , level(0)
+        , collapsed(0)
+    {}
     lxw_col_t firstcol;
     lxw_col_t lastcol;
     double width;
@@ -144,6 +153,12 @@ struct lxw_col_options {
 };
 
 struct lxw_merged_range {
+    lxw_merged_range()
+        : first_row(0)
+        , last_row(0)
+        , first_col(0)
+        , last_col(0)
+    {}
     lxw_row_t first_row;
     lxw_row_t last_row;
     lxw_col_t first_col;
@@ -151,18 +166,35 @@ struct lxw_merged_range {
 };
 
 struct lxw_repeat_rows {
+    lxw_repeat_rows()
+        : in_use(0)
+        , first_row(0)
+        , last_row(0)
+    {}
     uint8_t in_use;
     lxw_row_t first_row;
     lxw_row_t last_row;
 };
 
 struct lxw_repeat_cols {
+    lxw_repeat_cols()
+        : in_use(0)
+        , first_col(0)
+        , last_col(0)
+    {}
     uint8_t in_use;
     lxw_col_t first_col;
     lxw_col_t last_col;
 };
 
 struct lxw_print_area {
+    lxw_print_area()
+        : in_use(0)
+        , first_row(0)
+        , last_row(0)
+        , first_col(0)
+        , last_col(0)
+    {}
     uint8_t in_use;
     lxw_row_t first_row;
     lxw_row_t last_row;
@@ -171,6 +203,13 @@ struct lxw_print_area {
 };
 
 struct lxw_autofilter {
+    lxw_autofilter()
+        : in_use(0)
+        , first_row(0)
+        , last_row(0)
+        , first_col(0)
+        , last_col(0)
+    {}
     uint8_t in_use;
     lxw_row_t first_row;
     lxw_row_t last_row;
@@ -179,6 +218,15 @@ struct lxw_autofilter {
 };
 
 struct lxw_panes {
+    lxw_panes()
+        : type(0)
+        , first_row(0)
+        , first_col(0)
+        , top_row(0)
+        , left_col(0)
+        , x_split(0.0)
+        , y_split(0.0)
+    {}
     uint8_t type;
     lxw_row_t first_row;
     lxw_col_t first_col;
@@ -328,6 +376,13 @@ class worksheet;
  * Worksheet initialization data.
  */
 struct lxw_worksheet_init_data {
+    lxw_worksheet_init_data()
+        : index(0)
+        , hidden(0)
+        , optimize(0)
+        , active_sheet(nullptr)
+        , first_sheet(nullptr)
+    {}
     uint32_t index;
     uint8_t hidden;
     uint8_t optimize;

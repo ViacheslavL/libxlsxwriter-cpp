@@ -287,7 +287,7 @@ uint8_t packager::_write_app_file()
     if (!app->file)
         return LXW_ERROR_CREATING_TMPFILE;
 
-    number = std::to_string( workbook->num_sheets);
+    number = std::to_string( workbook->worksheets.size());
 
     app->add_heading_pair("Worksheets", number);
 
