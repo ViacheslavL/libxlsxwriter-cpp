@@ -586,7 +586,7 @@ public:
      * @endcode
      *
      */
-    chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
+    virtual chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
 
     void chart_set_y2_axis(const std::shared_ptr<chart_axis>& axis);
 
@@ -905,6 +905,7 @@ protected:
 class chart_scatter: public chart {
 public:
     chart_scatter(uint8_t t) : chart(t) {}
+    chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options()) override;
 protected:
     void write_chart_type(bool);
     void write_plot_area();

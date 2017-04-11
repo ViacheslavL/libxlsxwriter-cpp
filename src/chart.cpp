@@ -15,67 +15,12 @@
 
 namespace xlsxwriter {
 
-typedef struct val_axis_args {
+struct val_axis_args {
     std::shared_ptr<chart_axis> x_axis;
     std::shared_ptr<chart_axis> y_axis;
     uint32_t id_1;
     uint32_t id_2;
-} val_axis_args;
-
-/*
- * Forward declarations.
- */
-
-/*****************************************************************************
- *
- * Private functions.
- *
- ****************************************************************************/
-
-/*
- * Free a series range object.
- */
-void void_chart_free_range(series_range *range)
-{
-    /*
-    struct lxw_series_data_point *data_point;
-
-    if (!range)
-        return;
-
-    while (!STAILQ_EMPTY(range->data_cache)) {
-        data_point = STAILQ_FIRST(range->data_cache);
-        free(data_point->string);
-        STAILQ_REMOVE_HEAD(range->data_cache, list_pointers);
-
-        free(data_point);
-    }
-
-    free(range->data_cache);
-    free(range->formula);
-    free(range->sheetname);
-    free(range);
-    */
-}
-
-/*
- * Create a new axis object
- */
-/*
-chart_axis *lxw_axis_new()
-{
-    chart_axis *axis = calloc(1, sizeof(struct chart_axis));
-    GOTO_LABEL_ON_MEM_ERROR(axis, mem_error);
-
-    axis->min_value = NAN;
-    axis->max_value = NAN;
-    axis->title.range = calloc(1, sizeof(lxw_series_range));
-    GOTO_LABEL_ON_MEM_ERROR(axis->title.range, mem_error);
-
-    return axis;
-mem_error:
-    return NULL;
-}*/
+};
 
 /*
  * Create a new chart object.
@@ -920,7 +865,6 @@ void chart::_write_a_ln(lxw_line *line)
  */
 void chart::_write_sp_pr(lxw_shape_properties* properties)
 {
-
     if (!properties->fill.defined && !properties->line.defined && !properties->pattern.defined)
         return;
 
@@ -2474,6 +2418,16 @@ void chart_pie::write_plot_area()
 void chart_pie::_initialize()
 {
     has_markers = false;
+}
+
+chart_series *chart_scatter::add_series(const std::string &categories, const std::string &values, const series_options &options)
+{
+    chart_series* series = chart::add_series(categories, values, options);
+    if (type == LXW_CHART_SCATTER) {
+        series->properties.line.defined = true;
+        series->properties.line.none = true;
+    }
+    return series;
 }
 
 void chart_scatter::write_chart_type(bool primary_axes)
