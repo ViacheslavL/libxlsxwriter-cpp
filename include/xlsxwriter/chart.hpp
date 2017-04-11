@@ -905,7 +905,7 @@ protected:
 class chart_scatter: public chart {
 public:
     chart_scatter(uint8_t t) : chart(t) {}
-    chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options()) override;
+    chart_series* add_series(const std::string& categories = std::string(), const std::string& values = std::string(), const series_options& options = series_options());
 protected:
     void write_chart_type(bool);
     void write_plot_area();
