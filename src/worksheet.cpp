@@ -147,6 +147,7 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     margin_footer = 0.3;
     print_gridlines = 0;
     screen_gridlines = 1;
+    selected = false;
     print_options_changed = 0;
     zoom = 100;
     zoom_scale_normal = true;

@@ -2483,7 +2483,7 @@ private:
 
     uint32_t index;
     uint8_t active;
-    uint8_t selected;
+    bool selected;
     uint8_t hidden;
     uint16_t *active_sheet;
     uint16_t *first_sheet;
