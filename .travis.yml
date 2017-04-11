@@ -4,6 +4,10 @@ os:
   - linux
   - osx
 
+matrix:
+  allow_failures:
+    - os: osx
+
 addons:
   apt:
     sources:
@@ -16,6 +20,7 @@ addons:
 
 compiler:
   - gcc
+  - clang
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update      ; fi
