@@ -1865,18 +1865,6 @@ chart_series* chart::add_series(const std::string& categories, const std::string
 }
 
 /*
- * Set on of the 48 built-in Excel chart styles.
- */
-void chart_set_style(uint8_t style_id)
-{
-    /* The default style is 2. The range is 1 - 48 */
-    if (style_id < 1 || style_id > 48)
-        style_id = 2;
-
-    style_id = style_id;
-}
-
-/*
  * Set a user defined name for a series.
  */
 void chart_series::set_name(const std::string& name)

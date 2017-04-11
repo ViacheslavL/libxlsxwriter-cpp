@@ -51,9 +51,13 @@
 #endif
 
 #ifdef Z_U4
-   typedef Z_U4 z_crc_t;
+    typedef Z_U4 z_crc_t;
 #else
-   typedef unsigned long z_crc_t;
+#   ifdef uLongf
+        typedef uLongf z_crc_t;
+#   else
+        unsigned long z_crc_t;
+#   endif
 #endif
 
 
