@@ -73,29 +73,32 @@ enum shape_pattern_types {
 };
 
 struct lxw_pattern {
-    uint8_t defined;
+    lxw_pattern () : defined(false), pattern(0), fg_color(0), bg_color(0) {}
+    bool defined;
     uint8_t pattern;
     lxw_color_t fg_color;
     lxw_color_t bg_color;
 };
 
 struct lxw_line {
-    uint8_t defined;
-    uint8_t none;
+    lxw_line() : defined(false), none(false), dash_type(0), color(0), transparency(0) {}
+    bool defined;
+    bool none;
     uint8_t dash_type;
     lxw_color_t color;
     double transparency;
 };
 
 struct lxw_shape_fill {
-    uint8_t defined;
-    uint8_t none;
+    lxw_shape_fill() : defined(false), none(false), color(0), transparency(0) {}
+    bool defined;
+    bool none;
     lxw_color_t color;
     double transparency;
 };
 
 struct lxw_shape_properties {
-    lxw_shape_properties() { fill = {}; line = {}; pattern = {}; line = {};}
+    lxw_shape_properties() {}
     lxw_shape_fill fill;
     lxw_line line;
     lxw_pattern pattern;

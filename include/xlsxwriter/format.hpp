@@ -327,6 +327,10 @@ enum lxw_format_borders {
  * Struct to represent the font component of a format.
  */
 struct lxw_font {
+    lxw_font() {
+        memset(this, 0, sizeof(lxw_font));
+    }
+
     char font_name[LXW_FORMAT_FIELD_LEN];
     uint16_t font_size;
     uint8_t bold;
@@ -350,6 +354,10 @@ typedef lxw_font* lxw_font_ptr;
  */
 struct lxw_border {
 
+    lxw_border() {
+        memset(this, 0, sizeof(lxw_border));
+    }
+
     uint8_t bottom;
     uint8_t diag_border;
     uint8_t diag_type;
@@ -370,8 +378,10 @@ typedef lxw_border* lxw_border_ptr;
 /*
  * Struct to represent the fill component of a format.
  */
-struct lxw_fill {
-
+struct lxw_fill {    
+    lxw_fill() {
+        memset(this, 0, sizeof(lxw_fill));
+    }
     lxw_color_t fg_color;
     lxw_color_t bg_color;
     uint8_t pattern;
