@@ -86,6 +86,7 @@ chart::chart(uint8_t type)
 
     series_overlap_1 = 100;
     has_overlap = false;
+    has_markers = false;
 
     is_secondary = false;
     in_use = false;
@@ -1903,6 +1904,8 @@ chart_series::chart_series()
 {
     categories = std::make_shared<series_range>();
     values = std::make_shared<series_range>();
+    x2_axis = false;
+    y2_axis = false;
 }
 
 void chart_series::set_categories(const std::string& sheetname,
@@ -1940,6 +1943,11 @@ chart_axis::chart_axis()
 {
     min_value = NAN;
     max_value = NAN;
+    default_major_gridlines = false;
+    major_tick_mark = false;
+
+    position = false;
+    visible = false;
     title.range = std::make_shared<series_range>();
 }
 

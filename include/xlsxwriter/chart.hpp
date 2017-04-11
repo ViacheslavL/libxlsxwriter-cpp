@@ -380,8 +380,8 @@ public:
     chart_title title;
     lxw_shape_properties properties;
     lxw_marker marker;
-    uint8_t x2_axis;
-    uint8_t y2_axis;
+    bool x2_axis;
+    bool y2_axis;
 };
 
 typedef std::shared_ptr<chart_series> chart_series_ptr;
@@ -471,8 +471,8 @@ private:
     std::string default_num_format;
     std::string crossing;
 
-    uint8_t default_major_gridlines;
-    uint8_t major_tick_mark;
+    bool default_major_gridlines;
+    bool major_tick_mark;
 
     double min_value;
     double max_value;
