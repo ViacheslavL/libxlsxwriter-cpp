@@ -1,5 +1,9 @@
 language: cpp
 
+os:
+  - linux
+  - osx
+
 addons:
   apt:
     sources:
@@ -14,12 +18,14 @@ compiler:
   - gcc
 
 install:
-  - sudo pip install pytest
-  - sudo apt-get update
-  - sudo apt-get install -y zlib1g-dev
-  - sudo apt-get install -y zlib1g-dev:i386
-  - sudo apt-get install -y g++
-  - sudo apt-get install -y cmake
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update      ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install zlib; fi
+  - sudo pip install pytest 
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update            ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y zlib1g-dev     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y zlib1g-dev:i386; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y g++    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y cmake  ; fi
 
 script:
   - mkdir build
