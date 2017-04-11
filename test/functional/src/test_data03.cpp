@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_data03.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_data03.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->write_number(0,       16383, 123, NULL);

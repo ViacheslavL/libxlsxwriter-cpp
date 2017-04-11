@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_properties05.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_properties05.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     workbook->set_custom_property_string ( "Location", "Café");

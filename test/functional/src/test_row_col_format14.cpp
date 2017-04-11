@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook     = new xlsxwriter::workbook("test_row_col_format14.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_row_col_format14.xlsx");
     xlsxwriter::worksheet *worksheet    = workbook->add_worksheet();
     xlsxwriter::row_col_options options = {1, 0, 0};
     xlsxwriter::format    *bold         = workbook->add_format();

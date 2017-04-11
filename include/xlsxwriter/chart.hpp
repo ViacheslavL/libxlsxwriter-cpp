@@ -32,7 +32,7 @@
  *
  * int main() {
  *
- *     xlsxwriter::workbook *workbook = new xlsxwriter::workbook("chart.xlsx");
+ *     std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("chart.xlsx");
  *     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
  *
  *     // User function to add data to worksheet, not shown here.

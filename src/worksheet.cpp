@@ -97,6 +97,8 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     optimize_row = new lxw_row();
     optimize_row->height = LXW_DEF_ROW_HEIGHT;
 
+    default_row_zeroed = 0;
+
     if (init_data && init_data->optimize) {
         FILE *tmpfile;
 
@@ -163,6 +165,14 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
         active_sheet = init_data->active_sheet;
         first_sheet = init_data->first_sheet;
     }
+}
+
+worksheet::~worksheet()
+{
+   merged_ranges.clear();
+   selections.clear();
+   image_data.clear();
+   chart_data.clear();
 }
 
 /*
@@ -4390,7 +4400,7 @@ lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, xlsx
     image_options_ptr options = std::make_shared<image_options>();
 
     if (user_options)
-        memcpy(options.get(), user_options, sizeof(image_options));
+        *options = *user_options;
 
     /* Copy other options or set defaults. */
     options->row = row_num;

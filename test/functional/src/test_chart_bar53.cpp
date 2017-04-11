@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_chart_bar53.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_chart_bar53.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
     xlsxwriter::chart     *chart1    = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);
     xlsxwriter::chart     *chart2    = workbook->add_chart( xlsxwriter::LXW_CHART_BAR);

@@ -15,7 +15,7 @@ int main() {
     lxw_datetime datetime2 = {2013, 1, 27,  0, 0, 0};
 
     /* Use deprecated constructor for testing. */
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_simple04.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_simple04.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     xlsxwriter::format    *format1   = workbook->add_format();

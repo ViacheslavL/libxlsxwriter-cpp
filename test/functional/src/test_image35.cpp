@@ -11,7 +11,7 @@
 
 int main() {
 
-    xlsxwriter::workbook *workbook = new xlsxwriter::workbook("test_image35.xlsx");
+    std::shared_ptr<xlsxwriter::workbook> workbook = std::make_shared<xlsxwriter::workbook>("test_image35.xlsx");
     xlsxwriter::worksheet *worksheet = workbook->add_worksheet();
 
     worksheet->insert_image(CELL("E9"), "images/zero_dpi.jpg");

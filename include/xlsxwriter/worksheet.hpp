@@ -202,6 +202,24 @@ struct lxw_selection {
  */
 struct image_options {
 
+    image_options()
+        : x_offset(0)
+        , y_offset(0)
+        , x_scale(0.0)
+        , y_scale(0.0)
+        , row(0)
+        , col(0)
+        , anchor(0)
+        , stream(nullptr)
+        , image_type(0)
+        , width(0.0)
+        , height(0.0)
+        , x_dpi(0.0)
+        , y_dpi(0.0)
+        , chart(nullptr)
+    {}
+
+    ~image_options(){}
     /** Offset from the left of the cell in pixels. */
     int32_t x_offset;
 
@@ -404,6 +422,7 @@ class worksheet : public xmlwriter{
     friend class xlsxwriter::workbook;
 public:
     worksheet(lxw_worksheet_init_data *init_data);
+    ~worksheet();
     /**
      * @brief Write a number to a worksheet cell.
      *

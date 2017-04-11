@@ -63,6 +63,10 @@ void workbook::_prepare_fonts()
         }
     }
     font_count = index;
+
+    for (auto key : fonts.order_list) {
+        delete key.first;
+    }
 }
 
 /*
@@ -97,6 +101,10 @@ void workbook::_prepare_borders()
                 index++;
             }
         }
+    }
+
+    for (auto key : borders.order_list) {
+        delete key.first;
     }
 
     border_count = index;
@@ -184,6 +192,11 @@ void workbook::_prepare_fills()
             }
         }
     }
+
+    for (auto key : fills.order_list) {
+        delete key.first;
+    }
+
     fill_count = index;
 }
 
@@ -981,6 +994,8 @@ workbook::workbook(const std::string& file, const workbook_options& options) : f
 
 workbook::~workbook()
 {
+    worksheet_names.clear();
+
     for(auto p : used_xf_formats.order_list)
     {
         delete p.first;
