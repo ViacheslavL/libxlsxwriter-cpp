@@ -309,7 +309,7 @@ typedef std::shared_ptr<image_options> image_options_ptr;
  *
  */
 struct lxw_header_footer_options {
-    lxw_header_footer_options() {}
+    lxw_header_footer_options() : margin(0) {}
     lxw_header_footer_options(double m) : margin(m) {}
     /** Header or footer margin in inches. Excel default is 0.3. */
     double margin;
@@ -319,6 +319,9 @@ struct lxw_header_footer_options {
  * @brief Worksheet protection options.
  */
 struct lxw_protection {
+    lxw_protection() {
+        memset(this, 0, sizeof(lxw_protection));
+    }
     /** Turn off selection of locked cells. This in on in Excel by default.*/
     uint8_t no_select_locked_cells;
 
@@ -396,7 +399,10 @@ struct lxw_worksheet_init_data {
 };
 
 /* Struct to represent a worksheet row. */
-typedef struct lxw_row {
+struct lxw_row {
+    lxw_row() {
+        memset(this, 0, sizeof(lxw_row));
+    }
     lxw_row_t row_num;
     double height;
     xlsxwriter::format *format;
@@ -410,10 +416,13 @@ typedef struct lxw_row {
 
     /* tree management pointers for tree.h. */
     RB_ENTRY (lxw_row) tree_pointers;
-} lxw_row;
+};
 
 /* Struct to represent a worksheet cell. */
 struct lxw_cell {
+    lxw_cell() {
+        memset(this, 0, sizeof(lxw_cell));
+    }
     lxw_row_t row_num;
     lxw_col_t col_num;
     enum cell_types type;
@@ -2497,8 +2506,8 @@ private:
     xlsxwriter::format **col_formats;
     uint16_t col_formats_max;
 
-    uint8_t col_size_changed;
-    uint8_t row_size_changed;
+    bool col_size_changed;
+    bool row_size_changed;
     uint8_t optimize;
     lxw_row *optimize_row;
 
@@ -2511,11 +2520,11 @@ private:
     uint16_t rel_count;
     uint16_t vertical_dpi;
     uint16_t zoom;
-    uint8_t filter_on;
+    bool filter_on;
     uint8_t fit_page;
     uint8_t hcenter;
     uint8_t orientation;
-    uint8_t outline_changed;
+    bool outline_changed;
     uint8_t outline_on;
     uint8_t page_order;
     uint8_t page_setup_changed;
@@ -2524,9 +2533,9 @@ private:
     uint8_t print_gridlines;
     uint8_t print_headers;
     uint8_t print_options_changed;
-    uint8_t right_to_left;
+    bool right_to_left;
     uint8_t screen_gridlines;
-    uint8_t show_zeros;
+    bool show_zeros;
     uint8_t vba_codename;
     uint8_t vcenter;
     uint8_t zoom_scale_normal;
@@ -2546,7 +2555,7 @@ private:
     uint8_t default_row_zeroed;
     uint8_t default_row_set;
 
-    uint8_t header_footer_changed;
+    bool header_footer_changed;
     std::string header;
     std::string footer;
 

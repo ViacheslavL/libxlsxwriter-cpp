@@ -1020,6 +1020,8 @@ void workbook::workbook_new_opt(const workbook_options& options)
     this->options.constant_memory = options.constant_memory;
     this->options.tmpdir = options.tmpdir;
 
+    first_sheet = 0;
+    active_sheet = 0;
 
     has_png = false;
     has_jpeg = false;

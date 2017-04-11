@@ -82,6 +82,8 @@ chart::chart(uint8_t type)
     axis_id_3 = 0;
     axis_id_4 = 0;
 
+    rotation = 0;
+
     series_overlap_1 = 100;
     has_overlap = false;
 

@@ -129,6 +129,7 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     /* Initialize the page setup properties. */
     fit_height = 0;
     fit_width = 0;
+    filter_on = false;
     page_start = 0;
     print_scale = 100;
     fit_page = 0;
@@ -154,6 +155,18 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     show_zeros = true;
     outline_on = true;
     tab_color = LXW_COLOR_UNSET;
+    outline_changed = false;
+    vba_codename = 0;
+    right_to_left = false;
+
+    row_size_changed = false;
+    col_size_changed = false;
+
+    header_footer_changed = false;
+    merged_range_count = 0;
+
+    hbreaks_count = 0;
+    vbreaks_count = 0;
 
     if (init_data) {
         name = init_data->name;
@@ -3929,7 +3942,7 @@ lxw_error worksheet::set_header_opt(const std::string& string,
         return LXW_ERROR_255_STRING_LENGTH_EXCEEDED;
 
     header = string;
-    header_footer_changed = 1;
+    header_footer_changed = true;
 
     return LXW_NO_ERROR;
 }
@@ -3951,7 +3964,7 @@ worksheet::set_footer_opt(const std::string& string, const lxw_header_footer_opt
         return LXW_ERROR_255_STRING_LENGTH_EXCEEDED;
 
     footer = string;
-    header_footer_changed = 1;
+    header_footer_changed = true;
 
     return LXW_NO_ERROR;
 }

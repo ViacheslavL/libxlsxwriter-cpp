@@ -31,7 +31,7 @@ namespace xlsxwriter {
 static void
 _localtime_to_iso8601_date(time_t *timer, char *str, size_t size)
 {
-    struct tm *tmp_localtime;
+    struct tm *tmp_localtime = nullptr;
     time_t current_time = time(NULL);
 
     if (*timer)
