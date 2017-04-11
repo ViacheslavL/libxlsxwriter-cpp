@@ -1019,6 +1019,11 @@ void workbook::workbook_new_opt(const workbook_options& options)
 
     this->options.constant_memory = options.constant_memory;
     this->options.tmpdir = options.tmpdir;
+
+
+    has_png = false;
+    has_jpeg = false;
+    has_bmp = false;
 }
 
 /*
