@@ -2497,7 +2497,7 @@ private:
     uint16_t *active_sheet;
     uint16_t *first_sheet;
 
-    std::vector<lxw_col_options *> col_options;
+    std::vector<std::unique_ptr<lxw_col_options>> col_options;
 
     double *col_sizes;
     uint16_t col_sizes_max;
@@ -2507,7 +2507,7 @@ private:
     bool col_size_changed;
     bool row_size_changed;
     uint8_t optimize;
-    lxw_row *optimize_row;
+    std::unique_ptr<lxw_row> optimize_row;
 
     uint16_t fit_height;
     uint16_t fit_width;

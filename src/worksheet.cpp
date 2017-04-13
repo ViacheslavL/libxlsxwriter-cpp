@@ -16,6 +16,7 @@
 #include <xlsxwriter/relationships.hpp>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <iomanip>
 
 #define LXW_STR_MAX      32767
@@ -88,7 +89,7 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
         array = new lxw_cell *[LXW_COL_MAX]();
     }
 
-    optimize_row = new lxw_row();
+    optimize_row.reset(new lxw_row());
     optimize_row->height = LXW_DEF_ROW_HEIGHT;
 
     default_row_zeroed = 0;
@@ -178,8 +179,6 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
 
 worksheet::~worksheet()
 {
-   for(auto ptr: col_options)
-       if (ptr) delete ptr;
 }
 
 /*
@@ -434,15 +433,15 @@ lxw_row * worksheet::_get_row(lxw_row_t row_num)
     }
     else {
         if (row_num < optimize_row->row_num) {
-            return NULL;
+            return nullptr;
         }
         else if (row_num == optimize_row->row_num) {
-            return optimize_row;
+            return optimize_row.get();
         }
         else {
             /* Flush row. */
             write_single_row();
-            row = optimize_row;
+            row = optimize_row.get();
             row->row_num = row_num;
             return row;
         }
@@ -1335,7 +1334,7 @@ void worksheet::_write_row(lxw_row *row, const std::string& spans)
  */
 int32_t worksheet::_size_col(lxw_col_t col_num)
 {
-    lxw_col_options *col_opt = NULL;
+    lxw_col_options *col_opt = nullptr;
     uint32_t pixels;
     double width;
     double max_digit_width = 7.0;       /* For Calabri 11. */
@@ -1346,7 +1345,7 @@ int32_t worksheet::_size_col(lxw_col_t col_num)
      * entry contains the start and end column for a range.
      */
     for (col_index = 0; col_index < col_options.size(); col_index++) {
-        col_opt = col_options[col_index];
+        col_opt = col_options[col_index].get();
 
         if (col_opt) {
             if (col_num >= col_opt->firstcol && col_num <= col_opt->lastcol)
@@ -2289,7 +2288,7 @@ void worksheet::_write_rows()
  */
 void worksheet::write_single_row()
 {
-    lxw_row *row = optimize_row;
+    lxw_row *row = optimize_row.get();
     lxw_col_t col;
 
     /* skip row if it doesn't contain row formatting, cell data or a comment. */
@@ -2309,7 +2308,7 @@ void worksheet::write_single_row()
             if (array[col]) {
                 _write_cell(array[col], row->format);
                 _free_cell(array[col]);
-                array[col] = NULL;
+                array[col] = nullptr;
             }
         }
 
@@ -2318,7 +2317,7 @@ void worksheet::write_single_row()
 
     /* Reset the row. */
     row->height = LXW_DEF_ROW_HEIGHT;
-    row->format = NULL;
+    row->format = nullptr;
     row->hidden = false;
     row->level = 0;
     row->collapsed = false;
@@ -2407,7 +2406,7 @@ void worksheet::_write_cols()
 
     for (col = 0; col < col_options.size(); col++) {
         if (col_options[col])
-           _write_col_info(col_options[col]);
+           _write_col_info(col_options[col].get());
     }
 
     lxw_xml_end_tag("cols");
@@ -3434,7 +3433,6 @@ lxw_error worksheet::set_column_opt(
                          format* pformat,
                          const row_col_options& user_options)
 {
-    lxw_col_options *copied_options;
     uint8_t ignore_row = true;
     uint8_t ignore_col = true;
     bool hidden = user_options.hidden;
@@ -3466,7 +3464,8 @@ lxw_error worksheet::set_column_opt(
 
     /* Resize the col_options array if required. */
     if (firstcol >= col_options.size()) {
-        col_options.resize(firstcol + 1, nullptr);
+        std::generate_n(std::back_inserter(col_options), firstcol + 1 - col_options.size(), []{ return nullptr; });
+        //col_options.resize(firstcol + 1, std::unique_ptr<lxw_col_options>());
     }
 
     /* Resize the col_formats array if required. */
@@ -3475,7 +3474,7 @@ lxw_error worksheet::set_column_opt(
     }
 
     /* Store the column options. */
-    copied_options = new lxw_col_options();
+    lxw_col_options* copied_options = new lxw_col_options();
 
     copied_options->firstcol = firstcol;
     copied_options->lastcol = lastcol;
@@ -3485,7 +3484,7 @@ lxw_error worksheet::set_column_opt(
     copied_options->level = level;
     copied_options->collapsed = collapsed;
 
-    col_options[firstcol] = copied_options;
+    col_options[firstcol].reset(copied_options);
 
     /* Store the column formats for use when writing cell data. */
     for (col = firstcol; col <= lastcol; col++) {
