@@ -88,10 +88,10 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
         array = new lxw_cell *[LXW_COL_MAX]();
     }
 
-    col_options = new lxw_col_options*[LXW_COL_META_MAX]();
+    //col_options = new lxw_col_options*[LXW_COL_META_MAX]();
     col_options_max = LXW_COL_META_MAX;
 
-    col_formats = new xlsxwriter::format*[LXW_COL_META_MAX]();
+    //col_formats = new xlsxwriter::format*[LXW_COL_META_MAX]();
     col_formats_max = LXW_COL_META_MAX;
 
     optimize_row = new lxw_row();
@@ -184,10 +184,8 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
 
 worksheet::~worksheet()
 {
-   merged_ranges.clear();
-   selections.clear();
-   image_data.clear();
-   chart_data.clear();
+   for(auto ptr: col_options)
+       if (ptr) delete ptr;
 }
 
 /*
@@ -1353,7 +1351,7 @@ int32_t worksheet::_size_col(lxw_col_t col_num)
     /* Search for the col number in the array of col_options. Each col_option
      * entry contains the start and end column for a range.
      */
-    for (col_index = 0; col_index < col_options_max; col_index++) {
+    for (col_index = 0; col_index < col_options.size(); col_index++) {
         col_opt = col_options[col_index];
 
         if (col_opt) {
@@ -2204,7 +2202,7 @@ void worksheet::_write_cell(lxw_cell *cell, xlsxwriter::format* row_format)
     else if (row_format) {
         style_index = row_format->get_xf_index();
     }
-    else if (col_num < col_formats_max && col_formats[col_num]) {
+    else if (col_num < col_formats.size() && col_formats[col_num]) {
         style_index = col_formats[col_num]->get_xf_index();
     }
 
@@ -2413,7 +2411,7 @@ void worksheet::_write_cols()
 
     lxw_xml_start_tag("cols");
 
-    for (col = 0; col < col_options_max; col++) {
+    for (col = 0; col < col_options.size(); col++) {
         if (col_options[col])
            _write_col_info(col_options[col]);
     }
@@ -3473,7 +3471,9 @@ lxw_error worksheet::set_column_opt(
         return err;
 
     /* Resize the col_options array if required. */
-    if (firstcol >= col_options_max) {
+    if (firstcol >= col_options.size()) {
+        col_options.resize(firstcol + 1, nullptr);
+        /*
         lxw_col_t col;
         lxw_col_t old_size = col_options_max;
         lxw_col_t new_size = _next_power_of_two(firstcol + 1);
@@ -3490,11 +3490,13 @@ lxw_error worksheet::set_column_opt(
         }
         else {
             return LXW_ERROR_MEMORY_MALLOC_FAILED;
-        }
+        }*/
     }
 
     /* Resize the col_formats array if required. */
-    if (lastcol >= col_formats_max) {
+    if (lastcol >= col_formats.size()) {
+        col_formats.resize(lastcol + 1, nullptr);
+        /*
         lxw_col_t col;
         lxw_col_t old_size = col_formats_max;
         lxw_col_t new_size = _next_power_of_two(lastcol + 1);
@@ -3510,6 +3512,7 @@ lxw_error worksheet::set_column_opt(
         else {
             return LXW_ERROR_MEMORY_MALLOC_FAILED;
         }
+        */
     }
 
     /* Store the column options. */
