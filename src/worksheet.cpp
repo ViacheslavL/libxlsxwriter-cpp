@@ -508,23 +508,6 @@ void worksheet::_insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num, lxw_cell
 }
 
 /*
- * Next power of two for column reallocs. Taken from bithacks in the public
- * domain.
- */
-lxw_col_t
-_next_power_of_two(uint16_t col)
-{
-    col--;
-    col |= col >> 1;
-    col |= col >> 2;
-    col |= col >> 4;
-    col |= col >> 8;
-    col++;
-
-    return col;
-}
-
-/*
  * Check that row and col are within the allowed Excel range and store max
  * and min values for use in other methods/elements.
  *
