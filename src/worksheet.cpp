@@ -88,12 +88,6 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
         array = new lxw_cell *[LXW_COL_MAX]();
     }
 
-    //col_options = new lxw_col_options*[LXW_COL_META_MAX]();
-    col_options_max = LXW_COL_META_MAX;
-
-    //col_formats = new xlsxwriter::format*[LXW_COL_META_MAX]();
-    col_formats_max = LXW_COL_META_MAX;
-
     optimize_row = new lxw_row();
     optimize_row->height = LXW_DEF_ROW_HEIGHT;
 
@@ -3473,46 +3467,11 @@ lxw_error worksheet::set_column_opt(
     /* Resize the col_options array if required. */
     if (firstcol >= col_options.size()) {
         col_options.resize(firstcol + 1, nullptr);
-        /*
-        lxw_col_t col;
-        lxw_col_t old_size = col_options_max;
-        lxw_col_t new_size = _next_power_of_two(firstcol + 1);
-        lxw_col_options **new_ptr = (lxw_col_options **)realloc(col_options,
-                                            new_size *
-                                            sizeof(lxw_col_options *));
-
-        if (new_ptr) {
-            for (col = old_size; col < new_size; col++)
-                new_ptr[col] = NULL;
-
-            col_options = new_ptr;
-            col_options_max = new_size;
-        }
-        else {
-            return LXW_ERROR_MEMORY_MALLOC_FAILED;
-        }*/
     }
 
     /* Resize the col_formats array if required. */
     if (lastcol >= col_formats.size()) {
         col_formats.resize(lastcol + 1, nullptr);
-        /*
-        lxw_col_t col;
-        lxw_col_t old_size = col_formats_max;
-        lxw_col_t new_size = _next_power_of_two(lastcol + 1);
-        xlsxwriter::format **new_ptr = (xlsxwriter::format **)realloc(col_formats, new_size * sizeof(xlsxwriter::format*));
-
-        if (new_ptr) {
-            for (col = old_size; col < new_size; col++)
-                new_ptr[col] = NULL;
-
-            col_formats = new_ptr;
-            col_formats_max = new_size;
-        }
-        else {
-            return LXW_ERROR_MEMORY_MALLOC_FAILED;
-        }
-        */
     }
 
     /* Store the column options. */

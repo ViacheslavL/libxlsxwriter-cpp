@@ -2498,13 +2498,11 @@ private:
     uint16_t *first_sheet;
 
     std::vector<lxw_col_options *> col_options;
-    uint16_t col_options_max;
 
     double *col_sizes;
     uint16_t col_sizes_max;
 
     std::vector<xlsxwriter::format_ptr> col_formats;
-    uint16_t col_formats_max;
 
     bool col_size_changed;
     bool row_size_changed;
