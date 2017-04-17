@@ -680,7 +680,7 @@ void worksheet::_write_freeze_panes()
         selection = std::make_shared<lxw_selection>();
         if (selection) {
             selection->pane = "bottomRight";
-            selection->active_cell, user_selection->active_cell;
+            selection->active_cell = user_selection->active_cell;
             selection->sqref = user_selection->sqref;
 
             selections.push_back(selection);
