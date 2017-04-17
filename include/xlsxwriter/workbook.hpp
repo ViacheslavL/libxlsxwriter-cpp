@@ -586,7 +586,7 @@ private:
     uint16_t font_count;
     uint16_t border_count;
     uint16_t fill_count;
-    uint8_t optimize;
+    bool optimize;
 
     bool has_png;
     bool has_jpeg;

@@ -3144,8 +3144,8 @@ worksheet::write_url_opt(lxw_row_t row_num,
                         const std::string& tooltip)
 {
     lxw_cell *link;
-    std::string *string_copy = new std::string();
-    std::string *url_copy = nullptr;
+    std::unique_ptr<std::string> string_copy(new std::string());
+    std::unique_ptr<std::string> url_copy;
     std::string *url_external = nullptr;
     std::string *url_string = nullptr;
     std::string *tooltip_copy = nullptr;
@@ -3191,7 +3191,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
     }
 
     if (!url.empty()) {
-        url_copy = new std::string();
+        url_copy.reset( new std::string());
         if (link_type == HYPERLINK_URL)
             *url_copy = url;
         else
@@ -3250,8 +3250,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
 
             }
 
-            delete url_copy;
-            url_copy = url_external;
+            url_copy.reset(url_external);
 
             url_external = nullptr;
         }
@@ -3301,7 +3300,7 @@ worksheet::write_url_opt(lxw_row_t row_num,
             *url_copy = url_copy->substr(2);
 
         if (url_external) {
-            url_copy = url_external;
+            url_copy.reset(url_external);
             url_external = NULL;
         }
 
@@ -3310,23 +3309,20 @@ worksheet::write_url_opt(lxw_row_t row_num,
     /* Excel limits escaped URL to 255 characters. */
     if (url_copy->size() > 255) {
         //! @TODO make log here
-        delete string_copy;
         return LXW_NO_ERROR;
     }
 
     err = write_string(row_num, col_num, *string_copy, pformat);
     if (err) {
         //! @TODO make log here
-        delete string_copy;
         return LXW_NO_ERROR;
     }
 
-    link = _new_hyperlink_cell(row_num, col_num, link_type, url_copy,
+    link = _new_hyperlink_cell(row_num, col_num, link_type, url_copy.release(),
                                url_string, tooltip_copy);
 
     _insert_hyperlink(row_num, col_num, link);
 
-    delete string_copy;
     hlink_count++;
     return LXW_NO_ERROR;
 }

@@ -989,6 +989,17 @@ void workbook::assemble_xml_file()
 
 workbook::workbook(const std::string& file, const workbook_options& options) : filename(file)
 {
+    num_xf_formats = 0;
+    first_sheet = 0;
+    active_sheet = 0;
+    num_xf_formats = 0;
+    num_format_count = 0;
+    drawing_count = 0;
+
+    font_count = 0;
+    border_count = 0;
+    fill_count = 0;
+    optimize = false;
     workbook_new_opt(options);
 }
 
