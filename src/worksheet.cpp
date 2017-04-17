@@ -149,6 +149,7 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
     hbreaks_count = 0;
     vbreaks_count = 0;
     hlink_count = 0;
+    rel_count = 0;
 
     if (init_data) {
         name = init_data->name;

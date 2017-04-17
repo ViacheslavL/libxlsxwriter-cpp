@@ -207,7 +207,7 @@ lxw_fill * format::get_fill_key()
 int32_t format::get_xf_index()
 {
     hash_table<format_ptr, format_ptr> *formats_hash_table = xf_format_indices;
-    int32_t index;
+    int32_t index = 0;
 
     /* Note: The formats_hash_table/xf_format_indices contains the unique and
      * more importantly the *used* formats in the workbook.

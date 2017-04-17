@@ -31,7 +31,7 @@ public:
 
 private:
 
-    doc_properties *properties;
+    doc_properties* properties;
 
     void _write_cp_core_properties();
     void _write_dc_creator();

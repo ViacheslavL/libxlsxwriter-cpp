@@ -94,6 +94,7 @@ struct sort_defined_names
  * Workbook document properties.
  */
 struct doc_properties {
+    doc_properties() : created(0) {}
     /** The title of the Excel Document. */
     std::string title;
 
