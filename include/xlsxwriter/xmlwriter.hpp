@@ -41,9 +41,6 @@
 struct xml_attribute {
     char key[LXW_MAX_ATTRIBUTE_LENGTH];
     char value[LXW_MAX_ATTRIBUTE_LENGTH];
-
-    /* Make the struct a queue.h list element. */
-    STAILQ_ENTRY (xml_attribute) list_entries;
 };
 
 /* Use queue.h macros to define the xml_attribute_list type. */
@@ -55,38 +52,6 @@ struct xml_attribute *lxw_new_attribute_str(const char *key,
 struct xml_attribute *lxw_new_attribute_int(const char *key, uint32_t value);
 struct xml_attribute *lxw_new_attribute_dbl(const char *key, double value);
 
-/* Macro to initialize the xml_attribute_list pointers. */
-#define LXW_INIT_ATTRIBUTES()                                 \
-    STAILQ_INIT(&attributes)
-
-/* Macro to add attribute string elements to xml_attribute_list. */
-#define LXW_PUSH_ATTRIBUTES_STR(key, value)                   \
-    do {                                                      \
-    attribute = lxw_new_attribute_str((key), (value));        \
-    STAILQ_INSERT_TAIL(&attributes, attribute, list_entries); \
-    } while (0)
-
-/* Macro to add attribute int values to xml_attribute_list. */
-#define LXW_PUSH_ATTRIBUTES_INT(key, value)                   \
-    do {                                                      \
-    attribute = lxw_new_attribute_int((key), (value));        \
-    STAILQ_INSERT_TAIL(&attributes, attribute, list_entries); \
-    } while (0)
-
-/* Macro to add attribute double values to xml_attribute_list. */
-#define LXW_PUSH_ATTRIBUTES_DBL(key, value)                   \
-    do {                                                      \
-    attribute = lxw_new_attribute_dbl((key), (value));        \
-    STAILQ_INSERT_TAIL(&attributes, attribute, list_entries); \
-    } while (0)
-
-/* Macro to free xml_attribute_list and attribute. */
-#define LXW_FREE_ATTRIBUTES()                                 \
-    while (!STAILQ_EMPTY(&attributes)) {                      \
-        attribute = STAILQ_FIRST(&attributes);                \
-        STAILQ_REMOVE_HEAD(&attributes, list_entries);        \
-        free(attribute);                                      \
-    }
 
 namespace xlsxwriter {
 

@@ -34,25 +34,14 @@ void _write_rows();
 int _row_cmp(lxw_row *row1, lxw_row *row2);
 int _cell_cmp(lxw_cell *cell1, lxw_cell *cell2);
 
-LXW_RB_GENERATE_ROW(lxw_table_rows, lxw_row, tree_pointers, _row_cmp);
-LXW_RB_GENERATE_CELL(lxw_table_cells, lxw_cell, tree_pointers, _cell_cmp);
-
-/*****************************************************************************
- *
- * Private functions.
- *
- ****************************************************************************/
 
 /*
  * Find but don't create a row object for a given row number.
  */
 lxw_row * worksheet::find_row(lxw_row_t row_num)
 {
-    lxw_row row;
-
-    row.row_num = row_num;
-
-    return RB_FIND(lxw_table_rows, table, &row);
+    auto it = table.find(row_num);
+    return it != table.end() ? it->second : nullptr;
 }
 
 /*
@@ -60,14 +49,11 @@ lxw_row * worksheet::find_row(lxw_row_t row_num)
  */
 lxw_cell * worksheet::find_cell(lxw_row *row, lxw_col_t col_num)
 {
-    lxw_cell cell;
-
     if (!row)
-        return NULL;
+        return nullptr;
 
-    cell.col_num = col_num;
-
-    return RB_FIND(lxw_table_cells, row->cells, &cell);
+    auto it = row->cells.find(col_num);
+    return it != row->cells.end() ? it->second : nullptr;
 }
 
 /*
@@ -75,15 +61,15 @@ lxw_cell * worksheet::find_cell(lxw_row *row, lxw_col_t col_num)
  */
 worksheet::worksheet(lxw_worksheet_init_data *init_data)
 {
-    table = new lxw_table_rows();
-    RB_INIT(table);
+//    table = new lxw_table_rows();
+//    RB_INIT(table);
 
-    hyperlinks = new lxw_table_rows();
-    RB_INIT(hyperlinks);
+//    hyperlinks = new lxw_table_rows();
+//    RB_INIT(hyperlinks);
 
     /* Initialize the cached rows. */
-    table->cached_row_num = LXW_ROW_MAX + 1;
-    hyperlinks->cached_row_num = LXW_ROW_MAX + 1;
+    table.cached_row_num = LXW_ROW_MAX + 1;
+    hyperlinks.cached_row_num = LXW_ROW_MAX + 1;
 
     if (init_data && init_data->optimize) {
         array = new lxw_cell *[LXW_COL_MAX]();
@@ -182,48 +168,6 @@ worksheet::~worksheet()
 }
 
 /*
- * Free a worksheet cell.
- */
-void _free_cell(lxw_cell *cell)
-{
-    if (!cell)
-        return;
-
-    if (cell->type != NUMBER_CELL && cell->type != STRING_CELL
-        && cell->type != BLANK_CELL && cell->type != BOOLEAN_CELL) {
-
-        delete cell->u.string;
-    }
-
-    delete cell->user_data1;
-    delete cell->user_data2;
-
-    delete cell;
-}
-
-/*
- * Free a worksheet row.
- */
-void
-_free_row(lxw_row *row)
-{
-    lxw_cell *cell;
-    lxw_cell *next_cell;
-
-    if (!row)
-        return;
-
-    for (cell = RB_MIN(lxw_table_cells, row->cells); cell; cell = next_cell) {
-        next_cell = RB_NEXT(lxw_table_cells, row->cells, cell);
-        RB_REMOVE(lxw_table_cells, row->cells, cell);
-        _free_cell(cell);
-    }
-
-    free(row->cells);
-    free(row);
-}
-
-/*
  * Create a new worksheet row object.
  */
 lxw_row *
@@ -233,16 +177,7 @@ _new_row(lxw_row_t row_num)
 
     if (row) {
         row->row_num = row_num;
-        row->cells = new lxw_table_cells();
         row->height = LXW_DEF_ROW_HEIGHT;
-
-        if (row->cells)
-            RB_INIT(row->cells);
-        else
-            LXW_MEM_ERROR();
-    }
-    else {
-        LXW_MEM_ERROR();
     }
 
     return row;
@@ -395,27 +330,26 @@ _new_hyperlink_cell(lxw_row_t row_num, lxw_col_t col_num,
 /*
  * Get or create the row object for a given row number.
  */
-lxw_row * _get_row_list(lxw_table_rows *table, lxw_row_t row_num)
+lxw_row * _get_row_list(table_map& table, lxw_row_t row_num)
 {
     lxw_row *row;
-    lxw_row *existing_row;
 
-    if (table->cached_row_num == row_num)
-        return table->cached_row;
+    if (table.cached_row_num == row_num)
+        return table.cached_row;
 
     /* Create a new row and try and insert it. */
     row = _new_row(row_num);
-    existing_row = RB_INSERT(lxw_table_rows, table, row);
+    auto it = table.insert(std::make_pair(row_num, row));
 
     /* If existing_row is not NULL, then it already existed. Free new row */
     /* and return existing_row. */
-    if (existing_row) {
-        _free_row(row);
-        row = existing_row;
+    if (!it.second) {
+        delete row;
+        row = it.first->second;
     }
 
-    table->cached_row = row;
-    table->cached_row_num = row_num;
+    table.cached_row = row;
+    table.cached_row_num = row_num;
 
     return row;
 }
@@ -451,23 +385,21 @@ lxw_row * worksheet::_get_row(lxw_row_t row_num)
 /*
  * Insert a cell object in the cell list of a row object.
  */
-void _insert_cell_list(lxw_table_cells *cell_list,
+void _insert_cell_list(std::map<lxw_col_t, lxw_cell*>& cell_list,
                   lxw_cell *cell, lxw_col_t col_num)
 {
-    lxw_cell *existing_cell;
-
     cell->col_num = col_num;
-
-    existing_cell = RB_INSERT(lxw_table_cells, cell_list, cell);
+    auto it = cell_list.insert(std::make_pair(col_num, cell));
 
     /* If existing_cell is not NULL, then that cell already existed. */
     /* Remove existing_cell and add new one in again. */
-    if (existing_cell) {
-        RB_REMOVE(lxw_table_cells, cell_list, existing_cell);
+    if (!it.second) {
+        lxw_cell* existing_cell = it.first->second;
+        cell_list.erase(it.first);
 
         /* Add it in again. */
-        RB_INSERT(lxw_table_cells, cell_list, cell);
-        _free_cell(existing_cell);
+        cell_list.insert(std::make_pair(col_num, cell));
+        delete existing_cell;
     }
 
     return;
@@ -490,7 +422,7 @@ void worksheet::_insert_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *cel
 
             /* Overwrite an existing cell if necessary. */
             if (array[col_num])
-                _free_cell(array[col_num]);
+                delete array[col_num];
 
             array[col_num] = cell;
         }
@@ -1096,7 +1028,7 @@ void worksheet::_write_sheet_format_pr()
 void
 worksheet::_write_sheet_data()
 {
-    if (RB_EMPTY(table)) {
+    if (table.empty()) {
         lxw_xml_empty_tag("sheetData");
     }
     else {
@@ -2129,22 +2061,22 @@ void worksheet::_write_boolean_cell(lxw_cell *cell)
  *
  * The span is the same for each block of 16 rows.
  */
-void
-_calculate_spans(struct lxw_row *row, char *span, int32_t *block_num)
+void worksheet::_calculate_spans(table_map::iterator it, char *span, int32_t *block_num)
 {
-    lxw_col_t span_col_min = RB_MIN(lxw_table_cells, row->cells)->col_num;
-    lxw_col_t span_col_max = RB_MAX(lxw_table_cells, row->cells)->col_num;
+    lxw_row* row = it->second;
+    lxw_col_t span_col_min = row->cells.size() > 0 ? row->cells.begin()->second->col_num : -1 ;
+    lxw_col_t span_col_max = row->cells.size() > 0 ? row->cells.rbegin()->second->col_num : 1;
     lxw_col_t col_min;
     lxw_col_t col_max;
     *block_num = row->row_num / 16;
 
-    row = RB_NEXT(lxw_table_rows, root, row);
-
+    ++it;
+    row = it->second;
     while (row && (int32_t) (row->row_num / 16) == *block_num) {
 
-        if (!RB_EMPTY(row->cells)) {
-            col_min = RB_MIN(lxw_table_cells, row->cells)->col_num;
-            col_max = RB_MAX(lxw_table_cells, row->cells)->col_num;
+        if (!row->cells.empty()) {
+            col_min = row->cells.begin()->second->col_num;
+            col_max = row->cells.rbegin()->second->col_num;
 
             if (col_min < span_col_min)
                 span_col_min = col_min;
@@ -2152,9 +2084,12 @@ _calculate_spans(struct lxw_row *row, char *span, int32_t *block_num)
             if (col_max > span_col_max)
                 span_col_max = col_max;
         }
-
-        row = RB_NEXT(lxw_table_rows, root, row);
+        ++it;
+        if (it == table.end())
+            break;
+        row = it->second;
     }
+
 
     lxw_snprintf(span, LXW_MAX_CELL_RANGE_LENGTH,
                  "%d:%d", span_col_min + 1, span_col_max + 1);
@@ -2232,14 +2167,12 @@ void worksheet::_write_cell(lxw_cell *cell, xlsxwriter::format* row_format)
  */
 void worksheet::_write_rows()
 {
-    lxw_row *row;
-    lxw_cell *cell;
     int32_t block_num = -1;
     char spans[LXW_MAX_CELL_RANGE_LENGTH] = { 0 };
 
-    RB_FOREACH(row, lxw_table_rows, table) {
-
-        if (RB_EMPTY(row->cells)) {
+    for(auto it = table.begin(); it != table.end() ; ++it) {
+        lxw_row *row = it->second;
+        if (row->cells.empty()) {
             /* Row contains no cells but has height, format or other data. */
 
             /* Write a default span for default rows. */
@@ -2251,11 +2184,12 @@ void worksheet::_write_rows()
         else {
             /* Row and cell data. */
             if ((int32_t) row->row_num / 16 > block_num)
-                _calculate_spans(row, spans, &block_num);
+                _calculate_spans(it, spans, &block_num);
 
             _write_row(row, spans);
 
-            RB_FOREACH(cell, lxw_table_cells, row->cells) {
+            for(const auto& it : row->cells) {
+                lxw_cell *cell = it.second;
                 _write_cell(cell, row->format);
             }
             lxw_xml_end_tag("row");
@@ -2290,7 +2224,7 @@ void worksheet::write_single_row()
         for (col = dim_colmin; col <= dim_colmax; col++) {
             if (array[col]) {
                 _write_cell(array[col], row->format);
-                _free_cell(array[col]);
+                delete array[col];
                 array[col] = nullptr;
             }
         }
@@ -2685,21 +2619,18 @@ void worksheet::_write_hyperlink_internal(lxw_row_t row_num,
  */
 void worksheet::_write_hyperlinks()
 {
-
-    lxw_row *row;
-    lxw_cell *link;
     rel_tuple_ptr relationship;
 
-    if (RB_EMPTY(hyperlinks))
+    if (hyperlinks.empty())
         return;
 
     /* Write the hyperlink elements. */
     lxw_xml_start_tag("hyperlinks");
 
-    RB_FOREACH(row, lxw_table_rows, hyperlinks) {
-
-        RB_FOREACH(link, lxw_table_cells, row->cells) {
-
+    for (const auto& it: hyperlinks) {
+        lxw_row *row = it.second;
+        for(const auto& it : row->cells) {
+            lxw_cell *link = it.second;
             if (link->type == HYPERLINK_URL
                 || link->type == HYPERLINK_EXTERNAL) {
 
@@ -4391,6 +4322,40 @@ lxw_error worksheet::insert_chart_opt(lxw_row_t row_num, lxw_col_t col_num, xlsx
 lxw_error worksheet::insert_chart(lxw_row_t row_num, lxw_col_t col_num, xlsxwriter::chart* chart)
 {
     return insert_chart_opt(row_num, col_num, chart, NULL);
+}
+
+lxw_row::lxw_row()
+    : row_num(0)
+    , height(0.0)
+    , format(nullptr)
+    , hidden(false)
+    , level(0)
+    , collapsed(false)
+    , row_changed(false)
+    , data_changed(false)
+    , height_changed(false)
+{
+}
+
+lxw_row::~lxw_row(){
+    for (auto it : cells)
+        delete it.second;
+}
+
+lxw_cell::lxw_cell() {
+    memset(this, 0, sizeof(lxw_cell));
+}
+
+lxw_cell::~lxw_cell()
+{
+    if (type != NUMBER_CELL && type != STRING_CELL
+        && type != BLANK_CELL && type != BOOLEAN_CELL) {
+
+        delete u.string;
+    }
+
+    delete user_data1;
+    delete user_data2;
 }
 
 } // xlsxwriter

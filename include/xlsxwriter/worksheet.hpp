@@ -25,6 +25,7 @@
 #include "common.hpp"
 #include "format.hpp"
 #include "utility.hpp"
+#include <map>
 
 #define LXW_ROW_MAX 1048576
 #define LXW_COL_MAX 16384
@@ -77,9 +78,6 @@ enum pane_types {
     FREEZE_SPLIT_PANES
 };
 
-/* Define the tree.h RB structs for the red-black head types. */
-RB_HEAD(lxw_table_cells, lxw_cell);
-
 /* Define a RB_TREE struct manually to add extra members. */
 struct lxw_table_rows {
     struct lxw_row *rbh_root;
@@ -87,29 +85,19 @@ struct lxw_table_rows {
     lxw_row_t cached_row_num;
 };
 
-/* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
- * warnings and to avoid portability issues with the _unused attribute. */
-#define LXW_RB_GENERATE_ROW(name, type, field, cmp)       \
-    RB_GENERATE_INSERT_COLOR(name, type, field, static)   \
-    RB_GENERATE_REMOVE_COLOR(name, type, field, static)   \
-    RB_GENERATE_INSERT(name, type, field, cmp, static)    \
-    RB_GENERATE_REMOVE(name, type, field, static)         \
-    RB_GENERATE_FIND(name, type, field, cmp, static)      \
-    RB_GENERATE_NEXT(name, type, field, static)           \
-    RB_GENERATE_MINMAX(name, type, field, static)         \
-    /* Add unused struct to allow adding a semicolon */   \
-    struct lxw_rb_generate_row{int unused;}
+struct lxw_row;
 
-#define LXW_RB_GENERATE_CELL(name, type, field, cmp)      \
-    RB_GENERATE_INSERT_COLOR(name, type, field, static)   \
-    RB_GENERATE_REMOVE_COLOR(name, type, field, static)   \
-    RB_GENERATE_INSERT(name, type, field, cmp, static)    \
-    RB_GENERATE_REMOVE(name, type, field, static)         \
-    RB_GENERATE_FIND(name, type, field, cmp, static)      \
-    RB_GENERATE_NEXT(name, type, field, static)           \
-    RB_GENERATE_MINMAX(name, type, field, static)         \
-    /* Add unused struct to allow adding a semicolon */   \
-    struct lxw_rb_generate_cell{int unused;}
+class table_map : public std::map<int, lxw_row*> {
+public:
+    table_map()
+        : cached_row(nullptr)
+        , cached_row_num(0)
+    {
+    }
+
+    lxw_row* cached_row;
+    size_t cached_row_num;
+};
 
 /**
  * @brief Options for rows and columns.
@@ -398,31 +386,29 @@ struct lxw_worksheet_init_data {
 
 };
 
+struct lxw_cell;
+
 /* Struct to represent a worksheet row. */
 struct lxw_row {
-    lxw_row() {
-        memset(this, 0, sizeof(lxw_row));
-    }
+    lxw_row();
+    ~lxw_row();
+
     lxw_row_t row_num;
     double height;
     xlsxwriter::format *format;
-    uint8_t hidden;
+    bool hidden;
     uint8_t level;
-    uint8_t collapsed;
-    uint8_t row_changed;
-    uint8_t data_changed;
-    uint8_t height_changed;
-    lxw_table_cells *cells;
-
-    /* tree management pointers for tree.h. */
-    RB_ENTRY (lxw_row) tree_pointers;
+    bool collapsed;
+    bool row_changed;
+    bool data_changed;
+    bool height_changed;
+    std::map<lxw_col_t, lxw_cell*> cells;
 };
 
 /* Struct to represent a worksheet cell. */
 struct lxw_cell {
-    lxw_cell() {
-        memset(this, 0, sizeof(lxw_cell));
-    }
+    lxw_cell();
+    ~lxw_cell();
     lxw_row_t row_num;
     lxw_col_t col_num;
     enum cell_types type;
@@ -438,9 +424,6 @@ struct lxw_cell {
     std::string *user_data1;
     std::string *user_data2;
     std::string *sst_string;
-
-    /* List pointers for tree.h. */
-    RB_ENTRY (lxw_cell) tree_pointers;
 };
 
 class packager;
@@ -2472,8 +2455,8 @@ public:
 
 private:
     FILE *optimize_tmpfile;
-    lxw_table_rows *table;
-    lxw_table_rows *hyperlinks;
+    table_map table;
+    table_map hyperlinks;
     lxw_cell **array;
     std::vector<std::shared_ptr<lxw_merged_range>> merged_ranges;
     std::vector<std::shared_ptr<lxw_selection>> selections;
@@ -2637,6 +2620,7 @@ private:
     void _write_boolean_cell(lxw_cell *cell);
     void _insert_cell(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *cell);
     void _insert_hyperlink(lxw_row_t row_num, lxw_col_t col_num, lxw_cell *link);
+    void _calculate_spans(table_map::iterator it , char *span, int32_t *block_num);
 };
 
 lxw_row *_get_row_list(lxw_table_rows *table, lxw_row_t row_num);

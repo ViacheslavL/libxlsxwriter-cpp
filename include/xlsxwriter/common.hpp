@@ -16,8 +16,6 @@
 #define __LXW_COMMON_HPP__
 
 #include <time.h>
-#include "xlsxwriter/third_party/queue.h"
-#include "xlsxwriter/third_party/tree.h"
 #include <string>
 
 #include <memory>
@@ -270,18 +268,9 @@ msvc2010_snprintf(char *str, size_t size, const char *format, ...)
 #define lxw_strcpy(dest, src) \
     lxw_snprintf(dest, sizeof(dest), "%s", src)
 
-/* Define the queue.h structs for the formats list. */
-STAILQ_HEAD(lxw_formats, lxw_format);
-
-/* Define the queue.h structs for the generic data structs. */
-STAILQ_HEAD(lxw_tuples, lxw_tuple);
-STAILQ_HEAD(lxw_custom_properties, lxw_custom_property);
-
 typedef struct lxw_tuple {
     char *key;
     char *value;
-
-    STAILQ_ENTRY (lxw_tuple) list_pointers;
 } lxw_tuple;
 
 /* Define custom property used in workbook.c and custom.c. */

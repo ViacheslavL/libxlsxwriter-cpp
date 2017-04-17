@@ -57,15 +57,8 @@
 
 #define LXW_DEFINED_NAME_LENGTH 128
 
-/* Define the queue.h structs for the workbook lists. */
-STAILQ_HEAD(lxw_worksheets, lxw_worksheet);
-TAILQ_HEAD(lxw_defined_names, lxw_defined_name);
-
 namespace xlsxwriter {
 
-
-/* Wrapper around RB_GENERATE_STATIC from tree.h to avoid unused function
- * warnings and to avoid portability issues with the _unused attribute. */
 
 /* Struct to represent a defined name. */
 struct defined_name {
