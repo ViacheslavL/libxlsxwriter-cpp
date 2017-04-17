@@ -165,6 +165,10 @@ worksheet::worksheet(lxw_worksheet_init_data *init_data)
 
 worksheet::~worksheet()
 {
+    for(auto it: table)
+        delete it.second;
+    for(auto it: hyperlinks)
+        delete it.second;
 }
 
 /*
@@ -2873,8 +2877,7 @@ worksheet::write_string(lxw_row_t row_num,
 {
     lxw_cell *cell;
     int32_t string_id;
-    std::string *string_copy = new std::string();
-    struct sst_element *sst_element;
+    sst_element *sst_element;
     lxw_error err;
 
     if (string.empty()) {
@@ -2904,6 +2907,7 @@ worksheet::write_string(lxw_row_t row_num,
         cell = _new_string_cell(row_num, col_num, string_id, &sst_element->string, pformat);
     }
     else {
+        std::string *string_copy = new std::string();
         /* Look for and escape control chars in the string. */
         if (strpbrk(string.c_str(), "\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C"
                     "\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16"
