@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <iterator>
 #include <memory>
 
 #include "xmlwriter.hpp"
