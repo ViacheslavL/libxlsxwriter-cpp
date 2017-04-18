@@ -11,18 +11,16 @@ install:
   - cd zlib
   - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .
   - nmake
-  - dir
-  - dir lib
   - cd ..
 
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\lib\zlib.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib" ../ 
+  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\zlib.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib" ../ 
   - nmake 
 
 test_script:
-  - copy C:\projects\libxlsxwriter-cpp\zlib\bin\zlib.dll C:\projects\libxlsxwriter-cpp\bin\test_functional
+  - copy C:\projects\libxlsxwriter-cpp\zlib\zlib.dll C:\projects\libxlsxwriter-cpp\bin\test_functional
   - cd .\bin\test_functional
   - py.test . -v --exec_dir=. --data_dir=./xlsx_files
 
