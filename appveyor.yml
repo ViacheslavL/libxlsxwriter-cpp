@@ -9,7 +9,7 @@ install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
   - git clone https://github.com/madler/zlib
   - cd zlib
-  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -A x64 .
+  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .
   - nmake
 
 build_script:
