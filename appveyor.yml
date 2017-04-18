@@ -9,13 +9,11 @@ install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
   - appveyor DownloadFile "http://zlib.net/zlib128-dll.zip"
   - 7z x -ozlib zlib128-dll.zip
-  - set ZLIB_LIBRARY=..\zlib\lib\zdll.lib 
-  - set ZLIB_INCLUDE_DIR=..\zlib\include
 
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release ../ 
+  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="..\zlib\lib\zdll.lib" -DZLIB_INCLUDE_DIR="..\zlib\include" ../ 
   - nmake 
 
 test_script:
