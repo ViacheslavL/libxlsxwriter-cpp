@@ -9,7 +9,7 @@ install: []
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles"-DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release ../ 
+  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release ../ 
   - nmake 
 
 test_script:
