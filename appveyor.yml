@@ -1,0 +1,18 @@
+os: 
+  - Visual Studio 2015
+  - Visual Studio 2017
+  
+init: []
+
+install: []
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake -G "NMake Makefiles"-DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release ../ 
+  - nmake 
+
+test_script:
+  - cd .\bin\test_functional
+  - py.test . -v --exec_dir=. --data_dir=./xlsx_files
+
