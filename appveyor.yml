@@ -14,7 +14,9 @@ install:
   - cd ..
 
 build_script:
-  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\zlib.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib"
+  - mkdir build
+  - cd build
+  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\zlib.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib" -DCMAKE_INSTALL_PREFIX="C:\projects\libxlsxwriter-cpp\build" ..
   - nmake 
 
 test_script:
