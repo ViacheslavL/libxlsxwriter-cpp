@@ -9,6 +9,7 @@ install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
   - appveyor DownloadFile "http://zlib.net/zlib128-dll.zip"
   - 7z x -ozlib zlib128-dll.zip
+  - dir
 
 build_script:
   - mkdir build
