@@ -17,10 +17,6 @@ set(xlsxwriter_srcs
     worksheet.cpp
     xmlwriter.cpp)
 
-if (MSVC)
-    list(APPEND xlsxwriter_srcs XlsxWriter.def)
-endif()
-
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_library(xlsxwriter++ ${xlsxwriter_srcs})
