@@ -7,17 +7,19 @@ init: []
 install: 
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
-  - appveyor DownloadFile "http://zlib.net/zlib128-dll.zip"
-  - 7z x -ozlib zlib128-dll.zip
+  - git clone https://github.com/madler/zlib
+  - cd zlib
+  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -A x64 .
+  - nmake
 
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\lib\zdll.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib\include" ../ 
+  - cmake -G "NMake Makefiles" -DBUILD_TESTING=1 -DCMAKE_BUILD_TYPE=Release -DZLIB_LIBRARY="C:\projects\libxlsxwriter-cpp\zlib\lib\zlib.lib" -DZLIB_INCLUDE_DIR="C:\projects\libxlsxwriter-cpp\zlib\include" ../ 
   - nmake 
 
 test_script:
-  - copy ..\zlib\zlib.dll .\bin\test_functional
+  - copy C:\projects\libxlsxwriter-cpp\zlib\bin\zlib.dll C:\projects\libxlsxwriter-cpp\bin\test_functional
   - cd .\bin\test_functional
   - py.test . -v --exec_dir=. --data_dir=./xlsx_files
 
