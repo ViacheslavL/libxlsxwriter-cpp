@@ -1,10 +1,16 @@
 os:
   - Visual Studio 2015
+  - Visual Studio 2017
 
 init: []
 
 install: 
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+  - appveyor DownloadFile "http://zlib.net/zlib128-dll.zip"
+  - 7z x -ozlib zlib128-dll.zip
+  - set ZLIB_LIBRARY=..\zlib\lib\zdll.lib 
+  - set ZLIB_INCLUDE_DIR=..\zlib\include
 
 build_script:
   - mkdir build
@@ -13,6 +19,7 @@ build_script:
   - nmake 
 
 test_script:
+  - copy ..\zlib\zlib.dll .\bin\test_functional
   - cd .\bin\test_functional
   - py.test . -v --exec_dir=. --data_dir=./xlsx_files
 
