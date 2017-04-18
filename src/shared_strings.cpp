@@ -11,6 +11,7 @@
 #include <xlsxwriter/shared_strings.hpp>
 #include <xlsxwriter/utility.hpp>
 #include <ctype.h>
+#include <cctype>
 #include <cstring>
 
 
