@@ -88,7 +88,7 @@ packager::packager(const std::string& filename, const std::string& tmpdir)
 
     /* Create a zip container for the xlsx file. */
 #ifdef _WIN32
-    zipfile = _open_zipfile_win32(this->filename);
+    zipfile = _open_zipfile_win32(this->filename.c_str());
 #else
     zipfile = zipOpen(this->filename.c_str(), 0);
 #endif
