@@ -46,7 +46,7 @@ class no_zip_file_exception : public std::exception {
 /*
  * Struct to represent a packager.
  */
-class packager {
+class XLSXWRITER_EXPORT packager {
     friend class xlsxwriter::workbook;
 public:
     packager(const std::string& filename, const std::string& tmpdir = std::string());

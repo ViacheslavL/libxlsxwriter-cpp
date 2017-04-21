@@ -110,43 +110,43 @@ namespace xlsxwriter {
  *
  * @return A pointer to a statically allocated string. Do not free.
  */
-const std::string& lxw_strerror(lxw_error error_num);
+XLSXWRITER_EXPORT const std::string& lxw_strerror(lxw_error error_num);
 
 /* Create a quoted version of the worksheet name */
-std::string lxw_quote_sheetname(const std::string& str);
+XLSXWRITER_EXPORT std::string lxw_quote_sheetname(const std::string& str);
 
-void lxw_col_to_name(std::string& col_name, lxw_col_t col_num, uint8_t absolute);
+XLSXWRITER_EXPORT void lxw_col_to_name(std::string& col_name, lxw_col_t col_num, uint8_t absolute);
 
-void lxw_rowcol_to_cell(std::string& cell_name, lxw_row_t row, lxw_col_t col);
+XLSXWRITER_EXPORT void lxw_rowcol_to_cell(std::string& cell_name, lxw_row_t row, lxw_col_t col);
 
-void lxw_rowcol_to_cell_abs(std::string& cell_name,
+XLSXWRITER_EXPORT void lxw_rowcol_to_cell_abs(std::string& cell_name,
                             lxw_row_t row,
                             lxw_col_t col, uint8_t abs_row, uint8_t abs_col);
 
-void lxw_rowcol_to_range(std::string& range,
+XLSXWRITER_EXPORT void lxw_rowcol_to_range(std::string& range,
                          lxw_row_t first_row, lxw_col_t first_col,
                          lxw_row_t last_row, lxw_col_t last_col);
 
-void lxw_rowcol_to_range_abs(std::string& range,
+XLSXWRITER_EXPORT void lxw_rowcol_to_range_abs(std::string& range,
                              lxw_row_t first_row, lxw_col_t first_col,
                              lxw_row_t last_row, lxw_col_t last_col);
 
-void lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
+XLSXWRITER_EXPORT void lxw_rowcol_to_formula_abs(std::string& formula, const std::string& sheetname,
                           lxw_row_t first_row, lxw_col_t first_col,
                           lxw_row_t last_row, lxw_col_t last_col);
 
-uint32_t lxw_name_to_row(const std::string& row_str);
-uint16_t lxw_name_to_col(const std::string&  col_str);
-uint32_t lxw_name_to_row_2(const std::string& row_str);
-uint16_t lxw_name_to_col_2(const std::string& col_str);
+XLSXWRITER_EXPORT uint32_t lxw_name_to_row(const std::string& row_str);
+XLSXWRITER_EXPORT uint16_t lxw_name_to_col(const std::string&  col_str);
+XLSXWRITER_EXPORT uint32_t lxw_name_to_row_2(const std::string& row_str);
+XLSXWRITER_EXPORT uint16_t lxw_name_to_col_2(const std::string& col_str);
 
-double lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904);
+XLSXWRITER_EXPORT double lxw_datetime_to_excel_date(lxw_datetime *datetime, uint8_t date_1904);
 
-void lxw_str_tolower(std::string& str);
+XLSXWRITER_EXPORT void lxw_str_tolower(std::string& str);
 
-FILE *lxw_tmpfile(const char *tmpdir);
+XLSXWRITER_EXPORT FILE *lxw_tmpfile(const char *tmpdir);
 
-std::string to_string(double);
+XLSXWRITER_EXPORT std::string to_string(double);
 
 } // namespace xlsxwriter
 

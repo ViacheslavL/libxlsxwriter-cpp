@@ -21,7 +21,7 @@ class packager;
 /*
  * Struct to represent a styles.
  */
-class styles : public xmlwriter{
+class XLSXWRITER_EXPORT styles : public xmlwriter{
 
     friend class packager;
 public:

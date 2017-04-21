@@ -23,9 +23,11 @@ add_library(xlsxwriter++ ${xlsxwriter_srcs})
 
 target_link_libraries(xlsxwriter++ lxw_tmpfileplus lxw_minizip ${ZLIB_LIBRARIES}  )
 
+target_compile_definitions(xlsxwriter++ PRIVATE -DXLSXWRITER_EXPORTS )
+
 add_library(xlsxwriter_test STATIC ${xlsxwriter_srcs})
 
-target_compile_definitions(xlsxwriter_test PRIVATE -DTESTING)
+target_compile_definitions(xlsxwriter_test PRIVATE -DTESTING -DXLSXWRITER_EXPORTS)
 
 
 

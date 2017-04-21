@@ -44,7 +44,7 @@ enum image_types {
 };
 
 /* Coordinates used in a drawing object. */
-struct lxw_drawing_coords {
+struct XLSXWRITER_EXPORT lxw_drawing_coords {
     uint32_t col;
     uint32_t row;
     double col_offset;
@@ -52,7 +52,7 @@ struct lxw_drawing_coords {
 };
 
 /* Object to represent the properties of a drawing. */
-struct drawing_object {
+struct XLSXWRITER_EXPORT drawing_object {
     uint8_t anchor_type;
     uint8_t edit_as;
     lxw_drawing_coords from;
@@ -74,7 +74,7 @@ class worksheet;
 /*
  * Struct to represent a collection of drawings.
  */
-struct drawing : public xmlwriter {
+struct XLSXWRITER_EXPORT drawing : public xmlwriter {
     friend class packager;
     friend class worksheet;
 public:

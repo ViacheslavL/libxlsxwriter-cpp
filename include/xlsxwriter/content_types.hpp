@@ -25,7 +25,7 @@ class packager;
 /*
  * Struct to represent a content_types.
  */
-class content_types : public xmlwriter {
+class XLSXWRITER_EXPORT content_types : public xmlwriter {
     friend class packager;
 public:
 

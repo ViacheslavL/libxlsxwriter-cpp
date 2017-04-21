@@ -20,7 +20,7 @@ class packager;
 /*
  * Struct to represent a theme.
  */
-class theme : public xmlwriter {
+class XLSXWRITER_EXPORT theme : public xmlwriter {
     friend class packager;
 public:
     void xml_declaration();

@@ -152,7 +152,7 @@ struct doc_properties {
  *   accessible to your application, or doesn't contain enough space, you can
  *   specify an alternative location using the `tempdir` option.
  */
-struct workbook_options {
+struct XLSXWRITER_EXPORT workbook_options {
     workbook_options() : constant_memory(false) {}
 
     /** Optimize the workbook to use constant memory for worksheets */
@@ -171,7 +171,7 @@ class packager;
  * the workbook properties are set by calling the functions shown in
  * workbook.h.
  */
-class workbook : public xmlwriter {
+class XLSXWRITER_EXPORT workbook : public xmlwriter {
     friend class packager;
 
 public:

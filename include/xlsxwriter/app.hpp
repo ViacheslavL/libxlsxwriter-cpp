@@ -14,14 +14,15 @@
 #include "common.hpp"
 
 #include <map>
+#include <string>
 #include <list>
 
 namespace xlsxwriter {
 
-class packager;
+class XLSXWRITER_EXPORT packager;
 
 /* Class to represent an App object. */
-class app : public xmlwriter {
+class XLSXWRITER_EXPORT app : public xmlwriter {
     friend class packager;
 public:
 

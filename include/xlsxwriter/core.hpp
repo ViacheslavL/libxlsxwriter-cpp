@@ -20,7 +20,7 @@ class packager;
 /*
  * Struct to represent a core.
  */
-class core : public xmlwriter {
+class XLSXWRITER_EXPORT core : public xmlwriter {
     friend class packager;
 public:
     void assemble_xml_file();

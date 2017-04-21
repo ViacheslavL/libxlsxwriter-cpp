@@ -226,7 +226,7 @@ struct chart_font {
 
 };
 
-struct chart_title {
+struct XLSXWRITER_EXPORT chart_title {
 
     chart_title();
 
@@ -261,7 +261,7 @@ class worksheet;
  * used in functions that modify a chart series but the members of the struct
  * aren't modified directly.
  */
-struct chart_series {
+struct XLSXWRITER_EXPORT chart_series {
     friend class chart;
     friend class workbook;
     friend class worksheet;
@@ -391,7 +391,7 @@ typedef std::shared_ptr<chart_series> chart_series_ptr;
  * that modify a chart axis but the members of the struct aren't modified
  * directly.
  */
-struct chart_axis{
+struct XLSXWRITER_EXPORT chart_axis{
     friend class chart;
     friend class workbook;
 public:
@@ -497,7 +497,7 @@ class worksheet;
  * The members of the chart class aren't modified directly. Instead
  * the chart properties are set by calling the functions shown in chart.h.
  */
-class chart : public xmlwriter {
+class XLSXWRITER_EXPORT chart : public xmlwriter {
     friend class packager;
     friend class workbook;
     friend class worksheet;
@@ -928,7 +928,7 @@ protected:
     void _initialize();
 };
 
-int chart_add_data_cache(series_range *range, uint8_t *data,
+int XLSXWRITER_EXPORT chart_add_data_cache(series_range *range, uint8_t *data,
                              uint16_t rows, uint8_t cols, uint8_t col);
 
 

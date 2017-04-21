@@ -113,7 +113,7 @@ public:
  * * `level`
  * * `collapsed`
  */
-struct row_col_options {
+struct XLSXWRITER_EXPORT row_col_options {
     row_col_options() : hidden(false), level(0), collapsed(false) {}
     row_col_options(bool h, uint8_t l, bool c) : hidden(h), level(l), collapsed(c){}
     /** Hide the row/column */
@@ -122,7 +122,7 @@ struct row_col_options {
     bool collapsed;
 };
 
-struct lxw_col_options {
+struct XLSXWRITER_EXPORT lxw_col_options {
     lxw_col_options()
         : firstcol(0)
         , lastcol(0)
@@ -141,7 +141,7 @@ struct lxw_col_options {
     uint8_t collapsed;
 };
 
-struct lxw_merged_range {
+struct XLSXWRITER_EXPORT lxw_merged_range {
     lxw_merged_range()
         : first_row(0)
         , last_row(0)
@@ -154,7 +154,7 @@ struct lxw_merged_range {
     lxw_col_t last_col;
 };
 
-struct lxw_repeat_rows {
+struct XLSXWRITER_EXPORT lxw_repeat_rows {
     lxw_repeat_rows()
         : in_use(0)
         , first_row(0)
@@ -165,7 +165,7 @@ struct lxw_repeat_rows {
     lxw_row_t last_row;
 };
 
-struct lxw_repeat_cols {
+struct XLSXWRITER_EXPORT lxw_repeat_cols {
     lxw_repeat_cols()
         : in_use(0)
         , first_col(0)
@@ -176,7 +176,7 @@ struct lxw_repeat_cols {
     lxw_col_t last_col;
 };
 
-struct lxw_print_area {
+struct XLSXWRITER_EXPORT lxw_print_area {
     lxw_print_area()
         : in_use(0)
         , first_row(0)
@@ -191,7 +191,7 @@ struct lxw_print_area {
     lxw_col_t last_col;
 };
 
-struct lxw_autofilter {
+struct XLSXWRITER_EXPORT lxw_autofilter {
     lxw_autofilter()
         : in_use(0)
         , first_row(0)
@@ -206,7 +206,7 @@ struct lxw_autofilter {
     lxw_col_t last_col;
 };
 
-struct lxw_panes {
+struct XLSXWRITER_EXPORT lxw_panes {
     lxw_panes()
         : type(0)
         , first_row(0)
@@ -225,7 +225,7 @@ struct lxw_panes {
     double y_split;
 };
 
-struct lxw_selection {
+struct XLSXWRITER_EXPORT lxw_selection {
     std::string pane;
     std::string active_cell;
     std::string sqref;
@@ -237,7 +237,7 @@ struct lxw_selection {
  * Options for modifying images inserted via `worksheet_insert_image_opt()`.
  *
  */
-struct image_options {
+struct XLSXWRITER_EXPORT image_options {
 
     image_options()
         : x_offset(0)
@@ -288,6 +288,7 @@ struct image_options {
     xlsxwriter::chart* chart;
 };
 
+template class XLSXWRITER_EXPORT std::shared_ptr<image_options>;
 typedef std::shared_ptr<image_options> image_options_ptr;
 
 /**
@@ -307,7 +308,7 @@ struct lxw_header_footer_options {
 /**
  * @brief Worksheet protection options.
  */
-struct lxw_protection {
+struct XLSXWRITER_EXPORT lxw_protection {
     lxw_protection() {
         memset(this, 0, sizeof(lxw_protection));
     }
@@ -390,7 +391,7 @@ struct lxw_worksheet_init_data {
 struct lxw_cell;
 
 /* Struct to represent a worksheet row. */
-struct lxw_row {
+struct XLSXWRITER_EXPORT lxw_row {
     lxw_row();
     ~lxw_row();
 
@@ -407,7 +408,7 @@ struct lxw_row {
 };
 
 /* Struct to represent a worksheet cell. */
-struct lxw_cell {
+struct XLSXWRITER_EXPORT lxw_cell {
     lxw_cell();
     ~lxw_cell();
     lxw_row_t row_num;
@@ -465,7 +466,7 @@ class workbook;
  * @endcode
  *
  */
-class worksheet : public xmlwriter{
+class XLSXWRITER_EXPORT worksheet : public xmlwriter{
     friend class xlsxwriter::packager;
     friend class xlsxwriter::workbook;
 public:

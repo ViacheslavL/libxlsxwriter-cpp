@@ -20,10 +20,15 @@
 
 #include <memory>
 
-#ifndef TESTING
-#define STATIC static
+#ifdef _WIN32
+#  pragma warning( disable: 4251 )
+#  ifdef XLSXWRITER_EXPORTS
+#    define XLSXWRITER_EXPORT __declspec(dllexport)
+#  else
+#    define XLSXWRITER_EXPORT __declspec(dllimport)
+#  endif
 #else
-#define STATIC
+#  define XLSXWRITER_EXPORT
 #endif
 
 /** Integer data type to represent a row value. Equivalent to `uint32_t`.
@@ -274,7 +279,7 @@ typedef struct lxw_tuple {
 } lxw_tuple;
 
 /* Define custom property used in workbook.c and custom.c. */
-struct lxw_custom_property {
+struct XLSXWRITER_EXPORT lxw_custom_property {
 
     enum lxw_custom_property_types type;
     std::string name;
@@ -287,6 +292,8 @@ struct lxw_custom_property {
         lxw_datetime datetime;
     } u;
 };
+
+template class XLSXWRITER_EXPORT std::shared_ptr<lxw_custom_property>;
 
 typedef std::shared_ptr<lxw_custom_property> custom_property_ptr;
 

@@ -20,7 +20,7 @@ namespace xlsxwriter {
 
 class packager;
 
-struct rel_tuple {
+struct XLSXWRITER_EXPORT rel_tuple {
     std::string type;
     std::string target;
     std::string target_mode;
@@ -31,7 +31,7 @@ typedef std::shared_ptr<rel_tuple> rel_tuple_ptr;
 /*
  * Struct to represent a relationships.
  */
-class relationships : public xmlwriter{
+class XLSXWRITER_EXPORT relationships : public xmlwriter{
     friend class packager;
 public:
     void assemble_xml_file();

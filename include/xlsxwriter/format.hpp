@@ -417,7 +417,7 @@ class workbook;
  * @endcode
  *
  */
-class format {
+class XLSXWRITER_EXPORT format {
     friend class styles;
     friend class workbook;
 public:

@@ -57,7 +57,7 @@ namespace xlsxwriter {
 
 typedef std::list<std::pair<std::string, std::string>> xml_attribute_list;
 
-class xmlwriter {
+class XLSXWRITER_EXPORT xmlwriter {
 public:
     virtual ~xmlwriter();
 protected:

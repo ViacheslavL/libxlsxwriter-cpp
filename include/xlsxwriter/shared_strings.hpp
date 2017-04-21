@@ -26,7 +26,7 @@ namespace xlsxwriter {
  * be stored in a RB tree and also pointers to track the insertion order
  * in a separate list.
  */
-struct sst_element {
+struct XLSXWRITER_EXPORT sst_element {
     uint32_t index;
     std::string string;
 
@@ -53,7 +53,7 @@ struct sst_hash_by_string {
 /*
  * Struct to represent a sst.
  */
-class sst : public xmlwriter {
+class XLSXWRITER_EXPORT sst : public xmlwriter {
     friend class packager;
 public:
     sst_element *get_sst_index(const std::string& string);
