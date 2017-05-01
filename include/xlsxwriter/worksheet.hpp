@@ -288,7 +288,6 @@ struct XLSXWRITER_EXPORT image_options {
     xlsxwriter::chart* chart;
 };
 
-template class XLSXWRITER_EXPORT std::shared_ptr<image_options>;
 typedef std::shared_ptr<image_options> image_options_ptr;
 
 /**

@@ -2,7 +2,11 @@ os:
   - Visual Studio 2015
   - Visual Studio 2017
 
-init: []
+environment:
+  matrix:
+    - PYTHON: "C:\\Python27.10"
+      PYTHON_VERSION: "2.7.10"
+      PYTHON_ARCH: "64"
 
 install: 
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
@@ -12,6 +16,7 @@ install:
   - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .
   - nmake
   - cd ..
+  - pip install pytest
 
 build_script:
   - mkdir build
@@ -22,5 +27,5 @@ build_script:
 test_script:
   - copy C:\projects\libxlsxwriter-cpp\zlib\zlib.dll C:\projects\libxlsxwriter-cpp\build\bin\test_functional
   - cd bin\test_functional
-  - py.test . -v --exec_dir=. --data_dir=./xlsx_files
+  - python py.test . -v --exec_dir=. --data_dir=./xlsx_files
 
