@@ -20,7 +20,7 @@ build_script:
   - nmake 
 
 test_script:
-  - copy C:\projects\libxlsxwriter-cpp\zlib\zlib.dll C:\projects\libxlsxwriter-cpp\bin\test_functional
+  - copy C:\projects\libxlsxwriter-cpp\zlib\zlib.dll C:\projects\libxlsxwriter-cpp\build\bin\test_functional
   - cd bin\test_functional
   - py.test . -v --exec_dir=. --data_dir=./xlsx_files
 
