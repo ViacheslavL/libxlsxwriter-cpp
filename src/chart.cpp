@@ -1578,6 +1578,8 @@ void chart::_write_cat_axis(val_axis_args* args)
 
     _write_axis_id(args->id_1);
 
+    _write_tx_pr(&x_axis->title);
+
     /* Write the c:scaling element. */
     _write_scaling(args->x_axis);
 
