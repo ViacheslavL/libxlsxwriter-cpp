@@ -29,6 +29,7 @@ chart::chart(uint8_t type)
 {
     id = 0;
 
+    title.angle = -90;
     cross_between = 0;
 
     series_index = 0;
@@ -446,7 +447,7 @@ void chart::_write_a_body_pr(chart_title *title)
     xml_attribute_list attributes;
 
     if (title && title->is_horizontal) {
-        attributes.push_back(std::make_pair("rot", "-5400000"));
+        attributes.push_back(std::make_pair("rot", to_string(60000*title->angle)));
         attributes.push_back(std::make_pair("vert", "horz"));
     }
 
@@ -1948,6 +1949,7 @@ chart_axis::chart_axis()
 
     position = false;
     visible = false;
+    title.angle = -90;
     title.range = std::make_shared<series_range>();
 }
 

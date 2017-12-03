@@ -234,6 +234,7 @@ struct XLSXWRITER_EXPORT chart_title {
     lxw_row_t row;
     lxw_col_t col;
     chart_font font;
+    int32_t angle;
     bool off;
     bool is_horizontal;
     bool ignore_cache;
