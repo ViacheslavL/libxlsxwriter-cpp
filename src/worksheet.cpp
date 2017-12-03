@@ -1238,6 +1238,9 @@ void worksheet::_write_row(lxw_row *row, const std::string& spans)
 
     if (row->collapsed)
         attributes.push_back({"collapsed", "1"});
+	
+    if (row->level)
+        LXW_PUSH_ATTRIBUTES_INT("outlineLevel", row->level);
 
     if (!row->data_changed)
         lxw_xml_empty_tag("row", attributes);
