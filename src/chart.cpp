@@ -1351,9 +1351,14 @@ void chart::_write_lbl_offset()
  */
 void chart::_write_major_gridlines(const std::shared_ptr<chart_axis>& axis)
 {
-
     if (axis->default_major_gridlines)
         lxw_xml_empty_tag("c:majorGridlines");
+    else if (axis->major_gridlines_sp_pr)
+    {
+        lxw_xml_start_tag("c:majorGridlines");
+        _write_sp_pr(axis->major_gridlines_sp_pr);
+        lxw_xml_end_tag("c:majorGridlines");
+    }
 }
 
 /*
@@ -1946,6 +1951,7 @@ chart_axis::chart_axis()
     max_value = NAN;
     default_major_gridlines = false;
     major_tick_mark = false;
+    major_gridlines_sp_pr = nullptr;
 
     position = false;
     visible = false;

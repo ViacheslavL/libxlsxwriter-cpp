@@ -478,6 +478,8 @@ private:
     double min_value;
     double max_value;
 
+    lxw_shape_properties* major_gridlines_sp_pr;
+
     uint8_t position;
     bool visible;
 
